@@ -1,5 +1,5 @@
 {
-	"id": "com.palm.app.modeswitcher",
+	"id": "com.palm.org.e-lnx.wee.apps.modeswitcher",
 	"title": "Mode Switcher",
 	"type": "web",
 	"main": "index.html",
