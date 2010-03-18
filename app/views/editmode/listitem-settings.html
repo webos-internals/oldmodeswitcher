@@ -1,0 +1,150 @@
+<div class="palm-row multi-line no-divider">
+	<div class="palm-row-wrapper">
+
+		<div class="#{type}">
+			<div class="connection-settings">
+				<div class="palm-group">
+					<div class="palm-group-title">Connections</div>
+					<div class="palm-list">	
+						<div class='palm-row first'>
+							<div class='palm-row-wrapper'>
+								<div name="WIFISelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div name="BTSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div name="GPSSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div name="DataSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div name="PhoneSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="messaging-settings">	
+				<div class="palm-group">
+					<div class="palm-group-title">Messaging</div>
+					<div class="palm-list">	
+						<div class='palm-row first'>
+							<div class='palm-row-wrapper'>
+								<div name="IMStatusSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div name="MsgSoundSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+<!--						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Ringtone</div>
+								<div class="title right" id="Msgtone">#{messagingRingtoneName}</div>
+							</div>
+						</div>-->
+					</div>
+				</div>
+			</div>
+
+			<div class="ringer-settings">
+				<div class="palm-group">
+					<div class="palm-group-title">Ringer</div>
+					<div class="palm-list">	
+						<div class='palm-row first'>
+							<div class='palm-row-wrapper'>
+								<div name="RingerOnSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div name="RingerOffSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Ringtone</div>
+								<div class="title right" id="Ringtone">#{ringerRingtoneName}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="screen-settings">
+				<div class="palm-group">
+					<div class="palm-group-title">Screen</div>
+					<div class="palm-list">	
+						<div class='palm-row first'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Brightness</div>
+								<div class="title right">#{screenBrightnessLevel}</div>
+								
+								<div name="ScreenSlider" x-mojo-element="Slider" class="palm-slider"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div name="TimeoutSelector" x-mojo-element="ListSelector"></div>
+							</div>
+						</div>
+						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Wallpaper</div>
+								<div class="title right" id="Wallpaper">#{screenWallpaperName}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="sound-settings">
+				<div class="palm-group">
+					<div class="palm-group-title">Sounds</div>
+					<div class="palm-list">	
+						<div class='palm-row first'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Ringer</div>
+								<div class="title right">#{soundRingerVolume}</div>
+								
+								<div name="RingerSlider" x-mojo-element="Slider" class="palm-slider"></div>
+							</div>
+						</div>
+						<div class='palm-row'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>System</div>
+								<div class="title right">#{soundSystemVolume}</div>
+								
+								<div name="SystemSlider" x-mojo-element="Slider" class="palm-slider"></div>
+							</div>
+						</div>
+						<div class='palm-row last'>
+							<div class='palm-row-wrapper'>
+								<div class="label left" x-mojo-loc=''>Media</div>
+								<div class="title right">#{soundMediaVolume}</div>
+
+								<div name="MediaSlider" x-mojo-element="Slider" class="palm-slider"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div style="min-height:3px;"> </div>
+
+	</div>
+</div>
+

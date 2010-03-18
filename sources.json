@@ -1,0 +1,22 @@
+[
+    {
+			"source": "app\/assistants\/app-assistant.js"
+		},
+    {
+			"source": "app\/assistants\/stage-assistant.js"
+		},
+
+    {
+			"source": "app\/assistants\/config-assistant.js", 
+			"scenes": "config"
+		},
+    {
+			"source": "app\/assistants\/editmode-assistant.js", 
+			"scenes": "editmode"
+		},
+
+    {
+			"source": "app\/assistants\/launcher-assistant.js",
+			"scenes": "launcher"
+		},
+]

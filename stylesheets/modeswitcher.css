@@ -1,0 +1,86 @@
+.palm-page-header .header-icon.modeswitcher {
+  width: 32px;
+  height: 32px;
+  background: url(../images/header_icon.png) center center no-repeat;
+}
+
+.palm-row-wrapper > .palm-slider {
+  padding-top: 5px;
+  height: 36px;
+}
+
+.category {
+	padding: 5px 8px 5px 8px;
+}
+
+.category center {
+	color: #3c3c3c;
+	font-weight: bold;
+	padding: 5px 3px 8px 3px;
+	background: #afafa8;
+}
+
+.connection-settings {
+	display: none;
+}
+
+.messaging-settings {
+	display: none;
+}
+
+.ringer-settings {
+	display: none;
+}
+
+.screen-settings {
+	display: none;
+}
+
+.sound-settings {
+	display: none;
+}
+
+.connection .connection-settings {
+	display: block;
+}
+
+.messaging .messaging-settings {
+	display: block;
+}
+
+.ringer .ringer-settings {
+	display: block;
+}
+
+.screen .screen-settings {
+	display: block;
+}
+
+.sound .sound-settings {
+	display: block;
+}
+
+.charger-trigger {
+	display: none;
+}
+
+.timeout-trigger {
+	display: none;
+}
+
+.location-trigger {
+	display: none;
+}
+
+.charger .charger-trigger {
+	display: block;
+}
+
+.timeout .timeout-trigger {
+	display: block;
+}
+
+.location .location-trigger {
+	display: block;
+}
+
