@@ -1,6 +1,6 @@
 <div id="main">
 
-	<div id="ConfigurationView">
+	<div id="ConfigurationView" style="display:none">
 		<div style="min-height:3px;"> </div>
 
 		<div class="palm-group">
@@ -35,26 +35,49 @@
 		
 		<div style="min-height:5px;"> </div>
 		
-		<div class="palm-group">
-			<div class="palm-group-title">Automation</div>
+		<div id="ConfigurationCustom" style="display:none">
+			<div class="palm-group">
+				<div class="palm-group-title">Automation</div>
 			
-			<div class="palm-list">
-				<div class='palm-row first'>
-			 		<div class='palm-row-wrapper'>
-						<div id="StartSelector" x-mojo-element="ListSelector"></div>
+				<div class="palm-list">
+					<div class='palm-row first'>
+				 		<div class='palm-row-wrapper'>
+							<div id="StartSelector" x-mojo-element="ListSelector"></div>
+						</div>
+					</div>
+					<div class='palm-row last'>
+				 		<div class='palm-row-wrapper'>
+							<div id="CloseSelector" x-mojo-element="ListSelector"></div>
+						</div>
 					</div>
 				</div>
-				<div class='palm-row last'>
-			 		<div class='palm-row-wrapper'>
-						<div id="CloseSelector" x-mojo-element="ListSelector"></div>
+			</div>
+		</div>
+		
+		<div id="ConfigurationDefault" style="display:none">
+			<div class="palm-group">
+				<div class="palm-group-title">Misceangelous</div>
+			
+				<div class="palm-list">
+					<div class='palm-row first'>
+				 		<div class='palm-row-wrapper'>
+							<div id="StartupSelector" x-mojo-element="ListSelector"></div>
+						</div>
+					</div>
+					<div class='palm-row last'>
+				 		<div class='palm-row-wrapper'>
+							<div id="AppsSelector" x-mojo-element="ListSelector"></div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	
-	<div id="ModeSettingsView">
-		<div class="category" id="Preferences"><center>Preferences</center></div>
+	<div id="ModeSettingsView" style="display:none">
+		<div class="category" id="Preferences">
+			<center>Preferences</center>
+		</div>
 
 		<div class="palm-group">
 			<div class="palm-group-title">Behaviour</div>
@@ -70,12 +93,14 @@
 
 		<div class="category" id="Settings"><center>System Settings</center></div>
 		
+		<div style="min-height: 8px;"></div>
+		
 		<div class="palm-list">
 			<div  id="SettingsList" x-mojo-element="List"></div>
 		</div>
 	</div>
 
-	<div id="ModeAppsView">
+	<div id="ModeAppsView" style="display:none">
 		<div class="category"><center>Preferences</center></div>
 	
 		<div class="palm-group">
@@ -96,20 +121,27 @@
 		</div>
 		
 		<div class="category"><center>Applications</center></div>
-		
+
+		<div style="min-height: 8px;"></div>
+
 		<div class="palm-list">
 			<div  id="AppsList" x-mojo-element="List"></div>
 		</div>
 	</div>
 
-	<div id="ModeTriggersView">
+	<div id="ModeTriggersView" style="display:none">
 		<div class="category"><center>Preferences</center></div>
 			
 		<div class="palm-group">
 			<div class="palm-group-title">Behaviour</div>
 			
 			<div class="palm-list">
-				<div class='palm-row single'>
+				<div class='palm-row first'>
+			 		<div class='palm-row-wrapper'>
+				 		<div id="BlockSelector" x-mojo-element="ListSelector"></div>
+			 		</div>
+				</div>
+				<div class='palm-row last'>
 			 		<div class='palm-row-wrapper'>
 				 		<div id="RequiredSelector" x-mojo-element="ListSelector"></div>
 			 		</div>
@@ -118,6 +150,8 @@
 		</div>
 	
 		<div class="category"><center>Activation Triggers</center></div>
+
+		<div style="min-height: 8px;"></div>
 
 		<div class="palm-list">
 	 		<div  id="TriggersList" x-mojo-element="List"></div>

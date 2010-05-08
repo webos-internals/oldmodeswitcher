@@ -13,10 +13,12 @@ function ConfigAssistant() {
 	this.appAssistant = this.appControl.assistant;
 
 	this.config = this.appAssistant.config;
-	this.modes = this.appAssistant.modes;	
+
+	this.settings = this.appAssistant.settings;
 	
-	this.curmode = this.appAssistant.curmode;
-	this.defmode = this.appAssistant.defmode;
+	this.activated = this.config.modeSwitcher.activated;
+	
+	this.edited = new Array();
 }    
 
 ConfigAssistant.prototype.setup = function() {
@@ -34,14 +36,14 @@ ConfigAssistant.prototype.setup = function() {
 	
 	// Activated toggle button
 
-	this.modelActivatedButton = { value: this.config.activated, disabled: false };
+	this.modelActivatedButton = { value: this.config.modeSwitcher.activated, disabled: false };
 
 	this.controller.setupWidget('ActivatedButton', 
 		{falseValue: 0, falseLabel: "Off", trueValue: 1, trueLabel: "On"},
       this.modelActivatedButton);
 
-	 Mojo.Event.listen(this.controller.get('ActivatedButton'), 
-	 	Mojo.Event.propertyChange, this.handleActivatedToggle.bind(this));
+	Mojo.Event.listen(this.controller.get('ActivatedButton'), 
+		Mojo.Event.propertyChange, this.setConfigData.bind(this));
 
 	// Auto start & close timer selectors
 	
@@ -53,7 +55,7 @@ ConfigAssistant.prototype.setup = function() {
 		{label: "25 Seconds", value: 25},
 		{label: "30 Seconds", value: 30}];
 
-	this.modelStartSelector = {value: this.config.timerStart, disabled: false};
+	this.modelStartSelector = {value: this.config.modeSwitcher.timerStart, disabled: false};
 	   
 	this.controller.setupWidget("StartSelector", {
 		label: "Start Timer",
@@ -69,7 +71,7 @@ ConfigAssistant.prototype.setup = function() {
 		{label: "25 Seconds", value: 25},
 		{label: "30 Seconds", value: 30}];
 		
-	this.modelCloseSelector = {value: this.config.timerClose, disabled: false};
+	this.modelCloseSelector = {value: this.config.modeSwitcher.timerClose, disabled: false};
 	   
 	this.controller.setupWidget("CloseSelector", {
 		label: "Close Timer",
@@ -85,12 +87,12 @@ ConfigAssistant.prototype.setup = function() {
 
 	// Modes List
 	
-	this.modelModesList = {items: this.modes};
+	this.modelModesList = {items: this.config.modesConfig};
 	
 	this.controller.setupWidget("ModesList", {
 		itemTemplate: 'config/listitem-mode',
 		swipeToDelete: true,
-		autoconfirmDelete: true,
+		autoconfirmDelete: false,
 		reorderable: true},
 		this.modelModesList);
 	
@@ -125,20 +127,78 @@ ConfigAssistant.prototype.setup = function() {
 	Mojo.Event.listen(this.controller.get('DefModeButton'), Mojo.Event.tap, 
 		this.handleDefModeButtonPress.bind(this));
 	
-	// Check for need of initial setup
-	
-	if(this.defmode == null) {
+//
+// Check for need of initial default mode setup
+//
+
+	if(this.config.defaultMode == null) {
+		Mojo.Log.error("DEBUG: Mode Switcher Rerieving Settings");
+
+		this.mode = {
+			name: "Default Mode", type: "default",
+			
+			notifyMode: 1,	autoStart: 3, autoClose: 3,
+
+			miscOnStartup: 0, miscAppsMode: 0,
+			
+			settings: {mode: 0, charging: 1}, settingsList: [],
+			
+			apps: {start:0, close: 0}, appsList: [],
+			
+			triggers: {block: 0, required: 1}, triggersList: []
+		};
+
+		this.modelDefModeButton.disabled = true;
+		this.controller.modelChanged(this.modelDefModeButton, this);		
+
 		this.controller.showAlertDialog({
 			title: "Initial setup of Mode Switcher!",
-			message: "<div align='justify'>In order to use Mode Switcher you need to configure a Default Mode. "+
-						"When you press OK the Default Mode is created automatically with current system settings. " +
-						"After you are done with the configuration use back gesture to get into Mode Switcher main view.</div>",
-			choices:[{label:'Ok', value:"ok", type:'default'}],
+			message: "<div align='justify'><i>Mode Switcher</i> needs to retrieve your current system settings for " +
+						"<i>Default Mode</i>. This operation should only take few seconds to finish. You can modify " + 
+						"the <i>Default Mode</i> afterwards by clicking the '<i>Edit Default Mode</i>' button.</div>",
+			choices:[{label:'Continue', value:"ok", type:'default'}],
 			preventCancel: true,
 			allowHTMLMessage: true,
-			onChoose: function(value) {
-				this.controller.stageController.pushScene("editmode", "default");
-			}}); 
+			onChoose: function(appControl, appAssistant, value) {
+				Mojo.Log.info("Retrieving default settings from system");
+			
+				appControl.showBanner("Retrieving current system settings", {});
+
+				this.retrieveDefaultSettings(0);
+			}.bind(this, this.appControl, this.appAssistant)}); 
+	}
+}
+
+//
+
+ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
+	// Store settings from last round if returned by the extension.
+
+	if((index > 0) && (settings != undefined)) {
+		settings.type = this.settings[index - 1].id;
+		
+		this.mode.settingsList.push(settings);
+	}
+
+	if(index < this.settings.length) {
+		Mojo.Log.info("Retrieving " + this.settings[index].id + " settings");
+
+		var callback = this.retrieveDefaultSettings.bind(this, index + 1);
+
+		this.settings[index].setting.get(callback);
+	}
+	else {
+		Mojo.Log.info("Retrieving of default settings done");
+
+		this.appControl.showBanner("Retrieving system settings finished", {});
+
+		this.modelDefModeButton.disabled = false;
+
+		this.controller.modelChanged(this.modelDefModeButton, this);		
+
+		this.appAssistant.config.defaultMode = this.mode;
+		
+		this.appAssistant.saveConfigData("defaultMode");
 	}
 }
 
@@ -147,50 +207,37 @@ ConfigAssistant.prototype.setup = function() {
 ConfigAssistant.prototype.getConfigData = function() {
 	this.config = this.appAssistant.config;
 
-	this.modelActivatedButton.value = this.config.activated;
-	this.modelStartSelector.value = this.config.timerStart;
-	this.modelCloseSelector.value = this.config.timerClose;
+	this.modelActivatedButton.value = this.config.modeSwitcher.activated;
+	this.modelStartSelector.value = this.config.modeSwitcher.timerStart;
+	this.modelCloseSelector.value = this.config.modeSwitcher.timerClose;
+
+	this.modelModesList.items = this.config.modesConfig;
 
 	this.controller.modelChanged(this.modelActivatedButton, this);
 	this.controller.modelChanged(this.modelStartSelector, this);
 	this.controller.modelChanged(this.modelCloseSelector, this);
-}
-
-ConfigAssistant.prototype.setConfigData = function() {
-	this.appAssistant.config.activated = this.modelActivatedButton.value;
-	this.appAssistant.config.timerStart = this.modelStartSelector.value;
-	this.appAssistant.config.timerClose = this.modelCloseSelector.value;
-
-	this.appAssistant.saveConfigData("config");
-}
-
-//
-
-ConfigAssistant.prototype.getModesData = function() {
-	this.modes = this.appAssistant.modes;
-	
-	this.modelModesList.items = this.modes;
 
 	this.controller.modelChanged(this.modelModesList, this);
 }
 
-ConfigAssistant.prototype.setModesData = function() {
-	this.appAssistant.modes = this.modelModesList.items;
-	
-	this.appAssistant.saveConfigData("modes");
+ConfigAssistant.prototype.setConfigData = function() {
+	this.appAssistant.config.modeSwitcher.activated = this.modelActivatedButton.value;
+	this.appAssistant.config.modeSwitcher.timerStart = this.modelStartSelector.value;
+	this.appAssistant.config.modeSwitcher.timerClose = this.modelCloseSelector.value;
+
+	this.appAssistant.saveConfigData("modeSwitcher");
 }
 
 //
 
-ConfigAssistant.prototype.handleActivatedToggle = function() {
-	this.setConfigData();
-}
-
 ConfigAssistant.prototype.handleModesListTap = function(event) {
 	var index = event.model.items.indexOf(event.item);
 
-	if (index >= 0)
+	if (index >= 0) {
+		this.edited.push(this.config.modesConfig[index].name);
+
 		this.controller.stageController.pushScene("editmode", "custom", index);
+	}
 }
 
 ConfigAssistant.prototype.handleModesListReorder = function(event) {
@@ -199,13 +246,15 @@ ConfigAssistant.prototype.handleModesListReorder = function(event) {
 	this.modelModesList.items.splice(event.fromIndex,1);
 	this.modelModesList.items.splice(event.toIndex,0,tempMode);
 
-	this.setModesData();
+	this.appAssistant.modes = this.modelModesList.items;
+	this.appAssistant.saveConfigData("modesConfig");
 }
 
 ConfigAssistant.prototype.handleRemoveModeFromList = function(event) {
 	this.modelModesList.items.splice(event.index,1);
 
-	this.setModesData();
+	this.appAssistant.modes = this.modelModesList.items;
+	this.appAssistant.saveConfigData("modesConfig");
 }
 
 ConfigAssistant.prototype.handleAddModeButtonPress = function() {
@@ -213,6 +262,8 @@ ConfigAssistant.prototype.handleAddModeButtonPress = function() {
 }
 
 ConfigAssistant.prototype.handleDefModeButtonPress = function() {
+	this.edited.push("Default Mode");
+
 	this.controller.stageController.pushScene("editmode", "default", 0);
 }
 
@@ -223,6 +274,9 @@ ConfigAssistant.prototype.handleCommand = function(event) {
 	else if(event.type == Mojo.Event.command) {
 		if(event.command == "donate") {
 			window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7A4RPR9ZX3TYS&lc=FI&item_name=Mode%20Switcher%20Application&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted');
+		}
+		else if(event.command == "help") {
+			window.open('http://wee.e-lnx.org/webos/help/modeswitcher.html');
 		}
 	}
 }
@@ -235,7 +289,6 @@ ConfigAssistant.prototype.activate = function(event) {
 	 */
 
 	this.getConfigData();
-	this.getModesData();
 }
 	
 ConfigAssistant.prototype.deactivate = function(event) {
@@ -249,9 +302,20 @@ ConfigAssistant.prototype.cleanup = function(event) {
 	 * of being popped off the scene stack.
 	 */ 
 
-	var launchRequest = new Mojo.Service.Request("palm://com.palm.applicationManager", {
-		method: 'launch',
-		parameters: {"id": "com.palm.app.modeswitcher", "params": {
-			"action": "startup", "event": "reload"}} });
+	if((this.activated == 0) && (this.config.modeSwitcher.activated == 1)) {
+		this.controller.serviceRequest("palm://com.palm.applicationManager", {
+			method: 'launch', parameters: {"id": this.appAssistant.appid, "params": {
+				"action": "control", "event": "init", "modes": this.edited}} });
+	}
+	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 1)) {
+		this.controller.serviceRequest("palm://com.palm.applicationManager", {
+			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
+				"action": "control", "event": "reload", "modes": this.edited}} });
+	}
+	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 0)) {
+		this.controller.serviceRequest("palm://com.palm.applicationManager", {
+			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
+				"action": "control", "event": "shutdown", "modes": this.edited}} });
+	}
 }
 

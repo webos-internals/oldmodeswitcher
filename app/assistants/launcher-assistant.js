@@ -3,7 +3,7 @@
 */
 
 
-function LauncherAssistant(event) {
+function LauncherAssistant(event, startModes, closeMode) {
 	/* This is the creator function for your scene assistant object. It will be passed all the 
 	 * additional parameters (after the scene name) that were passed to pushScene. The reference
 	 * to the scene controller (this.controller) has not be established yet, so any initialization
@@ -13,16 +13,15 @@ function LauncherAssistant(event) {
 	this.appControl = Mojo.Controller.getAppController();
 	this.appAssistant = this.appControl.assistant;
 
+	this.appid = this.appAssistant.appid;
+
 	this.config = this.appAssistant.config;	
 
-	this.modes = this.appAssistant.launcherModes;
-	
-	this.close = this.appAssistant.launcherClose;
-
-	this.curmode = this.appAssistant.curmode;
-
 	this.event = event;
-		
+	
+	this.start = startModes;
+	this.close = closeMode;
+
 	this.modeidx = 0;
 }    
 
@@ -35,7 +34,7 @@ LauncherAssistant.prototype.setup = function() {
 	// Buttons
 	
 	if(this.event == "start") {
-		if(this.curmode)
+		if(this.config.currentMode)
 			this.modelStartButton = {label: "Switch Mode", buttonClass : 'affirmative popupbutton', disabled : false};
 		else
 			this.modelStartButton = {label: "Start Mode", buttonClass : 'affirmative popupbutton', disabled : false};
@@ -51,7 +50,7 @@ LauncherAssistant.prototype.setup = function() {
    if(this.event == "start")
 		this.modelSelectButton = {label: "Default Mode", buttonClass : 'popupbutton', disabled : false};
 	else
-		this.modelSelectButton = {label: this.curmode.name, buttonClass : 'popupbutton', disabled : true};
+		this.modelSelectButton = {label: this.config.currentMode.name, buttonClass : 'popupbutton', disabled : true};
   
    this.controller.setupWidget('SelectButton', {}, this.modelSelectButton);
 
@@ -73,26 +72,24 @@ LauncherAssistant.prototype.setup = function() {
 
 LauncherAssistant.prototype.setupStart = function() {
 	clearTimeout(this.timer);
-	this.modes = this.appAssistant.launcherModes;
-	this.close = this.appAssistant.launcherClose;
 
-	if(this.curmode)
+	if(this.config.currentMode)
 		this.modelStartButton.label = "Switch Mode";
 	else
 		this.modelStartButton.label = "Start Mode";
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
-	this.counterCancel = this.config.timerStart;
-	this.counterStart = this.config.timerStart;
+	this.counterCancel = this.config.modeSwitcher.timerStart;
+	this.counterStart = this.config.modeSwitcher.timerStart;
 
-	for(var i = 0 ; i < this.modes.length ; i++)
+	for(var i = 0 ; i < this.start.length ; i++)
 	{
-		if(this.modes[i].autoStart == 2)
+		if(this.start[i].autoStart == 2)
 		{
 			this.modeidx = i;
 
-			this.modelSelectButton.label = this.modes[i].name;
+			this.modelSelectButton.label = this.start[i].name;
 			this.controller.modelChanged(this.modelSelectButton, this);
 	
 			this.updateStartTimer();
@@ -101,7 +98,7 @@ LauncherAssistant.prototype.setupStart = function() {
 		}
 	}
 
-	this.modelSelectButton.label = this.modes[this.modeidx].name;
+	this.modelSelectButton.label = this.start[this.modeidx].name;
 	this.controller.modelChanged(this.modelSelectButton, this);
 
 	if(this.counterCancel > 0)
@@ -114,20 +111,19 @@ LauncherAssistant.prototype.setupStart = function() {
 
 LauncherAssistant.prototype.setupClose = function() {
 	clearTimeout(this.timer);
-	this.curmode = this.appAssistant.curmode;
-	
+
 	this.modelStartButton.label = "Close Mode";
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
-	this.modelSelectButton.label = this.curmode.name;
+	this.modelSelectButton.label = this.config.currentMode.name;
 	
 	this.controller.modelChanged(this.modelSelectButton, this);
 	
-	this.counterCancel = this.config.timerClose;
-	this.counterClose = this.config.timerClose;
+	this.counterCancel = this.config.modeSwitcher.timerClose;
+	this.counterClose = this.config.modeSwitcher.timerClose;
 
-	if(this.curmode.autoClose == 2)
+	if(this.config.currentMode.autoClose == 2)
 	{
 		this.updateCloseTimer();
 		
@@ -155,7 +151,7 @@ LauncherAssistant.prototype.updateCancelTimer = function() {
 
 LauncherAssistant.prototype.updateStartTimer = function() {
 	if(this.counterStart >= 0) {
-		if(this.curmode)
+		if(this.config.currentMode)
 			this.modelStartButton.label = "Switch Mode (" + this.counterStart-- + ")";
 		else
 			this.modelStartButton.label = "Start Mode (" + this.counterStart-- + ")";
@@ -189,7 +185,7 @@ LauncherAssistant.prototype.handleSelectButtonPress = function() {
 	clearTimeout(this.timer);
 
 	if(this.event == "start") {
-		if(this.curmode)
+		if(this.config.currentMode)
 			this.modelStartButton.label = "Switch Mode";
 		else
 			this.modelStartButton.label = "Start Mode";
@@ -201,10 +197,10 @@ LauncherAssistant.prototype.handleSelectButtonPress = function() {
 
 		this.modeidx++;
 	
-		if(this.modeidx == this.modes.length)
+		if(this.modeidx == this.start.length)
 			this.modeidx = 0;
 
-		this.modelSelectButton.label = this.modes[this.modeidx].name;
+		this.modelSelectButton.label = this.start[this.modeidx].name;
 		this.controller.modelChanged(this.modelSelectButton, this);
 	}
 }
@@ -212,7 +208,7 @@ LauncherAssistant.prototype.handleSelectButtonPress = function() {
 LauncherAssistant.prototype.handleCancelButtonPress = function() {
 	clearTimeout(this.timer);
 	
-	if((this.event == "start") && (this.close != null)) {
+	if((this.event == "start") && (this.close)) {
 		// FIXME: There should be some effect so user notices easily this!
 
 		this.event = "close";
@@ -244,22 +240,14 @@ LauncherAssistant.prototype.cleanup = function(event) {
 	 */    
 
 	if(this.event == "start") {
-		var launchRequest = new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: 'launch',
-			parameters: {"id": "com.palm.app.modeswitcher", "params": {
-				"action": "execute", "event": "start", "name": this.modes[this.modeidx].name}} });
+		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
+			'parameters': {'id': this.appid, 'params': {
+				'action': "execute", 'event': "start", 'name': this.start[this.modeidx].name}} });
 	}
 	else if(this.event == "close") {
-		var launchRequest = new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: 'launch',
-			parameters: {"id": "com.palm.app.modeswitcher", "params": {
-				"action": "execute", "event": "close", "name": this.curmode.name}} });
-	}
-	else {
-		var launchRequest = new Mojo.Service.Request("palm://com.palm.applicationManager", {
-			method: 'launch',
-			parameters: {"id": "com.palm.app.modeswitcher", "params": {
-				"action": "none"}} });
+		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
+			'parameters': {'id': this.appid, 'params': {
+				'action': "execute", 'event': "close", 'name': this.config.currentMode.name}} });
 	}
 }
 
