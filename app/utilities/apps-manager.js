@@ -143,8 +143,10 @@ AppsManager.prototype.handleRunningApps = function(newapps, oldapps, start, clos
 }
 
 AppsManager.prototype.launchModeApplications = function(index, retry, apps, callback) {
-	if(index >= apps.length)
-		callback();
+	if(index >= apps.length) {
+		if(callback)
+			callback();
+	}
 	else {
 		if(retry < 3) {
 			if(retry == 0) {

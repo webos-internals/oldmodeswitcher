@@ -1,43 +1,40 @@
-function BatteryTrigger(ServiceRequestWrapper) {
+function WirelessTrigger(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.batteryLevel = 0;
+	this.ssid = "none";
 	
 	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 }
 
 //
 
-BatteryTrigger.prototype.init = function(config) {
+WirelessTrigger.prototype.init = function(config) {
 	this.config = config;
 
-	this.subscribeBatteryStatus();
+	this.subscribeWirelessStatus();
 }
 
-BatteryTrigger.prototype.reload = function(modes) {
+WirelessTrigger.prototype.reload = function(modes) {
 }
 
-BatteryTrigger.prototype.shutdown = function() {
-	if(this.subscribtionBatteryStatus)
-		this.subscribtionBatteryStatus.cancel();
+WirelessTrigger.prototype.shutdown = function() {
+	if(this.subscribtionWirelessStatus)
+		this.subscribtionWirelessStatus.cancel();
 }
 
 //
 
-BatteryTrigger.prototype.check = function(config) {
-	if((this.batteryLevel <= config.batteryHigh) && 
-		(this.batteryLevel >= config.batteryLow))
-	{
+WirelessTrigger.prototype.check = function(config) {
+	if(this.ssid == config.wirelessSSID)
 		return true;
-	}
-
+	
 	return false;
 }
 
 //
 
-BatteryTrigger.prototype.execute = function(level, launchCallback) {
-	Mojo.Log.info("Battery trigger received: " + level);
+WirelessTrigger.prototype.execute = function(ssid, launchCallback) {
+	Mojo.Log.info("Wireless trigger received: " + ssid);
 
 	// Form a list of modes that the trigger involves and are valid.
 
@@ -46,7 +43,7 @@ BatteryTrigger.prototype.execute = function(level, launchCallback) {
 	var close = false;
 
 	for(var i = 0; i < this.config.currentMode.triggersList.length; i++) {
-		if(this.config.currentMode.triggersList[i].type == "battery") {
+		if(this.config.currentMode.triggersList[i].type == "wireless") {
 			close = true;
 			
 			break;
@@ -55,7 +52,7 @@ BatteryTrigger.prototype.execute = function(level, launchCallback) {
 	
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "battery") {
+			if(this.config.modesConfig[i].triggersList[j].type == "wireless") {
 				modes.push(this.config.modesConfig[i]);
 				
 				break;
@@ -68,33 +65,29 @@ BatteryTrigger.prototype.execute = function(level, launchCallback) {
 
 //
 
-BatteryTrigger.prototype.subscribeBatteryStatus = function() {
-	// Subscribe to Battery Notifications
+WirelessTrigger.prototype.subscribeWirelessStatus = function() {
+	// Subscribe to Wireless Notifications
 	
-	this.subscribtionBatteryStatus = this.service.request('palm://com.palm.bus/signal/', {
-		method: 'addmatch', parameters: {"category":"/com/palm/power","method":"batteryStatus"},
-		onSuccess: this.handleBatteryStatus.bind(this)});
-
-	// Get the Initial Value for battery status (returned as signals)
-	
-	this.requestBatteryStatus = this.service.request('palm://com.palm.power/com/palm/power/', {
-		method: 'batteryStatusQuery',});
+	this.subscribtionWirelessStatus = this.service.request('palm://com.palm.wifi/', {
+		method: 'getstatus', parameters: {"subscribe": true},
+		onSuccess: this.handleWirelessStatus.bind(this)});
 }
 
-BatteryTrigger.prototype.handleBatteryStatus = function(payload) {
-	if (payload.percent_ui != undefined) {
-		
-		//Save the Battery Level
-
-		var oldLevel = this.batteryLevel;
-		
-		this.batteryLevel = payload.percent_ui;
-		
-		if((oldLevel != this.batteryLevel) && (((this.batteryLevel % 5) == 0) || 
-			((this.batteryLevel % 5) == 1) || ((this.batteryLevel % 5) == 4))) {
+WirelessTrigger.prototype.handleWirelessStatus = function(payload) {
+	if (payload.status == 'connectionStateChanged') {
+		if(payload.networkInfo.connectState == "ipConfigured") {
+			this.ssid = payload.networkInfo.ssid;
+			
 			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
 				'parameters': {'id': this.appid, 'params': {
-					'action': "trigger", 'event': "battery", 'data': this.batteryLevel}} });
+					'action': "trigger", 'event': "wireless", 'data': this.ssid}} });
+		}
+		else if(this.ssid != "none") {
+			this.ssid = "none";
+		
+			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
+				'parameters': {'id': this.appid, 'params': {
+					'action': "trigger", 'event': "wireless", 'data': "none"}} });
 		}
 	}
 }

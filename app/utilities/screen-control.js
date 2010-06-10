@@ -39,6 +39,10 @@ ScreenControl.prototype.setMode = function(mode) {
 	this.displayMode = mode;
 	
 	this.checkDisplayBlock();
+	
+	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
+		method: 'getLockStatus', parameters: {'subscribe': true},
+		onSuccess: this.handleDisplayStatus.bind(this) });
 }
 
 //

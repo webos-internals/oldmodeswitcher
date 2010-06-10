@@ -13,7 +13,7 @@ function AppAssistant(appController) {
 	
 	this.initiated = false;
 
-//	this.modesList = new Array();
+	this.modesList = new Array();
 
 	this.settings = new Array();
 	this.triggers = new Array();
@@ -60,11 +60,15 @@ AppAssistant.prototype.setup = function() {
 	ExtTimeofdayConfig = new TimeofdayConfig(); 
 	ExtTimeofdayTrigger = new TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
 
+	ExtWirelessConfig = new WirelessConfig(); 
+	ExtWirelessTrigger = new WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
 	this.triggers.push({"id": "battery", "config": ExtBatteryConfig, "trigger": ExtBatteryTrigger});
 	this.triggers.push({"id": "charger", "config": ExtChargerConfig, "trigger": ExtChargerTrigger});
 	this.triggers.push({"id": "location", "config": ExtLocationConfig, "trigger": ExtLocationTrigger});
 	this.triggers.push({"id": "timeofday", "config": ExtTimeofdayConfig, "trigger": ExtTimeofdayTrigger});
-
+	this.triggers.push({"id": "wireless", "config": ExtWirelessConfig, "trigger": ExtWirelessTrigger});
+	
 	// Available setting group extensions.
 
 	ExtConnectionConfig = new ConnectionConfig(); 
@@ -306,24 +310,22 @@ AppAssistant.prototype.initModeSwitcher = function() {
 	for(var i = 0; i < this.triggers.length; i++)
 		this.triggers[i].trigger.init(this.config);
 	
-	// Re-start the current mode so applications will get restarted.
-	// On startup we want applications to be started so no oldmode.
-		
 	if((this.config.currentMode == null) || 
 		(this.config.defaultMode.miscOnStartup == 1) ||
 		(!this.checkModeTriggers(this.config.currentMode)))
 	{
-		this.config.currentMode = null;
+		if((this.config.currentMode == null) || 
+			(this.config.currentMode.type != "default")) 
+		{
+			this.config.currentMode = null;
 
-		this.executeStartMode("Default Mode");	
+			this.executeStartMode("Default Mode");	
+		}
+		else
+			this.modeAppsStart(null, this.config.defaultMode, false);
 	}
-	else {
-		var name = this.config.currentMode.name;
-	
-		this.config.currentMode = null;
-
-		this.executeStartMode(name);	
-	}
+	else 	
+		this.modeAppsStart(null, this.config.currentMode, false);
 }
 
 AppAssistant.prototype.reloadModeSwitcher = function(modes) {
@@ -450,9 +452,18 @@ AppAssistant.prototype.executeStartMode = function(modeName) {
 	var oldmode = this.config.currentMode;
 	var newmode = null;
 	
-//	if(oldmode)
-//		this.modesList.push(this.oldmode.name);
-
+	if(modeName == "Default Mode") {
+		this.modesList.clear();
+	}
+	else if(oldmode) {
+		for(var i = 0; i < this.modesList.length; i++) {
+			if(this.modesList[i] == oldmode.name)
+				this.modesList.splice(i--, 1);
+		}
+		
+		this.modesList.push(oldmode.name);
+	}
+	
 	if(modeName == this.config.defaultMode.name) {
 		newmode = this.config.defaultMode;
 			
@@ -497,25 +508,27 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 	var oldmode = this.config.currentMode;
 	var newmode = null;
 		
-/*	while(this.modesList.length > 0) {
-			var modeName = this.modesList.pop();
+	while(this.modesList.length > 0) {
+		modeName = this.modesList.pop();
+		
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if(this.config.modesConfig[i].name == modeName) {
+				if(this.checkModeTriggers(this.config.modesConfig[i]))
+					newmode = this.config.modesConfig[i];
 
-			for(var i = 0; i < this.modes.length; i++) {
-				if(this.modes[i].name == modeName) {
-					if(this.checkStartTriggers(this.modes[i]))
-						this.newmode = this.modes[i];
-
-					break;
-				}
-			}
-			
-			if(this.newmode != null)
 				break;
+			}
 		}
-	}*/
+		
+		if(newmode != null)
+			break;
+	}
 
-	if(newmode == null)
+	if(newmode == null) {
+		this.modesList.clear();
+		
 		newmode = this.config.defaultMode;
+	}
 	
 	// Notify about the start action if configured.
 
@@ -629,11 +642,11 @@ AppAssistant.prototype.modeChangeExecute = function(oldmode, newmode, index) {
 	else {
 		// Settings done so start the applicaitons.
 	
-		this.modeAppsStart(oldmode, newmode);
+		this.modeAppsStart(oldmode, newmode, true);
 	}
 }
 
-AppAssistant.prototype.modeAppsStart = function(oldmode, newmode) {
+AppAssistant.prototype.modeAppsStart = function(oldmode, newmode, notify) {
 	var newapps = new Array();
 	var start = 0;
 	var oldapps = new Array();
@@ -656,7 +669,10 @@ AppAssistant.prototype.modeAppsStart = function(oldmode, newmode) {
 
 	var callback = this.modeChangeDone.bind(this, oldmode, newmode);
 
-	AppsManagerWrapper.update(newapps, oldapps, start, close, callback);
+	if(notify)
+		AppsManagerWrapper.update(newapps, oldapps, start, close, callback);
+	else
+		AppsManagerWrapper.update(newapps, oldapps, start, close, null);
 }
 
 AppAssistant.prototype.modeChangeDone = function(oldmode, newmode) {

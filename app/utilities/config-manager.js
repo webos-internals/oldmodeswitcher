@@ -51,7 +51,7 @@ ConfigManager.prototype.save = function(params, target) {
 	if(this.requestSave)	
 		this.requestSave.cancel();
 				
-	this.requestSave = ServiceRequestWrapper.request('palm://com.palm.systemservice/', {
+	this.requestSave = this.service.request('palm://com.palm.systemservice/', {
 		'method': 'setPreferences', 'parameters': parameters,
 		onSuccess: function() {Mojo.Log.info("Config saved succesfully");}, 
 		onFailure: function() {Mojo.Log.error("Saving of config failed");},

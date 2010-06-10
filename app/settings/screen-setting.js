@@ -1,13 +1,13 @@
 function ScreenSetting(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 	
-	this.labels = new Array("screen params", "wallpaper");
+	this.labels = new Array("screen params", "screen config");
 }
 
 //
 
 ScreenSetting.prototype.get = function(callback) {
-	var settings = {"screenBrightnessLevel": 0, "screenTurnOffTimeout": 0, "screenWallpaperName": "", "screenWallpaperPath": ""};
+	var settings = {"screenBrightnessLevel": 0, "screenTurnOffTimeout": 0, "screenBlinkNotify": 0, "screenWallpaperName": "", "screenWallpaperPath": ""};
 	
 	this.getSystemSettings(0, 0, settings, callback);
 }
@@ -27,7 +27,7 @@ ScreenSetting.prototype.getSystemSettings = function(request, retry, settings, c
 	}
 	else if(request == 1) {
 		this.service.request('palm://com.palm.systemservice/', { method: 'getPreferences', 
-			parameters: {'subscribe':false, 'keys': ["wallpaper"]}, onComplete: completeCallback });
+			parameters: {'subscribe':false, 'keys': ["BlinkNotifications", "wallpaper"]}, onComplete: completeCallback });
 	}
 	else
 		callback(settings);
@@ -44,6 +44,11 @@ ScreenSetting.prototype.handleGetResponse = function(request, retry, settings, c
 			settings.screenTurnOffTimeout = response.timeout;
 		}
 		else if(request == 1) {
+			if(response.BlinkNotifications)
+				settings.screenBlinkNotify = 1;
+			else
+				settings.screenBlinkNotify = 0;			
+
 			settings.screenWallpaperName = response.wallpaper.wallpaperName;
 			settings.screenWallpaperPath = response.wallpaper.wallpaperFile;
 		}
@@ -81,13 +86,18 @@ ScreenSetting.prototype.setSystemSettings = function(request, retry, settings, c
 			onComplete: completeCallback });
 	}
 	else if(request == 1) {
+		if(settings.screenBlinkNotify == 1)
+			var blinkNotify = true;
+		else
+			var blinkNotify = false;
+	
 		var wallpaper = {
 			wallpaperName: settings.screenWallpaperName,
 			wallpaperFile: settings.screenWallpaperPath
 		}
 		
 		this.service.request("palm://com.palm.systemservice/", { method: 'setPreferences', 
-			parameters: {"wallpaper": wallpaper}, onComplete: completeCallback });
+			parameters: {"BlinkNotifications": blinkNotify, "wallpaper": wallpaper}, onComplete: completeCallback });
 	}
 	else
 		callback();

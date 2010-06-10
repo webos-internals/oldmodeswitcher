@@ -81,6 +81,12 @@
 	{
 		"source": "app\/triggers\/timeofday-trigger.js"
 	},
+	{
+		"source": "app\/triggers\/wireless-config.js"
+	},
+	{
+		"source": "app\/triggers\/wireless-trigger.js"
+	},
 
 	{
 		"source": "app\/utilities\/apps-manager.js"

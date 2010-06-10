@@ -17,11 +17,21 @@ ScreenConfig.prototype.setup = function(controller) {
 	controller.setupWidget("ScreenSlider", {'minValue': 0, 'maxValue': 100, 
 		'round': true, 'modelProperty': "screenBrightnessLevel"});
 
+	this.choicesBlinkSelector = [
+		{'label': "Enabled", 'value': 1},
+		{'label': "Disabled", 'value': 0}];  
+
+	controller.setupWidget("BlinkSelector", {'label': "Blink Notify", 
+		'labelPlacement': "left", 'modelProperty': "screenBlinkNotify",
+		'choices': this.choicesBlinkSelector});
+		
 	this.choicesTimeoutSelector = [
+		{'label': "15 Seconds", 'value': 15},
 		{'label': "30 Seconds", 'value': 30},
 		{'label': "1 Minute", 'value': 60},
 		{'label': "2 Minutes", 'value': 120},
-		{'label': "3 Minutes", 'value': 180}];  
+		{'label': "3 Minutes", 'value': 180},
+		{'label': "5 Minutes", 'value': 300}];  
 
 	controller.setupWidget("TimeoutSelector",	{'label': "Turn off After", 
 		'labelPlacement': "left", 'modelProperty': "screenTurnOffTimeout",
@@ -33,6 +43,7 @@ ScreenConfig.prototype.setup = function(controller) {
 ScreenConfig.prototype.load = function(config, preferences) {
 	config.push({'screenBrightnessLevel': preferences.screenBrightnessLevel,
 		'screenTurnOffTimeout': preferences.screenTurnOffTimeout, 
+		'screenBlinkNotify': preferences.screenBlinkNotify, 
 		'screenWallpaperName': preferences.screenWallpaperName, 
 		'screenWallpaperPath': preferences.screenWallpaperPath});
 }
@@ -40,6 +51,7 @@ ScreenConfig.prototype.load = function(config, preferences) {
 ScreenConfig.prototype.save = function(config, preferences) {
 	preferences.push({'screenBrightnessLevel': config.screenBrightnessLevel,
 		'screenTurnOffTimeout': config.screenTurnOffTimeout, 
+		'screenBlinkNotify': config.screenBlinkNotify, 
 		'screenWallpaperName': config.screenWallpaperName, 
 		'screenWallpaperPath': config.screenWallpaperPath});
 }
@@ -48,7 +60,7 @@ ScreenConfig.prototype.save = function(config, preferences) {
 
 ScreenConfig.prototype.append = function(config, saveCallback) {
 	config.push({'screenBrightnessLevel': "(querying)", 'screenTurnOffTimeout': "(querying)", 
-		'screenWallpaperName': "(querying)", 'screenWallpaperPath': ""});
+		'screenBlinkNotify': "(querying)", 'screenWallpaperName': "(querying)", 'screenWallpaperPath': ""});
 	
 	saveCallback();
 }
