@@ -11,6 +11,7 @@ ChargerConfig.prototype.label = function() {
 
 ChargerConfig.prototype.setup = function(controller) {
 	this.choicesChargerSelector = [
+		{'label': "No Charger", 'value': 0},
 		{'label': "Touchstone", 'value': 1},
 		{'label': "Wall Charger", 'value': 2},
 		{'label': "USB Charger", 'value': 3}];  

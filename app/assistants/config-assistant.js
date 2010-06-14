@@ -14,11 +14,17 @@ function ConfigAssistant() {
 
 	this.config = this.appAssistant.config;
 
+	this.applications = this.appAssistant.applications;
+
 	this.settings = this.appAssistant.settings;
 	
 	this.activated = this.config.modeSwitcher.activated;
 	
 	this.edited = new Array();
+
+	for(var i = 0; i < this.applications.length; i++) {
+		this.applications[i].config.init();
+	}
 }    
 
 ConfigAssistant.prototype.setup = function() {

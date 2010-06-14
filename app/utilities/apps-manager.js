@@ -40,10 +40,21 @@ AppsManager.prototype.handleRunningApps = function(newapps, oldapps, start, clos
 			var skip = false;
 			
 			// Always skip applications that would be started on newmode.
-				
+
+			for(var j = 0; j < oldapps.length; j++) {
+				if((oldapps[j].launchMode != 1) && (oldapps[j].appid == response.running[i].id)) {
+					if(oldapps[j].closeParams.length == 0)
+						skip = true;
+						
+					break;
+				}
+			}
+							
 			for(var j = 0; j < newapps.length; j++) {
-				if(newapps[j].appid == response.running[i].id) {
-					skip = true;
+				if((newapps[j].launchMode != 2) && (newapps[j].appid == response.running[i].id)) {
+					if(newapps[j].startParams.length == 0)
+						skip = true;
+						
 					break;
 				}
 			}
@@ -54,7 +65,7 @@ AppsManager.prototype.handleRunningApps = function(newapps, oldapps, start, clos
 				skip = true;
 			
 				for(var j = 0 ; j < oldapps.length; j++) {
-					if(oldapps[j].appid == response.running[i].id) {
+					if((oldapps[j].launchMode != 2) && (oldapps[j].appid == response.running[i].id)) {
 						skip = false;
 						
 						// Skip applications that were running when mode was started.
@@ -114,11 +125,39 @@ AppsManager.prototype.handleRunningApps = function(newapps, oldapps, start, clos
 			}
 		}	
 	}
+
+	if(oldapps.length > 0) {
+		for(var i = 0 ; i < oldapps.length ; i++) {
+			if(oldapps[i].launchMode == 1)
+				continue;
+		
+			var skip = false;
+
+			// Only start applications that were not running.
+
+			for(var j = 0 ; j < response.running.length ; j++) {
+				if((response.running[j].id == oldapps[i].appid) &&
+					(response.running[j].processid > 1010))
+				{
+					if(oldapps[i].closeParams.length == 0)
+						skip = true;
+					
+					break;
+				}
+			}
+		
+			if(!skip) {
+				appsForLaunch.push({"appid": oldapps[i].appid, 
+					"params": oldapps[i].closeParams});
+			}
+		}
+	}
 	
 	if(newapps.length > 0) {
-		Mojo.Log.info("Starting configured applications");
-
 		for(var i = 0 ; i < newapps.length ; i++) {
+			if(newapps[i].launchMode == 2)
+				continue;
+		
 			var skip = false;
 
 			// Only start applications that were not running.
@@ -127,17 +166,22 @@ AppsManager.prototype.handleRunningApps = function(newapps, oldapps, start, clos
 				if((response.running[j].id == newapps[i].appid) &&
 					(response.running[j].processid > 1010))
 				{
-					skip = true;
+					if(newapps[i].startParams.length == 0)
+						skip = true;
+						
 					break;
 				}
 			}
 		
 			if(!skip) {
 				appsForLaunch.push({"appid": newapps[i].appid, 
-					"params": newapps[i].params});
+					"params": newapps[i].startParams});
 			}
 		}
 	}
+	
+	if(appsForLaunch.length > 0)
+		Mojo.Log.info("Starting configured applications");
 
 	this.launchModeApplications(0, 0, appsForLaunch, callback);
 }

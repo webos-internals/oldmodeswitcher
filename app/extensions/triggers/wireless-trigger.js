@@ -1,9 +1,11 @@
 function WirelessTrigger(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.ssid = "none";
+	this.ssid = "unknown";
 	
 	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
+
+	this.timeoutTrigger = null;
 }
 
 //
@@ -26,6 +28,9 @@ WirelessTrigger.prototype.shutdown = function() {
 
 WirelessTrigger.prototype.check = function(config) {
 	if(this.ssid == config.wirelessSSID)
+		return true;
+	
+	if(this.ssid == "unknown")
 		return true;
 	
 	return false;
@@ -76,19 +81,51 @@ WirelessTrigger.prototype.subscribeWirelessStatus = function() {
 WirelessTrigger.prototype.handleWirelessStatus = function(payload) {
 	if (payload.status == 'connectionStateChanged') {
 		if(payload.networkInfo.connectState == "ipConfigured") {
-			this.ssid = payload.networkInfo.ssid;
-			
-			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': this.appid, 'params': {
-					'action': "trigger", 'event': "wireless", 'data': this.ssid}} });
+			this.handleWirelessEvent(payload.networkInfo.ssid);
 		}
 		else if(this.ssid != "none") {
-			this.ssid = "none";
-		
-			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': this.appid, 'params': {
-					'action': "trigger", 'event': "wireless", 'data': "none"}} });
+			this.handleWirelessEvent("none");
 		}
+	}
+}
+
+WirelessTrigger.prototype.handleChargerEvent = function(ssid) {
+
+	// Delay disconnect event so that if connected right back the event is not generated.
+
+	var timeout = 0;
+
+	if(this.timeoutTrigger)
+		clearTimeout(this.timeoutTrigger);
+
+	if((ssid == "none") && (this.ssid != "none")) {
+		for(var i = 0; i < this.config.currentMode.triggersList.length; i++) {
+			if(this.config.currentMode.triggersList[i].type == "wireless") {
+				if(this.config.currentMode.triggersList[i].wirelessSSID == this.ssid) {
+					timeout = this.config.currentMode.triggersList[i].wirelessDelay * 1000;
+					break;
+				}
+			}		
+		}
+	}
+	
+	this.timeoutTrigger = setTimeout(this.handleWirelessTrigger.bind(this, ssid), timeout);
+}
+
+ChargerTrigger.prototype.handleWirelessTrigger = function(ssid) {
+	if(ssid != "none") {
+		this.ssid = ssid;
+			
+		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
+			'parameters': {'id': this.appid, 'params': {
+				'action': "trigger", 'event': "wireless", 'data': this.ssid}} });
+	}
+	else {
+		this.ssid = "none";
+		
+		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
+			'parameters': {'id': this.appid, 'params': {
+				'action': "trigger", 'event': "wireless", 'data': "none"}} });
 	}
 }
 

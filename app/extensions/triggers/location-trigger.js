@@ -5,7 +5,7 @@ function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotif
 	
 	this.notifier = SystemNotifierWrapper;
 	
-	this.previous = false;
+	this.previous = true;
 	
 	this.latitude = 0;
 	this.longitude = 0;

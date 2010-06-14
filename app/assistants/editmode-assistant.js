@@ -14,6 +14,8 @@ function EditmodeAssistant(type, modeidx) {
 
 	this.config = this.appAssistant.config;
 
+	this.applications = this.appAssistant.applications;
+
 	this.settings = this.appAssistant.settings;
 
 	this.triggers = this.appAssistant.triggers;
@@ -232,7 +234,7 @@ EditmodeAssistant.prototype.setup = function() {
 		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
 		
 		this.controller.setupWidget(element, {
-			'itemTemplate': '../settings/' + id + '-listitem',
+			'itemTemplate': '../extensions/settings/' + id + '-listitem',
 			'swipeToDelete': true, 'autoconfirmDelete': true,
 			'reorderable': false, 'itemsProperty': id});
 	}
@@ -289,13 +291,27 @@ EditmodeAssistant.prototype.setup = function() {
 		this.setModeData.bind(this, false));
 
 	// Applications list
-	
+
 	this.modelAppsList = {'items': this.mode.appsList};
 	
 	this.controller.setupWidget("AppsList", {
-		'itemTemplate': "editmode/listitem-apps",
-		'swipeToDelete': true, 'autoconfirmDelete': true,
-		'reorderable': true}, this.modelAppsList);
+		'itemTemplate': 'editmode/listitem-apps',
+		'swipeToDelete': true, 'reorderable': true,
+		'autoconfirmDelete': true},
+		this.modelAppsList);
+
+	for(var i=0; i < this.applications.length; i++) {
+		var id = this.applications[i].id;
+		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
+		
+		this.controller.setupWidget(element, {
+			'itemTemplate': '../extensions/applications/' + id + '-listitem',
+			'swipeToDelete': false, 'autoconfirmDelete': false,
+			'reorderable': false, 'itemsProperty': id});
+	}
+
+	Mojo.Event.listen(this.controller.get("AppsList"), Mojo.Event.listTap, 
+		this.handleListTap.bind(this, "apps"));
 
 	Mojo.Event.listen(this.controller.get("AppsList"), Mojo.Event.listDelete, 
 		this.handleListDelete.bind(this, "apps"));
@@ -304,17 +320,14 @@ EditmodeAssistant.prototype.setup = function() {
 		this.handleListReorder.bind(this, "apps"));
 
 	Mojo.Event.listen(this.controller.get("AppsList"), Mojo.Event.propertyChange, 
-		this.setModeData.bind(this, false));
+		this.handleListChange.bind(this, "apps"));
 
 //
 // APPS LIST ITEM
 //
 
-	// Params text field
-
-	this.controller.setupWidget("ParamsText", {'hintText': "Launch Parameters", 
-		'multiline': false, 'focus': false, 'autoFocus': false, 'enterSubmits': false, 
-		'modelProperty': "params"});
+	for(var i = 0; i < this.applications.length; i++)
+		this.applications[i].config.setup(this.controller);
 
 //
 // TRIGGERS
@@ -364,7 +377,7 @@ EditmodeAssistant.prototype.setup = function() {
 		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
 
 		this.controller.setupWidget(element, {
-			'itemTemplate': "../triggers/" + id + "-listitem",
+			'itemTemplate': "../extensions/triggers/" + id + "-listitem",
 			'swipeToDelete': true, 'autoconfirmDelete': true,
 			'reorderable': false, 'itemsProperty': id});
 	}
@@ -389,6 +402,8 @@ EditmodeAssistant.prototype.setup = function() {
 //
 
 EditmodeAssistant.prototype.getModeData = function() {
+	var cfgIndex = 0;
+
 	if(this.type == "custom") {
 		var mode = {
 			'name': "", 'type': "custom",
@@ -415,7 +430,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 			'triggers': {'block': 0, 'required': 1}, 'triggersList': []
 		};
 	}
-	
+
 	for(var i = 0; i < this.settings.length; i++) {
 		var id = this.settings[i].id;
 		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
@@ -427,7 +442,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 
 		mode.settingsList.push(setting);
 	}
-		
+
 	if(this.type == "custom") {
 		for(var i = 0; i < this.triggers.length; i++) {
 			var id = this.triggers[i].id;
@@ -442,9 +457,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 		}
 	}
 
-	// Actual loading of the configuration.
-
-	if(this.type == "custom") {		
+	if(this.type == "custom") {
 		if(this.modeidx == undefined)
 			return mode;
 	
@@ -452,7 +465,31 @@ EditmodeAssistant.prototype.getModeData = function() {
 	}
 	else
 		var config = this.config.defaultMode;
-	
+
+	for(var i = 0; i < config.appsList.length; i++) {
+		for(var j = 0; j < this.applications.length; j++) {
+			if(this.applications[j].id == "default")
+				cfgIndex = j;
+			else if(this.applications[j].appid == config.appsList[i].appid) {
+				cfgIndex = j;
+				
+				break;
+			}
+		}
+
+		var id = this.applications[cfgIndex].id;
+		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
+
+		var setting = {};
+		
+		setting[id] = []; 
+		setting['list'] = "<div name='" + element + "' x-mojo-element='List'></div>";
+		
+		mode.appsList.push(setting);
+	}
+
+	// Actual loading of the configuration.
+
 	mode.name =  config.name;
 	mode.type =  config.type;
 						
@@ -493,10 +530,21 @@ EditmodeAssistant.prototype.getModeData = function() {
 		}
 	}
 	
-	for(var i = 0; i < config.appsList.length; i++) {
-		mode.appsList.push({'name': config.appsList[i].name, 
-			'appid': config.appsList[i].appid,
-			'params': config.appsList[i].params});
+	for(var i = 0; i < config.appsList.length; i++) {
+		for(var j = 0; j < this.applications.length; j++) {
+			if(this.applications[j].id == "default")
+				cfgIndex = j;
+			else if(this.applications[j].appid == config.appsList[i].appid) {
+				cfgIndex = j;
+				
+				break;
+			}
+		}
+			
+		var source = config.appsList[i];
+		eval("var target = mode.appsList[i]['" + this.applications[cfgIndex].id + "']");
+
+		this.applications[cfgIndex].config.load(target, source);
 	}
 
 	for(var i = 0; i < this.triggers.length; i++) {
@@ -516,6 +564,8 @@ EditmodeAssistant.prototype.getModeData = function() {
 }
 
 EditmodeAssistant.prototype.setModeData = function(refresh) {
+	var cfgIndex = 0;
+
 	if(refresh) {
 		// FIXME: hack so that the list position is not resetted.
 
@@ -603,12 +653,24 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		}
 	}
 
-	for(var i = 0; i < this.mode.appsList.length; i++) {
-		mode.appsList.push({"name": this.mode.appsList[i].name, 
-			"appid": this.mode.appsList[i].appid,
-			"params": this.mode.appsList[i].params});
-	}
+	for(var i = 0; i < this.mode.appsList.length; i++) {
+		for(var j = 0; j < this.applications.length; j++) {
+			if(eval("this.mode.appsList[i]['" + this.applications[j].id + "']") != undefined) {
+				cfgIndex = j;
+				
+				break;
+			}
+		}
+		
+		eval("var source = this.mode.appsList[i]['" + this.applications[cfgIndex].id + "'][0]");
 
+		if(source != undefined) {
+			var target = mode.appsList;
+			
+			this.applications[cfgIndex].config.save(source, target);
+		}
+	}
+	
 	if(this.type == "custom") {
 		for(var i = 0; i < this.triggers.length; i++) {
 			eval('var list = this.mode.triggersList[i].' + this.triggers[i].id);
@@ -888,20 +950,37 @@ EditmodeAssistant.prototype.handleSettingsChoose = function(target) {
 }
 
 EditmodeAssistant.prototype.handleAppsChoose = function(index) {
-	if(index != undefined) {
-		if(this.launchPoints[index].params != undefined) {
-			var tmp = Object.toJSON(this.launchPoints[index].params);
-		
-			this.mode.appsList.push({'name': this.launchPoints[index].title, 
-				'appid': this.launchPoints[index].id, 'params': tmp});
-		}
-		else
-			this.mode.appsList.push({'name': this.launchPoints[index].title, 
-				'appid': this.launchPoints[index].id});
+	var cfgIndex = 0;
 
-		this.controller.sceneScroller.mojo.revealBottom();
+	if(index != undefined) {
+		for(var i = 0; i < this.applications.length; i++) {
+			if(this.applications[i].id == "default")
+				cfgIndex = i;
+			else if(this.applications[i].appid == this.launchPoints[index].id) {
+				cfgIndex = i;
+				
+				break;
+			}
+		}
 		
-		this.setModeData(true);
+		var id = this.applications[cfgIndex].id;
+		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
+
+		var setting = {};
+		
+		setting[id] = []; 
+		setting['list'] = "<div name='" + element + "' x-mojo-element='List'></div>";
+
+		this.mode.appsList.push(setting);
+		
+		this.controller.setupWidget(element, {
+			'itemTemplate': '../extensions/applications/' + id + '-listitem',
+			'swipeToDelete': false, 'autoconfirmDelete': false,
+			'reorderable': false, 'itemsProperty': id});
+
+		eval("var list = this.mode.appsList[this.mode.appsList.length - 1]['" + this.applications[cfgIndex].id + "']");
+		
+		this.applications[cfgIndex].config.append(list, this.launchPoints[index], this.setModeData.bind(this, true));
 	}
 }
 
@@ -966,6 +1045,9 @@ EditmodeAssistant.prototype.handleListChange = function(list, event) {
 					}
 				}
 			}
+			else if(list == "apps") {
+				this.setModeData(false);
+			}
 			else if(list == "triggers") {
 				for(var i = 0; i < this.triggers.length; i++) {
 					if(event.model.type == this.triggers[i].id) {
@@ -1007,7 +1089,18 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 		}
 	}
 	else if(list == "apps") {
-		this.mode.appsList.splice(event.index,1);
+		for(var i = 0; i < this.applications.length; i++) {
+			if(eval("event.model.items[event.index]['" + this.applications[i].id + "']") != undefined) {
+				eval("var list = this.mode.appsList[event.index]['" + this.applications[i].id + "']");
+				
+				this.applications[i].config.remove(list, 0, 
+					this.setModeData.bind(this, true));
+
+				this.mode.appsList.splice(event.index,1);
+		
+				break;
+			}
+		}
 	}
 	else if(list == "triggers") {
 		for(var i = 0; i < this.triggers.length; i++) {

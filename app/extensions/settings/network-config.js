@@ -28,15 +28,15 @@ NetworkConfig.prototype.setup = function(controller) {
 	controller.setupWidget("DataRoamingSelector", {'label': "Data Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkData",
 		'choices': this.choicesDataRoamingSelector});
-/*		
+
 	this.choicesVoiceRoamingSelector = [
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Automatic", 'value': 1},
+		{'label': "Home Only", 'value': 2},
+		{'label': "Roam Only", 'value': 3}];  
 
 	controller.setupWidget("VoiceRoamingSelector", {'label': "Voice Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkVoice",
 		'choices': this.choicesVoiceRoamingSelector});
-		*/
 }
 
 //
@@ -57,9 +57,7 @@ NetworkConfig.prototype.save = function(config, preferences) {
 
 NetworkConfig.prototype.append = function(config, saveCallback) {
 	config.push({'networkType': "(querying)", 'networkData': "(querying)", 
-		'networkVoice': 0});
-	
-// FIXME: muuta 0 querying kun tuki voice roamingille!
+		'networkVoice': "(querying)"});
 	
 	saveCallback();
 }

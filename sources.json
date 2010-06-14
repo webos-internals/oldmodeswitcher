@@ -21,71 +21,99 @@
 	},
 
 	{
-		"source": "app\/settings\/connection-config.js"
+		"source": "app\/extensions/applications\/default-config.js"
 	},
 	{
-		"source": "app\/settings\/connection-setting.js"
+		"source": "app\/extensions/applications\/browser-config.js"
 	},
 	{
-		"source": "app\/settings\/messaging-config.js"
+		"source": "app\/extensions/applications\/govnah-config.js"
 	},
 	{
-		"source": "app\/settings\/messaging-setting.js"
+		"source": "app\/extensions/applications\/phone-config.js"
 	},
 	{
-		"source": "app\/settings\/network-config.js"
-	},
-	{
-		"source": "app\/settings\/network-setting.js"
-	},
-	{
-		"source": "app\/settings\/ringtone-config.js"
-	},
-	{
-		"source": "app\/settings\/ringtone-setting.js"
-	},
-	{
-		"source": "app\/settings\/screen-config.js"
-	},
-	{
-		"source": "app\/settings\/screen-setting.js"
-	},
-	{
-		"source": "app\/settings\/sound-config.js"
-	},
-	{
-		"source": "app\/settings\/sound-setting.js"
+		"source": "app\/extensions/applications\/wwindow-config.js"
 	},
 
 	{
-		"source": "app\/triggers\/battery-config.js"
+		"source": "app\/extensions/settings\/airplane-config.js"
 	},
 	{
-		"source": "app\/triggers\/battery-trigger.js"
+		"source": "app\/extensions/settings\/airplane-setting.js"
 	},
 	{
-		"source": "app\/triggers\/charger-config.js"
+		"source": "app\/extensions/settings\/connection-config.js"
 	},
 	{
-		"source": "app\/triggers\/charger-trigger.js"
+		"source": "app\/extensions/settings\/connection-setting.js"
 	},
 	{
-		"source": "app\/triggers\/location-config.js"
+		"source": "app\/extensions/settings\/messaging-config.js"
 	},
 	{
-		"source": "app\/triggers\/location-trigger.js"
+		"source": "app\/extensions/settings\/messaging-setting.js"
 	},
 	{
-		"source": "app\/triggers\/timeofday-config.js"
+		"source": "app\/extensions/settings\/network-config.js"
 	},
 	{
-		"source": "app\/triggers\/timeofday-trigger.js"
+		"source": "app\/extensions/settings\/network-setting.js"
 	},
 	{
-		"source": "app\/triggers\/wireless-config.js"
+		"source": "app\/extensions/settings\/ringtone-config.js"
 	},
 	{
-		"source": "app\/triggers\/wireless-trigger.js"
+		"source": "app\/extensions/settings\/ringtone-setting.js"
+	},
+	{
+		"source": "app\/extensions/settings\/screen-config.js"
+	},
+	{
+		"source": "app\/extensions/settings\/screen-setting.js"
+	},
+	{
+		"source": "app\/extensions/settings\/sound-config.js"
+	},
+	{
+		"source": "app\/extensions/settings\/sound-setting.js"
+	},
+
+	{
+		"source": "app\/extensions/triggers\/battery-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/battery-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/btprofile-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/btprofile-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/charger-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/charger-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/location-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/location-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/timeofday-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/timeofday-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/wireless-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/wireless-trigger.js"
 	},
 
 	{

@@ -13,6 +13,31 @@ ConnectionSetting.prototype.get = function(callback) {
 }
 
 ConnectionSetting.prototype.set = function(settings, callback) {
+	var current = {"connectionWiFi": 0, "connectionBT": 0, "connectionGPS": 0, "connectionData": 0, "connectionPhone": 0};
+	
+	this.getSystemSettings(0, 0, current, this.apply.bind(this, current, settings, callback));
+}
+
+//
+
+ConnectionSetting.prototype.apply = function(current, requested, callback) {
+	var settings = {"connectionWiFi": undefined, "connectionBT": undefined, "connectionGPS": undefined, "connectionData": undefined, "connectionPhone": undefined};
+
+	if(current.connectionWiFi != requested.connectionWiFi)
+		settings.connectionWiFi = requested.connectionWiFi;
+		
+	if(current.connectionBT != requested.connectionBT)
+		settings.connectionBT = requested.connectionBT;
+
+	if(current.connectionGPS != requested.connectionGPS)
+		settings.connectionGPS = requested.connectionGPS;
+
+	if(current.connectionData != requested.connectionData)
+		settings.connectionData = requested.connectionData;
+
+	if(current.connectionPhone != requested.connectionPhone)
+		settings.connectionPhone = requested.connectionPhone;
+
 	this.setSystemSettings(0, 0, settings, callback);
 }
 
@@ -104,53 +129,73 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
 	
 	if(request == 0) {
-		if(settings.connectionWiFi == 1)
-			var wifiState = "enabled";
-		else
-			var wifiState = "disabled";
+		if(settings.connectionWiFi == undefined)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.connectionWiFi == 1)
+				var wifiState = "enabled";
+			else
+				var wifiState = "disabled";
 		
-		this.service.request('palm://com.palm.wifi/', { method: 'setstate', 
-			parameters: {'state': wifiState}, onComplete: completeCallback });
+			this.service.request('palm://com.palm.wifi/', { method: 'setstate', 
+				parameters: {'state': wifiState}, onComplete: completeCallback });
+		}
 	}
 	else if(request == 1) {
-		if(settings.connectionBT == 1) {
-			var btmethod = "radioon";
-			var btstates = true;
-		}
+		if(settings.connectionBT == undefined)
+			this.setSystemSettings(++request, 0, settings, callback);
 		else {
-			var btmethod = "radiooff";
-			var btstates = false;
-		}
+			if(settings.connectionBT == 1) {
+				var btmethod = "radioon";
+				var btstates = true;
+			}
+			else {
+				var btmethod = "radiooff";
+				var btstates = false;
+			}
 		
-		this.service.request('palm://com.palm.btmonitor/monitor/', { method: btmethod, 
-			parameters: {'visible': btstates, 'connectable': btstates}, onComplete: completeCallback });
+			this.service.request('palm://com.palm.btmonitor/monitor/', { method: btmethod, 
+				parameters: {'visible': btstates, 'connectable': btstates}, onComplete: completeCallback });
+		}
 	}
 	else if(request == 2) {
-		if(settings.connectionGPS == 1)
-			var useGps = true;
-		else
-			var useGps = false;
+		if(settings.connectionGPS == undefined)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.connectionGPS == 1)
+				var useGps = true;
+			else
+				var useGps = false;
 		
-		this.service.request('palm://com.palm.location/', { method: 'setUseGps', 
-			parameters: {"useGps": useGps}, onComplete: completeCallback });
+			this.service.request('palm://com.palm.location/', { method: 'setUseGps', 
+				parameters: {"useGps": useGps}, onComplete: completeCallback });
+		}
 	}
 	else if(request == 3) {
-		if(settings.connectionData == 1)
-			var disabled = "off";
-		else
-			var disabled = "on";
+		if(settings.connectionData == undefined)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.connectionData == 1)
+				var disabled = "off";
+			else
+				var disabled = "on";
 		
-		this.service.request('palm://com.palm.wan/', { method: 'set',
-			parameters: {"disablewan": disabled}, onComplete: completeCallback });
+			this.service.request('palm://com.palm.wan/', { method: 'set',
+				parameters: {"disablewan": disabled}, onComplete: completeCallback });
+		}
 	}
 	else if(request == 4) {
-		if(settings.connectionPhone == 1)
-			var state = "on";
-		else
-			var state = "off";
+		if(settings.connectionPhone == undefined)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.connectionPhone == 1)
+				var state = "on";
+			else
+				var state = "off";
 		
-		this.service.request('palm://com.palm.telephony', { method: 'powerSet', 
-			parameters: {"state": state}, onComplete: completeCallback });
+			this.service.request('palm://com.palm.telephony', { method: 'powerSet', 
+				parameters: {"state": state}, onComplete: completeCallback });
+		}
 	}
 	else
 		callback();

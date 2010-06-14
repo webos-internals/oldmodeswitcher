@@ -29,12 +29,10 @@ NetworkSetting.prototype.getSystemSettings = function(request, retry, settings, 
 		this.service.request("palm://com.palm.preferences/appProperties/", { method: 'Get', 
 			parameters: {'appId': "com.palm.wan", 'key': "roamguard"}, onComplete: completeCallback });
 	}
-	/*
 	else if(request == 2) {
 		this.service.request("palm://com.palm.telephony/", { method: 'roamModeQuery', 
 			parameters: {'subscribe':false}, onComplete: completeCallback });
 	}
-	*/
 	else
 		callback(settings);
 }
@@ -59,8 +57,18 @@ NetworkSetting.prototype.handleGetResponse = function(request, retry, settings, 
 			else
 				settings.networkData = 0;
 		}
-//		else if(request == 2) {
-//		}		
+		else if(request == 2) {
+			if(!response.extended)
+				settings.networkVoice = 1;
+			else {
+				if(response.extended.band == "homeonly")
+					settings.networkVoice = 1;
+				if(response.extended.band == "roamonly")
+					settings.networkVoice = 2;
+				else
+					settings.networkVoice = 1;
+			}
+		}		
 		
 		this.getSystemSettings(++request, 0, settings, callback);
 	}
@@ -105,8 +113,18 @@ NetworkSetting.prototype.setSystemSettings = function(request, retry, settings, 
 		this.service.request('palm://com.palm.wan/', { method: 'set', 
 			parameters: {'roamguard': roamguard}, onComplete: completeCallback });
 	}
-//	else if(request == 2) {
-//	}
+	else if(request == 2) {
+		if(settings.networkVoice == 2)
+			var roamguard = "homeonly";
+		else if(settings.networkVoice == 3)
+			var roamguard = "roamonly";
+		else
+			var roammode = "any";
+			
+		this.service-request('palm://com.palm.telephony', {
+			method: 'roamModeSet', parameters: {mode: roammode,
+			client: Mojo.appName} });
+	}
 	else
 		callback();
 }

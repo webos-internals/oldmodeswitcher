@@ -15,6 +15,7 @@ function AppAssistant(appController) {
 
 	this.modesList = new Array();
 
+	this.applications = new Array();
 	this.settings = new Array();
 	this.triggers = new Array();
 
@@ -46,33 +47,27 @@ AppAssistant.prototype.setup = function() {
 	
 	this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;	
 
-	// Available trigger extensions.
+	// Available applications extensions.
 
-	ExtBatteryConfig = new BatteryConfig(); 
-	ExtBatteryTrigger = new BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtChargerConfig = new ChargerConfig(); 
-	ExtChargerTrigger = new ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-	 
-	ExtLocationConfig = new LocationConfig(); 
-	ExtLocationTrigger = new LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtTimeofdayConfig = new TimeofdayConfig(); 
-	ExtTimeofdayTrigger = new TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtWirelessConfig = new WirelessConfig(); 
-	ExtWirelessTrigger = new WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	this.triggers.push({"id": "battery", "config": ExtBatteryConfig, "trigger": ExtBatteryTrigger});
-	this.triggers.push({"id": "charger", "config": ExtChargerConfig, "trigger": ExtChargerTrigger});
-	this.triggers.push({"id": "location", "config": ExtLocationConfig, "trigger": ExtLocationTrigger});
-	this.triggers.push({"id": "timeofday", "config": ExtTimeofdayConfig, "trigger": ExtTimeofdayTrigger});
-	this.triggers.push({"id": "wireless", "config": ExtWirelessConfig, "trigger": ExtWirelessTrigger});
-	
+	ExtDefaultConfig = new DefaultConfig(ServiceRequestWrapper); 
+	ExtBrowserConfig = new BrowserConfig(ServiceRequestWrapper); 
+	ExtGovnahConfig = new GovnahConfig(ServiceRequestWrapper);
+	ExtPhoneConfig = new PhoneConfig(ServiceRequestWrapper);  
+	ExtWWindowConfig = new WWindowConfig(ServiceRequestWrapper);
+		
+	this.applications.push({"id": "default", "appid": "default", "config": ExtDefaultConfig});
+	this.applications.push({"id": "browser", "appid": "com.palm.app.browser", "config": ExtBrowserConfig});
+	this.applications.push({"id": "govnah", "appid": "org.webosinternals.govnah", "config": ExtGovnahConfig});
+	this.applications.push({"id": "phone", "appid": "com.palm.app.phone", "config": ExtPhoneConfig});
+	this.applications.push({"id": "wwindow", "appid": "com.hiddenworldhut.weatherwindow", "config": ExtWWindowConfig});
+		
 	// Available setting group extensions.
 
 	ExtConnectionConfig = new ConnectionConfig(); 
 	ExtConnectionSetting = new ConnectionSetting(ServiceRequestWrapper); 
+
+	ExtAirplaneConfig = new AirplaneConfig(); 
+	ExtAirplaneSetting = new AirplaneSetting(ServiceRequestWrapper);
 	
 	ExtMessagingConfig = new MessagingConfig(); 
 	ExtMessagingSetting = new MessagingSetting(ServiceRequestWrapper);
@@ -89,12 +84,40 @@ AppAssistant.prototype.setup = function() {
 	ExtSoundConfig = new SoundConfig(); 
 	ExtSoundSetting = new SoundSetting(ServiceRequestWrapper);
 			
+	this.settings.push({"id": "airplane", "config": ExtAirplaneConfig, "setting": ExtAirplaneSetting});
 	this.settings.push({"id": "connection", "config": ExtConnectionConfig, "setting": ExtConnectionSetting});
 	this.settings.push({"id": "messaging", "config": ExtMessagingConfig, "setting": ExtMessagingSetting});
 	this.settings.push({"id": "network", "config": ExtNetworkConfig, "setting": ExtNetworkSetting});
 	this.settings.push({"id": "ringtone", "config": ExtRingtoneConfig, "setting": ExtRingtoneSetting});
 	this.settings.push({"id": "screen", "config": ExtScreenConfig, "setting": ExtScreenSetting});
 	this.settings.push({"id": "sound", "config": ExtSoundConfig, "setting": ExtSoundSetting});
+
+	// Available trigger extensions.
+
+	ExtBatteryConfig = new BatteryConfig(); 
+	ExtBatteryTrigger = new BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
+	ExtBTProfileConfig = new BTProfileConfig(); 
+	ExtBTProfileTrigger = new BTProfileTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
+	ExtChargerConfig = new ChargerConfig(); 
+	ExtChargerTrigger = new ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+	 
+	ExtLocationConfig = new LocationConfig(); 
+	ExtLocationTrigger = new LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
+	ExtTimeofdayConfig = new TimeofdayConfig(); 
+	ExtTimeofdayTrigger = new TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
+	ExtWirelessConfig = new WirelessConfig(); 
+	ExtWirelessTrigger = new WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
+
+	this.triggers.push({"id": "battery", "config": ExtBatteryConfig, "trigger": ExtBatteryTrigger});
+	this.triggers.push({"id": "btprofile", "config": ExtBTProfileConfig, "trigger": ExtBTProfileTrigger});
+	this.triggers.push({"id": "charger", "config": ExtChargerConfig, "trigger": ExtChargerTrigger});
+	this.triggers.push({"id": "location", "config": ExtLocationConfig, "trigger": ExtLocationTrigger});
+	this.triggers.push({"id": "timeofday", "config": ExtTimeofdayConfig, "trigger": ExtTimeofdayTrigger});
+	this.triggers.push({"id": "wireless", "config": ExtWirelessConfig, "trigger": ExtWirelessTrigger});
 }
 
 AppAssistant.prototype.cleanup = function() {
@@ -198,6 +221,12 @@ AppAssistant.prototype.executeLaunch = function(params) {
 					this.triggers[i].trigger.execute(data, callback);
 					break;
 				}
+			}
+		}
+		
+		else if(params.type != undefined) {
+			for(var i = 0; i < this.applications.length; i++) {
+				this.applications[i].config.data(params);
 			}
 		}
 	}
