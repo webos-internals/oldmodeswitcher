@@ -43,7 +43,7 @@ AppAssistant.prototype.setup = function() {
 	
 	// Default configuration.
 		
-	this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 1}; 
+	this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 2}; 
 	
 	this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;	
 
@@ -308,9 +308,67 @@ AppAssistant.prototype.updateConfigData = function(params, callback, payload) {
 	{
 		Mojo.Log.error("DEBUG: Mode Switcher Resetting Old Config");
 
-		this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 1}; 
+		this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 2}; 
 			
 		this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;
+	}
+	
+	if(this.config.modeSwitcher.cfgVersion <= 1) {
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			for(var j = 0; j < this.config.modesConfig[i].appsList.length; j++) {
+				if(this.config.modesConfig[i].appsList[j].launchMode == undefined) {
+					if(this.config.modesConfig[i].appsList[j].appid == "org.webosinternals.govnah")
+						this.config.modesConfig[i].appsList[j].launchMode = 0;
+					else
+						this.config.modesConfig[i].appsList[j].launchMode = 1;
+					this.config.modesConfig[i].appsList[j].startParams = "";
+					this.config.modesConfig[i].appsList[j].closeParams = "";
+				}
+			}
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].type == "wireless") {
+					this.config.modesConfig[i].triggersList[j].wirelessDelay = 0;
+				}
+			}
+		}
+
+		for(var j = 0; j < this.config.currentMode.appsList.length; j++) {
+			if(this.config.currentMode.appsList[j].launchMode == undefined) {
+				if(this.config.currentMode.appsList[j].appid == "org.webosinternals.govnah")
+					this.config.currentMode.appsList[j].launchMode = 0;
+				else
+					this.config.currentMode.appsList[j].launchMode = 1;
+
+				this.config.currentMode.appsList[j].startParams = "";
+				this.config.currentMode.appsList[j].closeParams = "";
+			}
+		}
+		for(var j = 0; j < this.config.currentMode.triggersList.length; j++) {
+			if(this.config.currentMode.triggersList[j].type == "wireless") {
+				this.config.currentMode.triggersList[j].wirelessDelay = 0;
+			}
+		}
+
+		for(var j = 0; j < this.config.currentMode.appsList.length; j++) 
+		{
+			if(this.config.defaultMode.appsList[j].launchMode == undefined) {
+				if(this.config.defaultMode.appsList[j].appid == "org.webosinternals.govnah")
+					this.config.defaultMode.appsList[j].launchMode = 0;
+				else
+					this.config.defaultMode.appsList[j].launchMode = 1;
+	
+				this.config.defaultMode.appsList[j].launchMode = 1;
+				this.config.defaultMode.appsList[j].startParams = "";
+				this.config.defaultMode.appsList[j].closeParams = "";
+			}
+		}
+		for(var j = 0; j < this.config.defaultMode.triggersList.length; j++) {
+			if(this.config.defaultMode.triggersList[j].type == "wireless") {
+				this.config.defaultMode.triggersList[j].wirelessDelay = 0;
+			}
+		}
+
+		this.config.modeSwitcher.cfgVersion = 2;
 	}
 
 	// Allow normal operation after configuration is loaded.
