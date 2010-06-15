@@ -30,6 +30,9 @@
 		"source": "app\/extensions/applications\/govnah-config.js"
 	},
 	{
+		"source": "app\/extensions/applications\/modesw-config.js"
+	},
+	{
 		"source": "app\/extensions/applications\/phone-config.js"
 	},
 	{

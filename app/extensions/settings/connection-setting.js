@@ -21,7 +21,7 @@ ConnectionSetting.prototype.set = function(settings, callback) {
 //
 
 ConnectionSetting.prototype.apply = function(current, requested, callback) {
-	var settings = {"connectionWiFi": undefined, "connectionBT": undefined, "connectionGPS": undefined, "connectionData": undefined, "connectionPhone": undefined};
+	var settings = {"connectionWiFi": 0, "connectionBT": 0, "connectionGPS": 0, "connectionData": 0, "connectionPhone": 0};
 
 	if(current.connectionWiFi != requested.connectionWiFi)
 		settings.connectionWiFi = requested.connectionWiFi;
@@ -76,33 +76,33 @@ ConnectionSetting.prototype.handleGetResponse = function(request, retry, setting
 		
 		if(request == 0) {
 			if (response.status == 'serviceDisabled')
-				settings.connectionWiFi = 0;
+				settings.connectionWiFi = 2;
 			else
 				settings.connectionWiFi = 1;
 		}
 		else if(request == 1) {
 			if((response.radio == "turningoff") || (response.radio == "off"))
-				settings.connectionBT = 0;
+				settings.connectionBT = 2;
 			else
 				settings.connectionBT = 1;
 		}
 		else if(request == 2) {
 			if(response.useGps == true)
 				settings.connectionGPS = 1;
-			else
-				settings.connectionGPS = 0;
+			else if(response.useGps == false)
+				settings.connectionGPS = 2;
 		}
 		else if(request == 3) {
 			if(response.wan.state == "connected")
 				settings.connectionData = 1;
 			else if(response.wan.state == "disconnected")
-				settings.connectionData = 0;
+				settings.connectionData = 2;
 		}
 		else if(request == 4) {
 			if((response.extended.powerState) && (response.extended.powerState == 'on'))
 				settings.connectionPhone = 1;
-			else
-				settings.connectionPhone = 0;
+			else if((response.extended.powerState) && (response.extended.powerState == 'off'))
+				settings.connectionPhone = 2;
 		}
 		
 		this.getSystemSettings(++request, 0, settings, callback);
@@ -129,7 +129,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
 	
 	if(request == 0) {
-		if(settings.connectionWiFi == undefined)
+		if(settings.connectionWiFi == 0)
 			this.setSystemSettings(++request, 0, settings, callback);
 		else {
 			if(settings.connectionWiFi == 1)
@@ -142,7 +142,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 		}
 	}
 	else if(request == 1) {
-		if(settings.connectionBT == undefined)
+		if(settings.connectionBT == 0)
 			this.setSystemSettings(++request, 0, settings, callback);
 		else {
 			if(settings.connectionBT == 1) {
@@ -159,7 +159,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 		}
 	}
 	else if(request == 2) {
-		if(settings.connectionGPS == undefined)
+		if(settings.connectionGPS == 0)
 			this.setSystemSettings(++request, 0, settings, callback);
 		else {
 			if(settings.connectionGPS == 1)
@@ -172,7 +172,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 		}
 	}
 	else if(request == 3) {
-		if(settings.connectionData == undefined)
+		if(settings.connectionData == 0)
 			this.setSystemSettings(++request, 0, settings, callback);
 		else {
 			if(settings.connectionData == 1)
@@ -185,7 +185,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, retry, setting
 		}
 	}
 	else if(request == 4) {
-		if(settings.connectionPhone == undefined)
+		if(settings.connectionPhone == 0)
 			this.setSystemSettings(++request, 0, settings, callback);
 		else {
 			if(settings.connectionPhone == 1)

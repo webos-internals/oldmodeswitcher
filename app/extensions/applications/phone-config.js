@@ -1,4 +1,5 @@
 function PhoneConfig(ServiceRequestWrapper) {
+	this.service = ServiceRequestWrapper;
 }
 
 //
@@ -14,24 +15,24 @@ PhoneConfig.prototype.data = function(data) {
 PhoneConfig.prototype.setup = function(controller) {
 	// Mode selector
 
-	this.choicesModeSelector = [
+	this.choicesPhoneLaunchSelector = [
 		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2}];  
+		{'label': "On Mode Close", value: 2} ];  
 
-	controller.setupWidget("ModeSelector",	{'label': "Launch", 
+	controller.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
-		'choices': this.choicesModeSelector});
+		'choices': this.choicesPhoneLaunchSelector} );
 
 	// URL text field
 			
-	controller.setupWidget("NumberText", { 'hintText': "Enter phone number...", 
+	controller.setupWidget("PhoneNumberText", { 'hintText': "Enter phone number...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
-		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchNumber"});
+		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchNumber"} );
 }
 
 //
 
-PhoneConfig.prototype.load = function(config, preferences) {
+PhoneConfig.prototype.load = function(preferences) {
 	var launchNumber = "";
 	
 	if(preferences.launchMode == 1) {
@@ -44,14 +45,17 @@ PhoneConfig.prototype.load = function(config, preferences) {
 	if(params.number != undefined)
 		launchNumber = params.number;
 		
-	config.push({'extension': "phone", 
+	var config = {
 		'name': preferences.name,
 		'appid': preferences.appid,
 		'launchMode': preferences.launchMode, 
-		'launchNumber': launchNumber});
+		'launchDelay': preferences.launchDelay, 
+		'launchNumber': launchNumber };
+	
+	return config;
 }
 
-PhoneConfig.prototype.save = function(config, preferences) {
+PhoneConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
@@ -64,26 +68,27 @@ PhoneConfig.prototype.save = function(config, preferences) {
 		}
 	}
 
-	preferences.push({'extension': "phone",
+	var preferences = {
 		'name': config.name,
 		'appid': config.appid, 
-		'launchMode': config.launchMode, 
+		'launchMode': config.launchMode,
+		'launchDelay': config.launchDelay,  
 		'startParams': startParams,
-		'closeParams': closeParams});
+		'closeParams': closeParams };
+	
+	return preferences;
 }
 
 //
 
-PhoneConfig.prototype.append = function(config, launchPoint, saveCallback) {
-	config.push({'extension': "phone", 'name': launchPoint.title, 'appid': launchPoint.id, 
-		'launchMode': 1, 'launchNumber': ""});
+PhoneConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0, 
+		'launchNumber': "" };
 	
-	saveCallback();
-}
-
-PhoneConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return config;
 }
 

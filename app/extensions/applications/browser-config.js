@@ -1,4 +1,5 @@
 function BrowserConfig(ServiceRequestWrapper) {
+	this.service = ServiceRequestWrapper;
 }
 
 //
@@ -14,24 +15,24 @@ BrowserConfig.prototype.data = function(data) {
 BrowserConfig.prototype.setup = function(controller) {
 	// Mode selector
 
-	this.choicesModeSelector = [
+	this.choicesBrowserLaunchSelector = [
 		{'label': "On Mode Start", value: 1},
 		{'label': "On Mode Close", value: 2}];  
 
-	controller.setupWidget("ModeSelector",	{'label': "Launch", 
+	controller.setupWidget("BrowserLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
-		'choices': this.choicesModeSelector});
+		'choices': this.choicesBrowserLaunchSelector});
 
 	// URL text field
 			
-	controller.setupWidget("URLText", { 'hintText': "Enter URL to load...", 
+	controller.setupWidget("BrowserURLText", { 'hintText': "Enter URL to load...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchURL"});
 }
 
 //
 
-BrowserConfig.prototype.load = function(config, preferences) {
+BrowserConfig.prototype.load = function(preferences) {
 	var launchURL = "";
 	
 	if(preferences.launchMode == 1) {
@@ -44,14 +45,17 @@ BrowserConfig.prototype.load = function(config, preferences) {
 	if(params.target != undefined)
 		launchURL = params.target;
 		
-	config.push({'extension': "browser", 
+	var config = {
 		'name': preferences.name,
 		'appid': preferences.appid,
 		'launchMode': preferences.launchMode, 
-		'launchURL': launchURL});
+		'launchDelay': preferences.launchDelay, 
+		'launchURL': launchURL };
+	
+	return config;
 }
 
-BrowserConfig.prototype.save = function(config, preferences) {
+BrowserConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
@@ -64,26 +68,27 @@ BrowserConfig.prototype.save = function(config, preferences) {
 		}
 	}
 
-	preferences.push({'extension': "browser",
+	var preferences = {
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode, 
+		'launchDelay': config.launchDelay, 
 		'startParams': startParams,
-		'closeParams': closeParams});
+		'closeParams': closeParams };
+	
+	return preferences;
 }
 
 //
 
-BrowserConfig.prototype.append = function(config, launchPoint, saveCallback) {
-	config.push({'extension': "browser", 'name': launchPoint.title, 'appid': launchPoint.id, 
-		'launchMode': 1, 'launchURL': ""});
+BrowserConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0, 
+		'launchURL': "" };
 	
-	saveCallback();
-}
-
-BrowserConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return config;
 }
 

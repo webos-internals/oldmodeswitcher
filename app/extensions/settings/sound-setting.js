@@ -7,7 +7,7 @@ function SoundSetting(ServiceRequestWrapper) {
 //
 
 SoundSetting.prototype.get = function(callback) {
-	var settings = {"soundRingerVolume": 0, "soundSystemVolume": 0, "soundMediaVolume": 0};
+	var settings = {"soundRingerVolume": 50, "soundSystemVolume": 50, "soundMediaVolume": 50};
 	
 	this.getSystemSettings(0, 0, settings, callback);
 }

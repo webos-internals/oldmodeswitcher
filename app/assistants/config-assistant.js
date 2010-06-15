@@ -181,7 +181,7 @@ ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
 	// Store settings from last round if returned by the extension.
 
 	if((index > 0) && (settings != undefined)) {
-		settings.type = this.settings[index - 1].id;
+		settings.extension = this.settings[index - 1].id;
 		
 		this.mode.settingsList.push(settings);
 	}

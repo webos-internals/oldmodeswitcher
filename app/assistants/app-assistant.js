@@ -43,7 +43,7 @@ AppAssistant.prototype.setup = function() {
 	
 	// Default configuration.
 		
-	this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 2}; 
+	this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1.0, cfgVersion: 1.1}; 
 	
 	this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;	
 
@@ -52,12 +52,14 @@ AppAssistant.prototype.setup = function() {
 	ExtDefaultConfig = new DefaultConfig(ServiceRequestWrapper); 
 	ExtBrowserConfig = new BrowserConfig(ServiceRequestWrapper); 
 	ExtGovnahConfig = new GovnahConfig(ServiceRequestWrapper);
+	ExtModeSWConfig = new ModeSWConfig(ServiceRequestWrapper);
 	ExtPhoneConfig = new PhoneConfig(ServiceRequestWrapper);  
 	ExtWWindowConfig = new WWindowConfig(ServiceRequestWrapper);
 		
 	this.applications.push({"id": "default", "appid": "default", "config": ExtDefaultConfig});
 	this.applications.push({"id": "browser", "appid": "com.palm.app.browser", "config": ExtBrowserConfig});
-	this.applications.push({"id": "govnah", "appid": "org.webosinternals.govnah", "config": ExtGovnahConfig});
+	//this.applications.push({"id": "govnah", "appid": "org.webosinternals.govnah", "config": ExtGovnahConfig});
+	this.applications.push({"id": "modesw", "appid": "com.palm.org.e-lnx.wee.apps.modeswitcher", "config": ExtModeSWConfig});
 	this.applications.push({"id": "phone", "appid": "com.palm.app.phone", "config": ExtPhoneConfig});
 	this.applications.push({"id": "wwindow", "appid": "com.hiddenworldhut.weatherwindow", "config": ExtWWindowConfig});
 		
@@ -304,73 +306,17 @@ AppAssistant.prototype.updateConfigData = function(params, callback, payload) {
 	Mojo.Log.error("DEBUG: Mode Switcher Updating Config");
 	
 	if((this.config.modeSwitcher.cfgVersion == undefined) || 
-		(this.config.modeSwitcher.cfgVersion <= 0))
+		(this.config.modeSwitcher.cfgVersion != 1.1))
 	{
 		Mojo.Log.error("DEBUG: Mode Switcher Resetting Old Config");
 
-		this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1, cfgVersion: 2}; 
+		this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1.0, cfgVersion: 1.1}; 
 			
 		this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;
+		
+		ConfigManagerWrapper.save(this.config);
 	}
 	
-	if(this.config.modeSwitcher.cfgVersion <= 1) {
-		for(var i = 0; i < this.config.modesConfig.length; i++) {
-			for(var j = 0; j < this.config.modesConfig[i].appsList.length; j++) {
-				if(this.config.modesConfig[i].appsList[j].launchMode == undefined) {
-					if(this.config.modesConfig[i].appsList[j].appid == "org.webosinternals.govnah")
-						this.config.modesConfig[i].appsList[j].launchMode = 0;
-					else
-						this.config.modesConfig[i].appsList[j].launchMode = 1;
-					this.config.modesConfig[i].appsList[j].startParams = "";
-					this.config.modesConfig[i].appsList[j].closeParams = "";
-				}
-			}
-			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-				if(this.config.modesConfig[i].triggersList[j].type == "wireless") {
-					this.config.modesConfig[i].triggersList[j].wirelessDelay = 0;
-				}
-			}
-		}
-
-		for(var j = 0; j < this.config.currentMode.appsList.length; j++) {
-			if(this.config.currentMode.appsList[j].launchMode == undefined) {
-				if(this.config.currentMode.appsList[j].appid == "org.webosinternals.govnah")
-					this.config.currentMode.appsList[j].launchMode = 0;
-				else
-					this.config.currentMode.appsList[j].launchMode = 1;
-
-				this.config.currentMode.appsList[j].startParams = "";
-				this.config.currentMode.appsList[j].closeParams = "";
-			}
-		}
-		for(var j = 0; j < this.config.currentMode.triggersList.length; j++) {
-			if(this.config.currentMode.triggersList[j].type == "wireless") {
-				this.config.currentMode.triggersList[j].wirelessDelay = 0;
-			}
-		}
-
-		for(var j = 0; j < this.config.currentMode.appsList.length; j++) 
-		{
-			if(this.config.defaultMode.appsList[j].launchMode == undefined) {
-				if(this.config.defaultMode.appsList[j].appid == "org.webosinternals.govnah")
-					this.config.defaultMode.appsList[j].launchMode = 0;
-				else
-					this.config.defaultMode.appsList[j].launchMode = 1;
-	
-				this.config.defaultMode.appsList[j].launchMode = 1;
-				this.config.defaultMode.appsList[j].startParams = "";
-				this.config.defaultMode.appsList[j].closeParams = "";
-			}
-		}
-		for(var j = 0; j < this.config.defaultMode.triggersList.length; j++) {
-			if(this.config.defaultMode.triggersList[j].type == "wireless") {
-				this.config.defaultMode.triggersList[j].wirelessDelay = 0;
-			}
-		}
-
-		this.config.modeSwitcher.cfgVersion = 2;
-	}
-
 	// Allow normal operation after configuration is loaded.
 
 	this.initiated = true;
@@ -673,7 +619,7 @@ AppAssistant.prototype.modeChangeExecute = function(oldmode, newmode, index) {
 			var mode = this.config.defaultMode;
 
 		for(var i = 0; i < mode.settingsList.length; i++) {
-			if(mode.settingsList[i].type == this.settings[index].id) {
+			if(mode.settingsList[i].extension == this.settings[index].id) {
 				
 				settings = mode.settingsList[i];
 			
@@ -691,7 +637,7 @@ AppAssistant.prototype.modeChangeExecute = function(oldmode, newmode, index) {
 	
 			if((oldmode) && (oldmode.type == "custom")) {
 				for(var i = 0; i < oldmode.settingsList.length; i++) {
-					if(oldmode.settingsList[i].type == this.settings[index].id) {
+					if(oldmode.settingsList[i].extension == this.settings[index].id) {
 						settings = oldmode.settingsList[i];
 						
 						break;
@@ -703,7 +649,7 @@ AppAssistant.prototype.modeChangeExecute = function(oldmode, newmode, index) {
 				// If config set in oldmode then execute the config resetting.
 
 				for(var i = 0; i < this.config.defaultMode.settingsList.length; i++) {
-					if(this.config.defaultMode.settingsList[i].type == this.settings[index].id) {
+					if(this.config.defaultMode.settingsList[i].extension == this.settings[index].id) {
 						Mojo.Log.info("Resetting " + this.settings[index].id + " settings");
 
 						settings = this.config.defaultMode.settingsList[i];

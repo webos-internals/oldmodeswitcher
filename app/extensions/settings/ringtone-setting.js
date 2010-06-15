@@ -7,7 +7,7 @@ function RingtoneSetting(ServiceRequestWrapper) {
 //
 
 RingtoneSetting.prototype.get = function(callback) {
-	var settings = {"ringerRingerOn": 1, "ringerRingerOff": 1, "ringerRingtoneName": "", "ringerRingtonePath": ""};
+	var settings = {"ringerRingerOn": 0, "ringerRingerOff": 0, "ringerRingtoneName": "Do Not Set*", "ringerRingtonePath": ""};
 	
 	this.getSystemSettings(0, 0, settings, callback);
 }
@@ -25,10 +25,10 @@ RingtoneSetting.prototype.getSystemSettings = function(request, retry, settings,
 		this.service.request('palm://com.palm.audio/vibrate/', { method: 'get',
 			parameters: {}, onComplete: completeCallback });
 	}
-	else if(request == 1) {
+	/*else if(request == 1) {
 		this.service.request("palm://com.palm.systemservice/", { method: 'getPreferences', 
 			parameters: {'subscribe':false, 'keys': ["ringtone"]}, onComplete: completeCallback });
-	}
+	}*/
 	else
 		callback(settings);
 }
@@ -50,10 +50,10 @@ RingtoneSetting.prototype.handleGetResponse = function(request, retry, settings,
 			else
 				settings.ringerRingerOff = 1;
 		}
-		else if(request == 1) {
+		/*else if(request == 1) {
 			settings.ringerRingtoneName = response.ringtone.name;
 			settings.ringerRingtonePath = response.ringtone.fullPath;
-		}
+		}*/
 		
 		this.getSystemSettings(++request, 0, settings, callback);
 	}
@@ -79,28 +79,36 @@ RingtoneSetting.prototype.setSystemSettings = function(request, retry, settings,
 	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
 	
 	if(request == 0) {
-		if(settings.ringerRingerOn == 1)
-			var ringerOn = true;
-		else
-			var ringerOn = false;
+		if(settings.ringerRingerOn == 0)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.ringerRingerOn == 1)
+				var ringerOn = true;
+			else
+				var ringerOn = false;
 
-		if(settings.ringerRingerOff == 1)
-			var ringerOff = true;
-		else
-			var ringerOff = false;
+			if(settings.ringerRingerOff == 1)
+				var ringerOff = true;
+			else
+				var ringerOff = false;
 
-		this.service.request('palm://com.palm.audio/vibrate/', { method: 'set', 
-			parameters: {"VibrateWhenRingerOn": ringerOn, "VibrateWhenRingerOff": ringerOff}, 
-			onComplete: completeCallback });
+			this.service.request('palm://com.palm.audio/vibrate/', { method: 'set', 
+				parameters: {"VibrateWhenRingerOn": ringerOn, "VibrateWhenRingerOff": ringerOff}, 
+				onComplete: completeCallback });
+		}
 	}
 	else if(request == 1) {
-		var ringtone = {
-			name: settings.ringerRingtoneName, 
-			fullPath: settings.ringerRingtonePath
-		};
+		if(settings.ringerRingtoneName == "Do Not Set*")
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			var ringtone = {
+				name: settings.ringerRingtoneName, 
+				fullPath: settings.ringerRingtonePath
+			};
 	
-		this.service.request("palm://com.palm.systemservice/", { method: 'setPreferences', 
-			parameters: {"ringtone": ringtone}, onComplete: completeCallback });
+			this.service.request("palm://com.palm.systemservice/", { method: 'setPreferences', 
+				parameters: {"ringtone": ringtone}, onComplete: completeCallback });
+		}
 	}
 	else
 		callback();

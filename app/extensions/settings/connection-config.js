@@ -13,40 +13,45 @@ ConnectionConfig.prototype.setup = function(controller) {
 	// Wi-Fi, Bluetooth, GPS, Data and Phone toggle selectors
 
 	this.choicesWIFISelector = [
+		{'label': "Do Not Set", value: 0},
 		{'label': "Enabled", value: 1},
-		{'label': "Disabled", value: 0}];  
+		{'label': "Disabled", value: 2}];  
 
 	controller.setupWidget("WIFISelector",	{'label': "Wi-Fi", 
 		'labelPlacement': "left", 'modelProperty': "connectionWiFi",
 		'choices': this.choicesWIFISelector});
 
 	this.choicesBTSelector = [
+		{'label': "Do Not Set", value: 0},
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Disabled", 'value': 2}];  
 
 	controller.setupWidget("BTSelector", {'label': "Bluetooth", 
 		'labelPlacement': "left", 'modelProperty': "connectionBT",
 		'choices': this.choicesBTSelector});
 
 	this.choicesGPSSelector = [
+		{'label': "Do Not Set", value: 0},
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Disabled", 'value': 2}];  
 
 	controller.setupWidget("GPSSelector",	{'label': "GPS", 
 		'labelPlacement': "left", 'modelProperty': "connectionGPS",
 		'choices': this.choicesGPSSelector});
 
 	this.choicesDataSelector = [
+		{'label': "Do Not Set", value: 0},
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Disabled", 'value': 2}];  
 
 	controller.setupWidget("DataSelector",	{'label': "Data", 
 		'labelPlacement': "left", 'modelProperty': "connectionData",
 		'choices': this.choicesDataSelector});
 
 	this.choicesPhoneSelector = [
+		{'label': "Do Not Set", value: 0},
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Disabled", 'value': 2}];  
 
 	controller.setupWidget("PhoneSelector", {'label': "Phone", 
 		'labelPlacement': "left", 'modelProperty': "connectionPhone",
@@ -55,44 +60,38 @@ ConnectionConfig.prototype.setup = function(controller) {
 
 //
 
-ConnectionConfig.prototype.load = function(config, preferences) {
-	config.push({'connectionWiFi': preferences.connectionWiFi,
+ConnectionConfig.prototype.load = function(preferences) {
+	var config = {
+		'connectionWiFi': preferences.connectionWiFi,
 		'connectionBT': preferences.connectionBT, 
 		'connectionGPS': preferences.connectionGPS, 
 		'connectionData': preferences.connectionData,
-		'connectionPhone': preferences.connectionPhone});
+		'connectionPhone': preferences.connectionPhone };
+	
+	return config;
 }
 
 ConnectionConfig.prototype.save = function(config, preferences) {
-	preferences.push({'connectionWiFi': config.connectionWiFi,
+	var preferences = {
+		'connectionWiFi': config.connectionWiFi,
 		'connectionBT': config.connectionBT, 
 		'connectionGPS': config.connectionGPS, 
 		'connectionData': config.connectionData,
-		'connectionPhone': config.connectionPhone});
-}
-
-//
-
-ConnectionConfig.prototype.append = function(config, saveCallback) {
-	config.push({'connectionWiFi': "(querying)", 'connectionBT': "(querying)", 
-		'connectionGPS': "(querying)", 'connectionData': "(querying)", 
-		'connectionPhone': "(querying)"});
+		'connectionPhone': config.connectionPhone };
 	
-	saveCallback();
-}
-
-ConnectionConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return preferences;
 }
 
 //
 
-ConnectionConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
-
-ConnectionConfig.prototype.tapped = function(config, event, saveCallback) {
+ConnectionConfig.prototype.config = function() {
+	var config = {
+		'connectionWiFi': 0, 
+		'connectionBT': 0, 
+		'connectionGPS': 0, 
+		'connectionData': 0, 
+		'connectionPhone': 0 };
+	
+	return config;
 }
 

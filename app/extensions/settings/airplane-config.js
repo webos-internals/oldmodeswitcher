@@ -1,52 +1,49 @@
 function AirplaneConfig() {
 }
 
+//
+
 AirplaneConfig.prototype.label = function() {
 	return "Airplane Settings";
 }
 
+//
+
 AirplaneConfig.prototype.setup = function(controller) {
-	this.choicesAirplaneSelector = [
+	this.choicesAirplaneModeSelector = [
+		{'label': "Do Not Set", 'value': 0},
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}
+		{'label': "Disabled", 'value': 2}
 	];  
 
-	controller.setupWidget(
-		"FlightModeSelector",
-		{
-			'label': "Flight Mode",
-			'labelPlacement': "left",
-			'modelProperty': "airplaneMode",
-			'choices': this.choicesAirplaneSelector
-		}
-	);
+	controller.setupWidget("AirplaneModeSelector", {
+		'label': "Flight Mode",	'labelPlacement': "left",
+		'modelProperty': "airplaneMode", 
+		'choices': this.choicesAirplaneModeSelector} );
 }
 
-AirplaneConfig.prototype.load = function(config, preferences){
-	config.push({'airplaneMode': preferences.airplaneMode});
-}
+//
 
-AirplaneConfig.prototype.save = function(config, preferences){
-	preferences.push({'airplaneMode': config.airplaneMode});
-}
-
-
-AirplaneConfig.prototype.append = function(config, saveCallback){
-	config.push({'airplaneMode': "(querying)"});
-	saveCallback();
-}
-
-AirplaneConfig.prototype.remove = function(config, index, saveCallback){
-	config.splice(index,1);
+AirplaneConfig.prototype.load = function(preferences) {
+	var config = {
+		'airplaneMode': preferences.airplaneMode };
 	
-	saveCallback();
+	return config;
 }
 
-AirplaneConfig.prototype.changed = function(config, event, saveCallback){
-	saveCallback();
-}
-
-AirplaneConfig.prototype.tapped = function(config, event, saveCallback){
+AirplaneConfig.prototype.save = function(config) {
+	var preferences = {
+		'airplaneMode': config.airplaneMode };
 	
+	return preferences;
+}
+
+//
+
+AirplaneConfig.prototype.config = function() {
+	var config = {
+		'airplaneMode': 0 };
+	
+	return config;
 }
 

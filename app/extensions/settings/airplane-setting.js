@@ -13,15 +13,29 @@ AirplaneSetting.prototype.get = function(callback) {
 }
 
 AirplaneSetting.prototype.set = function(settings, callback) {
+	var current = {"airplaneMode": 0};
+	
+	this.getSystemSettings(0, 0, current, this.apply.bind(this, current, settings, callback));
+}
+
+AirplaneSetting.prototype.apply = function(current, requested, callback) {
+	var settings = {"airplaneMode": 0};
+
+	if(current.airplaneMode != requested.airplaneMode)
+		settings.airplaneMode = requested.airplaneMode;
+
 	this.setSystemSettings(0, 0, settings, callback);
 }
+
+//
 
 AirplaneSetting.prototype.getSystemSettings = function(request, retry, settings, callback) {
 	var completeCallback = this.handleGetResponse.bind(this, request, retry, settings, callback);
 	
 	if(request == 0) {
-		this.service.request('palm://com.palm.systemservice', { method: 'getPreferences', 
-			parameters: {'subscribe': false}, onComplete: completeCallback });
+		this.service.request('palm://com.palm.systemservice', {method: 'getPreferences', 
+			parameters: {'subscribe': false, keys: ["airplaneMode"]}, 
+			onComplete: completeCallback} );
 	}
 	else
 		callback(settings);
@@ -32,10 +46,10 @@ AirplaneSetting.prototype.handleGetResponse = function(request, retry, settings,
 		// System request was succesfull so store the data and move to next request.
 		
 		if(request == 0) {
-			if (response.airplaneMode == true)
+			if(response.airplaneMode == true)
 				settings.airplaneMode = 1;
-			else
-				settings.airplaneMode = 0;
+			else if(response.airplaneMode == false)
+				settings.airplaneMode = 2;
 		}
 		
 		this.getSystemSettings(++request, 0, settings, callback);
@@ -60,16 +74,17 @@ AirplaneSetting.prototype.setSystemSettings = function(request, retry, settings,
 	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
 	
 	if(request == 0) {
-		if(settings.airplaneMode == 1)
-			var mode = true;
-		else if(settings.airplaneMode == 2)
-			var mode = false;
+		if(settings.airplaneMode == 0)
+			this.setSystemSettings(++request, 0, settings, callback);
+		else {
+			if(settings.airplaneMode == 1)
+				var mode = true;
+			else if(settings.airplaneMode == 2)
+				var mode = false;
 				
-		this.service.request('palm://com.palm.systemservice', {
-		    method: 'setPreferences',
-		    parameters: {"airplaneMode": mode},
-		    onSuccess: completeCallback
-		});		
+			this.service.request('palm://com.palm.systemservice', {method: 'setPreferences', 
+				parameters: {"airplaneMode": mode}, onSuccess: completeCallback} );		
+		}
 	}
 	else
 		callback();

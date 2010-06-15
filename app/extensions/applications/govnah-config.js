@@ -1,25 +1,26 @@
 function GovnahConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.choicesPStartSelector = [];
-	this.choicesPCloseSelector = [];
+	this.choicesGovnahStartSelector = [];
+	this.choicesGovnahCloseSelector = [];
 }
 
 //
 
 GovnahConfig.prototype.init = function() {
 	this.service.request('palm://com.palm.applicationManager', {
-		method: 'launch', parameters: {
-			id: 'org.webosinternals.govnah', params: {
-				type: 'get-profiles',
-				returnid: 'com.palm.org.e-lnx.wee.apps.modeswitcher'}}});
+		method: 'launch', parameters: { id: 'org.webosinternals.govnah', params: {
+				type: 'get-profiles', returnid: 'com.palm.org.e-lnx.wee.apps.modeswitcher'}}} );
 }
 
 GovnahConfig.prototype.data = function(data) {
+	this.choicesGovnahStartSelector.clear();
+	this.choicesGovnahCloseSelector.clear();
+	
 	for(var i = 0; i < data.profiles.length; i++) {
-		this.choicesPStartSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
+		this.choicesGovnahStartSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
 
-		this.choicesPCloseSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
+		this.choicesGovnahCloseSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
 	}
 }
 
@@ -28,20 +29,20 @@ GovnahConfig.prototype.data = function(data) {
 GovnahConfig.prototype.setup = function(controller) {
 	// Start profile selector
 
-	controller.setupWidget("PStartSelector",	{'label': "On Start", 
+	controller.setupWidget("GovnahStartSelector", {'label': "On Start", 
 		'labelPlacement': "left", 'modelProperty': "startProfile",
-		'choices': this.choicesPStartSelector});
+		'choices': this.choicesGovnahStartSelector});
 		
 	// Close profile selector
 
-	controller.setupWidget("PCloseSelector",	{'label': "On Close", 
+	controller.setupWidget("GovnahCloseSelector", {'label': "On Close", 
 		'labelPlacement': "left", 'modelProperty': "closeProfile",
-		'choices': this.choicesPCloseSelector});
+		'choices': this.choicesGovnahCloseSelector});
 }
 
 //
 
-GovnahConfig.prototype.load = function(config, preferences) {
+GovnahConfig.prototype.load = function(preferences) {
 	var startProfile = 0;
 	var closeProfile = 0;
 		
@@ -55,41 +56,46 @@ GovnahConfig.prototype.load = function(config, preferences) {
 	if(closeParams.profileid != undefined)
 		closeProfile = closeParams.profileid;
 
-	config.push({'extension': "govnah",
+	var config = {
 		'name': preferences.name,
 		'appid': preferences.appid,
 		'launchMode': preferences.launchMode, 
+		'launchDelay': preferences.launchDelay, 
 		'startProfile': startProfile,
-		'closeProfile': closeProfile});
+		'closeProfile': closeProfile };
+	
+	return config;
 }
 
-GovnahConfig.prototype.save = function(config, preferences) {
+GovnahConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
 	startParams = "{type: 'set-profile', profileid: '" + config.startProfile + "'}";
 	closeParams = "{type: 'set-profile', profileid: '" + config.closeProfile + "'}";
 
-	preferences.push({'extension': "govnah",
+	var preferences = {
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode, 
+		'launchDelay': config.launchDelay, 		
 		'startParams': startParams,
-		'closeParams': closeParams});
+		'closeParams': closeParams };
+	
+	return preferences;
 }
 
 //
 
-GovnahConfig.prototype.append = function(config, launchPoint, saveCallback) {
-	config.push({'extension': "govnah", 'name': launchPoint.title, 'appid': launchPoint.id, 
-		'launchMode': 0, 'startProfile': 1, 'closeProfile': 1});
+GovnahConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 0, 
+		'launchDelay': 0, 
+		'startProfile': 1, 
+		'closeProfile': 1 };
 	
-	saveCallback();
-}
-
-GovnahConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return config;
 }
 

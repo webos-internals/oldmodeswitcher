@@ -1,4 +1,5 @@
 function WWindowConfig(ServiceRequestWrapper) {
+	this.service = ServiceRequestWrapper;
 }
 
 //
@@ -14,28 +15,28 @@ WWindowConfig.prototype.data = function(data) {
 WWindowConfig.prototype.setup = function(controller) {
 	// Mode selector
 
-	this.choicesModeSelector = [
+	this.choicesWWindowLaunchSelector = [
 		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2}];  
+		{'label': "On Mode Close", value: 2} ];  
 
-	controller.setupWidget("ModeSelector",	{'label': "Launch", 
+	controller.setupWidget("WWindowLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
-		'choices': this.choicesModeSelector});
+		'choices': this.choicesWWindowLaunchSelector} );
 
 	// Action selector
 	
-	this.choicesActionSelector = [
+	this.choicesWWindowActionSelector = [
 		{'label': "Do Nothing", value: 0},
-		{'label': "Get Weather", value: 1}];  
+		{'label': "Get Weather", value: 1} ];  
 
-	controller.setupWidget("ActionSelector",	{'label': "Action", 
+	controller.setupWidget("WWindowActionSelector", {'label': "Action", 
 		'labelPlacement': "left", 'modelProperty': "launchAction",
-		'choices': this.choicesActionSelector});
+		'choices': this.choicesWWindowActionSelector} );
 }
 
 //
 
-WWindowConfig.prototype.load = function(config, preferences) {
+WWindowConfig.prototype.load = function(preferences) {
 	var launchAction = 0;
 	
 	if(preferences.launchMode == 1) {
@@ -48,14 +49,17 @@ WWindowConfig.prototype.load = function(config, preferences) {
 	if(params.action != undefined)
 		launchAction = 1;
 		
-	config.push({'extension': "wwindow", 
+	var config = {
 		'name': preferences.name,
 		'appid': preferences.appid,
-		'launchMode': preferences.launchMode, 
-		'launchAction': launchAction});
+		'launchMode': preferences.launchMode,
+		'launchDelay': preferences.launchDelay,  
+		'launchAction': launchAction };
+	
+	return config;
 }
 
-WWindowConfig.prototype.save = function(config, preferences) {
+WWindowConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
@@ -68,26 +72,27 @@ WWindowConfig.prototype.save = function(config, preferences) {
 		}
 	}
 
-	preferences.push({'extension': "wwindow",
+	var preferences = {
 		'name': config.name,
 		'appid': config.appid, 
-		'launchMode': config.launchMode, 
+		'launchMode': config.launchMode,
+		'launchDelay': config.launchDelay,  
 		'startParams': startParams,
-		'closeParams': closeParams});
+		'closeParams': closeParams };
+	
+	return preferences;
 }
 
 //
 
-WWindowConfig.prototype.append = function(config, launchPoint, saveCallback) {
-	config.push({'extension': "wwindow", 'name': launchPoint.title, 'appid': launchPoint.id, 
-		'launchMode': 1, 'launchAction': 1});
+WWindowConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0,
+		'launchAction': 1 };
 	
-	saveCallback();
-}
-
-WWindowConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return config;
 }
 

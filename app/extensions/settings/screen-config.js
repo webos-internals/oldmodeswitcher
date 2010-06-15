@@ -18,14 +18,16 @@ ScreenConfig.prototype.setup = function(controller) {
 		'round': true, 'modelProperty': "screenBrightnessLevel"});
 
 	this.choicesBlinkSelector = [
+		{'label': "Do Not Set", 'value': 0},		
 		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}];  
+		{'label': "Disabled", 'value': 2}];  
 
 	controller.setupWidget("BlinkSelector", {'label': "Blink Notify", 
 		'labelPlacement': "left", 'modelProperty': "screenBlinkNotify",
 		'choices': this.choicesBlinkSelector});
 		
 	this.choicesTimeoutSelector = [
+		{'label': "Do Not Set", 'value': 0},
 		{'label': "15 Seconds", 'value': 15},
 		{'label': "30 Seconds", 'value': 30},
 		{'label': "1 Minute", 'value': 60},
@@ -36,64 +38,72 @@ ScreenConfig.prototype.setup = function(controller) {
 	controller.setupWidget("TimeoutSelector",	{'label': "Turn off After", 
 		'labelPlacement': "left", 'modelProperty': "screenTurnOffTimeout",
 		'choices': this.choicesTimeoutSelector});
+	
+	// Listen for tap event for wallpaper selector
+	
+	Mojo.Event.listen(controller.get("SettingsList"), Mojo.Event.listTap, 
+		this.handleListTap.bind(this));
 }
 
 //
 
-ScreenConfig.prototype.load = function(config, preferences) {
-	config.push({'screenBrightnessLevel': preferences.screenBrightnessLevel,
+ScreenConfig.prototype.load = function(preferences) {
+	var config = {
+		'screenBrightnessLevel': preferences.screenBrightnessLevel,
 		'screenTurnOffTimeout': preferences.screenTurnOffTimeout, 
 		'screenBlinkNotify': preferences.screenBlinkNotify, 
 		'screenWallpaperName': preferences.screenWallpaperName, 
-		'screenWallpaperPath': preferences.screenWallpaperPath});
+		'screenWallpaperPath': preferences.screenWallpaperPath };
+	
+	return config;
 }
 
-ScreenConfig.prototype.save = function(config, preferences) {
-	preferences.push({'screenBrightnessLevel': config.screenBrightnessLevel,
+ScreenConfig.prototype.save = function(config) {
+	var preferences = {
+		'screenBrightnessLevel': config.screenBrightnessLevel,
 		'screenTurnOffTimeout': config.screenTurnOffTimeout, 
 		'screenBlinkNotify': config.screenBlinkNotify, 
 		'screenWallpaperName': config.screenWallpaperName, 
-		'screenWallpaperPath': config.screenWallpaperPath});
-}
-
-//
-
-ScreenConfig.prototype.append = function(config, saveCallback) {
-	config.push({'screenBrightnessLevel': "(querying)", 'screenTurnOffTimeout': "(querying)", 
-		'screenBlinkNotify': "(querying)", 'screenWallpaperName': "(querying)", 'screenWallpaperPath': ""});
+		'screenWallpaperPath': config.screenWallpaperPath };
 	
-	saveCallback();
-}
-
-ScreenConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return preferences;
 }
 
 //
 
-ScreenConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
-
-ScreenConfig.prototype.tapped = function(config, event, saveCallback) {
-	if(event.target.id == "Wallpaper") {
-		this.executeWallpaperSelect(config, saveCallback);
-	}
+ScreenConfig.prototype.config = function() {
+	var config = {
+		'screenBrightnessLevel': 50, 
+		'screenTurnOffTimeout': 0, 
+		'screenBlinkNotify': 0, 
+		'screenWallpaperName': "Do Not Set*", 
+		'screenWallpaperPath': "" };
+	
+	return config;
 }
 
 //
 
-ScreenConfig.prototype.executeWallpaperSelect = function(config, saveCallback) {
+ScreenConfig.prototype.handleListTap = function(event) {
+	if(event.model.screen != undefined) {
+		if(event.originalEvent.target.id == "WallpaperSelect") {
+			this.executeWallpaperSelect(event.model.screen[0]);
+		}
+	}	
+}
+
+//
+
+ScreenConfig.prototype.executeWallpaperSelect = function(config) {
 	Mojo.FilePicker.pickFile({'defaultKind': "image", 'kinds': ["image"], 'actionType': "open", 
 		'actionName': "Select wallpaper", 'crop': {'width': 318, 'height': 479}, 'onSelect': 
-			function(config, saveCallback, payload) {
+			function(config, payload) {
 				if((!payload) || (!payload.fullPath)) {
 					config.screenWallpaperName = "Default";
 					config.screenWallpaperPath = "";
 
-					saveCallback();
+					this.controller.get("SettingsList").mojo.invalidateItems(0);
+					
 					return;
 				}
 	
@@ -113,7 +123,7 @@ ScreenConfig.prototype.executeWallpaperSelect = function(config, saveCallback) {
 				this.controller.serviceRequest("palm://com.palm.systemservice/wallpaper/", {
 					'method': "importWallpaper", 
 					'parameters': params,
-					'onSuccess': function(config, saveCallback, payload) {
+					'onSuccess': function(config, payload) {
 						if(payload.wallpaper) {
 							config.screenWallpaperName = payload.wallpaper.wallpaperName;
 							config.screenWallpaperPath = payload.wallpaper.wallpaperFile;
@@ -122,16 +132,16 @@ ScreenConfig.prototype.executeWallpaperSelect = function(config, saveCallback) {
 							config.screenWallpaperName = "Default";
 							config.screenWallpaperPath = "";
 						}
-					
-						saveCallback();
-					}.bind(this, config, saveCallback),
+						
+						this.controller.get("SettingsList").mojo.invalidateItems(0);
+					}.bind(this, config),
 					'onFailure': function(payload) {
 						config.screenWallpaperName = "Default";
 						config.screenWallpaperPath = "";
-				
-						saveCallback();
-					}.bind(this, config, saveCallback)});
-			}.bind(this, config, saveCallback)},
+
+						this.controller.get("SettingsList").mojo.invalidateItems(0);				
+					}.bind(this, config)});
+			}.bind(this, config)},
 		this.controller.stageController);
 }
 

@@ -89,7 +89,7 @@ WirelessTrigger.prototype.handleWirelessStatus = function(payload) {
 	}
 }
 
-WirelessTrigger.prototype.handleChargerEvent = function(ssid) {
+WirelessTrigger.prototype.handleWirelessEvent = function(ssid) {
 
 	// Delay disconnect event so that if connected right back the event is not generated.
 
@@ -112,7 +112,7 @@ WirelessTrigger.prototype.handleChargerEvent = function(ssid) {
 	this.timeoutTrigger = setTimeout(this.handleWirelessTrigger.bind(this, ssid), timeout);
 }
 
-ChargerTrigger.prototype.handleWirelessTrigger = function(ssid) {
+WirelessTrigger.prototype.handleWirelessTrigger = function(ssid) {
 	if(ssid != "none") {
 		this.ssid = ssid;
 			

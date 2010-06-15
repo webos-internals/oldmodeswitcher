@@ -13,19 +13,21 @@ MessagingConfig.prototype.setup = function(controller) {
 	// IM status, sound and ringtone selectors
 
 	this.choicesIMStatusSelector = [
-		{'label': "Available", 'value': 0},
+		{'label': "Do Not Set", 'value': 0},
+		{'label': "Available", 'value': 1},
 		{'label': "Busy", 'value': 2},
-		{'label': "Sign Off", 'value': 4}];  
+		{'label': "Sign Off", 'value': 3} ];  
 
 	controller.setupWidget("IMStatusSelector", {'label': "IM Status", 
 		'labelPlacement': "left", 'modelProperty': "messagingIMStatus",
 		'choices': this.choicesIMStatusSelector});
 
 	this.choicesSoundSelector = [
-		{'label': "Vibrate", 'value': 3},
-		{'label': "System Sound", 'value': 1},
-		{'label': "Ringtone", 'value': 2},
-		{'label': "Mute", 'value': 0}];  
+		{'label': "Do Not Set", 'value': 0},
+		{'label': "Vibrate", 'value': 1},
+		{'label': "System Sound", 'value': 2},
+		{'label': "Ringtone", 'value': 3},
+		{'label': "Mute", 'value': 4}];  
 
 	controller.setupWidget("MsgSoundSelector", {'label': "Alert", 
 		'labelPlacement': "left", 'modelProperty': "messagingSoundMode",
@@ -34,41 +36,35 @@ MessagingConfig.prototype.setup = function(controller) {
 
 //
 
-MessagingConfig.prototype.load = function(config, preferences) {
-	config.push({'messagingIMStatus': preferences.messagingIMStatus,
+MessagingConfig.prototype.load = function(preferences) {
+	var config = {
+		'messagingIMStatus': preferences.messagingIMStatus,
 		'messagingSoundMode': preferences.messagingSoundMode, 
 		'messagingRingtoneName': preferences.messagingRingtoneName, 
-		'messagingRingtonePath': preferences.messagingRingtonePath});
+		'messagingRingtonePath': preferences.messagingRingtonePath };
+	
+	return config;
 }
 
-MessagingConfig.prototype.save = function(config, preferences) {
-	preferences.push({'messagingIMStatus': config.messagingIMStatus,
+MessagingConfig.prototype.save = function(config) {
+	var preferences = {
+		'messagingIMStatus': config.messagingIMStatus,
 		'messagingSoundMode': config.messagingSoundMode, 
 		'messagingRingtoneName': config.messagingRingtoneName, 
-		'messagingRingtonePath': config.messagingRingtonePath});
-}
-
-//
-
-MessagingConfig.prototype.append = function(config, saveCallback) {
-	config.push({'messagingIMStatus': "(querying)", 'messagingSoundMode': "(querying)", 
-		'messagingRingtoneName': "(querying)", 'messagingRingtonePath': ""});
+		'messagingRingtonePath': config.messagingRingtonePath };
 	
-	saveCallback();
-}
-
-MessagingConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback();
+	return preferences;
 }
 
 //
 
-MessagingConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
-
-MessagingConfig.prototype.tapped = function(config, event, saveCallback) {
+MessagingConfig.prototype.config = function() {
+	var config = {
+		'messagingIMStatus': 0, 
+		'messagingSoundMode': 0, 
+		'messagingRingtoneName': 0, 
+		'messagingRingtonePath': 0 };
+	
+	return config;
 }
 
