@@ -467,7 +467,7 @@ AppAssistant.prototype.initExtensionDone = function(type, extensions, index, ext
 	var id = extensions[index];
 
 	if(state) {
-		Mojo.Log.info("Loading " + type + " extension: " + id);
+		Mojo.Log.error("Loading " + type + " extension: " + id);
 	
 		if(type == "setting")
 			this.settings.push({"id": id, "config": extConfig, "setting": extClass});

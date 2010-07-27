@@ -49,7 +49,7 @@ ConfigManager.prototype.save = function(params, target) {
 
 	this.requestSave = this.service.request('palm://com.palm.systemservice/', {
 		'method': 'setPreferences', 'parameters': parameters,
-		onSuccess: function() {Mojo.Log.info("Config saved succesfully");}, 
+		onSuccess: function() {Mojo.Log.error("Config saved succesfully");}, 
 		onFailure: function() {Mojo.Log.error("Saving of config failed");},
 		onComplete: function() {this.requestSave = null;}.bind(this) });
 }
@@ -61,7 +61,7 @@ ConfigManager.prototype.handleConfigData = function(params, callback, payload) {
 
 	for(var key in params) {
 		eval("var config = payload." + key);
-		
+
 		if((config != undefined) && (config != "none")) {
 			Mojo.Log.info("Config loaded succesfully: " + key);
 

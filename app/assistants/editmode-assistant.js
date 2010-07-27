@@ -1051,7 +1051,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 		}	
 		else if(event.command == "launchpoint") {
 			this.controller.serviceRequest('palm://com.palm.applicationManager/', {
-				'method': "addLaunchPoint", 'parameters': {'id': this.appAssistant.appid,
+				'method': "addLaunchPoint", 'parameters': {'id': Mojo.Controller.appInfo.id,
 					'icon': "images/default_icon.png", 'title': this.mode.name,
 					'params': {'action': "execute", 'event': "toggle", 'name': this.mode.name}}});
 		}

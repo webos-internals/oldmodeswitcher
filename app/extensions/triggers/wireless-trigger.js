@@ -36,11 +36,11 @@ WirelessTrigger.prototype.shutdown = function() {
 WirelessTrigger.prototype.enable = function(config) {
 	this.config = config;
 
-	this.enable = true;
+	this.enabled = true;
 }
 
 WirelessTrigger.prototype.disable = function() {
-	this.enable = false;
+	this.enabled = false;
 }
 
 //
@@ -99,6 +99,9 @@ WirelessTrigger.prototype.subscribeWirelessStatus = function() {
 
 WirelessTrigger.prototype.handleWirelessStatus = function(response) {
 	if(!this.initialized) {
+		if((response.networkInfo) && (response.networkInfo.ssid))
+			this.ssid = response.networkInfo.ssid;
+	
 		this.initialized = true;
 		this.callback(true);
 		this.callback = null;
