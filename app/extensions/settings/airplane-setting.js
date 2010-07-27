@@ -1,118 +1,85 @@
 function AirplaneSetting(ServiceRequestWrapper) {
 	
 	this.service = ServiceRequestWrapper;
-	
-	this.labels = new Array("flight mode");
-	
-}
-
-AirplaneSetting.prototype.get = function(callback) {
-	var settings = {"airplaneMode": 0};
-
-	this.getSystemSettings(0, 0, settings, callback);
-}
-
-AirplaneSetting.prototype.set = function(settings, callback) {
-	var current = {"airplaneMode": 0};
-	
-	this.getSystemSettings(0, 0, current, this.apply.bind(this, current, settings, callback));
-}
-
-AirplaneSetting.prototype.apply = function(current, requested, callback) {
-	var settings = {"airplaneMode": 0};
-
-	if(current.airplaneMode != requested.airplaneMode)
-		settings.airplaneMode = requested.airplaneMode;
-
-	this.setSystemSettings(0, 0, settings, callback);
 }
 
 //
 
-AirplaneSetting.prototype.getSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, retry, settings, callback);
+AirplaneSetting.prototype.get = function(callback) {
+	var settings = {};
+
+	this.getSystemSettings(0, settings, callback);
+}
+
+AirplaneSetting.prototype.set = function(settings, callback) {
+	var current = {};
+	
+	var applyCallback = this.apply.bind(this, current, settings, callback);
+	
+	this.getSystemSettings(0, current, applyCallback);
+}
+
+//
+
+AirplaneSetting.prototype.apply = function(current, requested, callback) {
+	var settings = {};
+
+	if((requested.airplaneMode) && (current.airplaneMode != requested.airplaneMode))
+		settings.airplaneMode = requested.airplaneMode;
+	
+	this.setSystemSettings(0, settings, callback);
+}
+
+//
+
+AirplaneSetting.prototype.getSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
 	
 	if(request == 0) {
-		this.service.request('palm://com.palm.systemservice', {method: 'getPreferences', 
-			parameters: {'subscribe': false, keys: ["airplaneMode"]}, 
-			onComplete: completeCallback} );
+		this.service.request("palm://com.palm.systemservice/", {'method': "getPreferences", 
+			'parameters': {'subscribe': false, 'keys': ["airplaneMode"]}, 
+			'onComplete': completeCallback});
 	}
 	else
 		callback(settings);
 }
 
-AirplaneSetting.prototype.handleGetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValuer == undefined)) {
-		// System request was succesfull so store the data and move to next request.
-		
+AirplaneSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
+	if(response.returnValue) {	
 		if(request == 0) {
 			if(response.airplaneMode == true)
 				settings.airplaneMode = 1;
 			else if(response.airplaneMode == false)
-				settings.airplaneMode = 2;
-		}
-		
-		this.getSystemSettings(++request, 0, settings, callback);
-	}
-	else {
-		// System request failed so retry or skip the request.
-
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.getSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.getSystemSettings(++request, 0, settings, callback);
+				settings.airplaneMode = 0;
 		}
 	}
+	
+	this.getSystemSettings(++request, settings, callback);
 }
 
-AirplaneSetting.prototype.setSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
+//
+
+AirplaneSetting.prototype.setSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
 	
 	if(request == 0) {
-		if(settings.airplaneMode == 0)
-			this.setSystemSettings(++request, 0, settings, callback);
+		if(settings.airplaneMode == undefined)
+			this.setSystemSettings(++request, settings, callback);
 		else {
 			if(settings.airplaneMode == 1)
-				var mode = true;
-			else if(settings.airplaneMode == 2)
-				var mode = false;
+				var airplaneMode = true;
+			else if(settings.airplaneMode == 0)
+				var airplaneMode = false;
 				
-			this.service.request('palm://com.palm.systemservice', {method: 'setPreferences', 
-				parameters: {"airplaneMode": mode}, onSuccess: completeCallback} );		
+			this.service.request("palm://com.palm.systemservice/", {'method': "setPreferences", 
+				'parameters': {'airplaneMode': airplaneMode}, 'onSuccess': completeCallback});		
 		}
 	}
 	else
 		callback();
 }
 
-//
-
-AirplaneSetting.prototype.handleSetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValuer == undefined)) {
-		// System request was succesful so move to next request.
-		
-		Mojo.Log.info("Succesful " + this.labels[request] + " request");
-		
-		this.setSystemSettings(++request, 0, settings, callback);
-	}
-	else {
-		// System request failed so retry or skip the request.
-		
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.setSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.setSystemSettings(++request, 0, settings, callback);
-		}
-	}
+AirplaneSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
+	this.setSystemSettings(++request, settings, callback);
 }	
 

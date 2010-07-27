@@ -39,15 +39,15 @@ EditmodeAssistant.prototype.setup = function() {
 // Application menu
 //
 	
-	if(this.type == "custom") {
+	if(this.type == "default") {
 		this.controller.setupWidget(Mojo.Menu.appMenu, 
 			{'omitDefaultItems': true}, {'visible': true, 'items': [ 
-			{'label': "Add to Launcher", 'command': "launchpoint"}]} );
+			{'label': "Get System Settings", 'command': "retrieve"}]} );
 	}
 	else {
 		this.controller.setupWidget(Mojo.Menu.appMenu, 
 			{'omitDefaultItems': true}, {'visible': true, 'items': [ 
-			{'label': "Get System Settings", 'command': "retrieve"}]} );
+			{'label': "Add to Launcher", 'command': "launchpoint"}]} );
 	}
 	
 //
@@ -60,10 +60,10 @@ EditmodeAssistant.prototype.setup = function() {
 	
 	this.configurationView.style.display = 'block';
 		
-	if(this.type == "custom")
-		this.itemsViewMenu = [{'label': "Mode Configuration", 'command': "configuration", 'width': 320}];
-	else
+	if(this.type == "default")
 		this.itemsViewMenu = [{'label': "Default Mode Settings", 'command': "configuration", 'width': 320}];
+	else
+		this.itemsViewMenu = [{'label': "Mode Configuration", 'command': "configuration", 'width': 320}];
 
 	this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 
@@ -80,17 +80,7 @@ EditmodeAssistant.prototype.setup = function() {
 	this.customCfg = this.controller.get("ConfigurationCustom");
 	this.defaultCfg = this.controller.get("ConfigurationDefault");
 
-	if(this.type == "custom") {
-		this.customCfg.style.display = 'block';
-	
-		this.itemsCommandMenu = [
-			{'width': 5},
-			{'label': "Settings", 'command': "settings", 'width': 100},
-			{'label': "Apps", 'command': "applications", 'width': 80},
-			{'label': "Triggers", 'command': "triggers", 'width': 100},
-			{'width': 5}];
-	}
-	else {
+	if(this.type == "default") {
 		this.defaultCfg.style.display = 'block';
 
 		this.itemsCommandMenu = [
@@ -98,7 +88,17 @@ EditmodeAssistant.prototype.setup = function() {
 			{'label': "Settings", 'command': "settings", 'width': 110},
 			{'width': 30},
 			{'label': "Apps", 'command': "applications", 'width': 110},
-			{'width': 35}];
+			{'width': 35} ];
+	}
+	else {
+		this.customCfg.style.display = 'block';
+	
+		this.itemsCommandMenu = [
+			{'width': 5},
+			{'label': "Settings", 'command': "settings", 'width': 100},
+			{'label': "Apps", 'command': "applications", 'width': 80},
+			{'label': "Triggers", 'command': "triggers", 'width': 100},
+			{'width': 5} ];
 	}
 
 	this.modelCommandMenu = {'visible': true, 'items': this.itemsCommandMenu};
@@ -111,10 +111,10 @@ EditmodeAssistant.prototype.setup = function() {
 
 	// Mode name text field
 	
-	if(this.type == "custom")
-		this.modelNameText = {'value': this.mode.name, 'disabled': false};
-	else
+	if(this.type == "default")
 		this.modelNameText = {'value': this.mode.name, 'disabled': true};
+	else
+		this.modelNameText = {'value': this.mode.name, 'disabled': false};
 		   
 	this.controller.setupWidget("NameText", { 'hintText': "Unique Mode Name", 
 		'multiline': false, 'enterSubmits': false, 'focus': true},
@@ -123,33 +123,48 @@ EditmodeAssistant.prototype.setup = function() {
 	Mojo.Event.listen(this.controller.get("NameText"), Mojo.Event.propertyChange, 
 		this.setModeData.bind(this, false));
 
-	// Mode notify selector
+	// Mode type selector
 
-	this.modelNotifySelector = {'value': this.mode.notifyMode, 'disabled': false};
+	if(this.mode.type == "default")
+		this.modelTypeSelector = {'value': this.mode.type, 'disabled': true};
+	else
+		this.modelTypeSelector = {'value': this.mode.type, 'disabled': false};
+		
+	if(this.mode.type == "default") {
+		this.choicesTypeSelector = [
+			{'label': "Default", 'value': "default"}
+			/*{'label': "System", 'value': "system"}*/];  
+	}
+	else {
+		this.choicesTypeSelector = [
+			{'label': "Normal", 'value': "normal"},
+			{'label': "Modifier", 'value': "modifier"}];  
+	}
 
-	this.choicesNotifySelector = [
-		{'label': "Disabled", 'value': 0},
-		{'label': "Use Banner", 'value': 1}/*,
-		{'label': "System Alert", 'value': 2},
-		{'label': "Short Vibrate", 'value': 3}*/];  
+	this.controller.setupWidget("ModeTypeSelector", {'label': "Mode Type", 
+		'labelPlacement': "left", 'choices': this.choicesTypeSelector}, 
+		this.modelTypeSelector);
 
-	this.controller.setupWidget("NotifySelector", {'label': "Notify", 
-		'labelPlacement': "left", 'choices': this.choicesNotifySelector}, 
-		this.modelNotifySelector);
-
-	Mojo.Event.listen(this.controller.get("NotifySelector"), Mojo.Event.propertyChange, 
-		this.setModeData.bind(this, false));
+	Mojo.Event.listen(this.controller.get("ModeTypeSelector"), Mojo.Event.propertyChange, 
+		this.setModeType.bind(this));
 
 	// Auto start and close selectors
 
-	this.modelStartSelector = {'value': this.mode.autoStart, 'disabled': false};
+	this.modelStartSelector = {'value': this.mode.autoStartMode, 'disabled': false};
 
-	this.choicesStartSelector = [
-		{'label': "Only Manually", 'value': 0},
-		{'label': "By Selection", 'value': 1},
-		{'label': "After Timer", 'value': 2},
-		{'label': "Immediate", 'value': 3}];  
-		
+	if(this.mode.type == "normal") {
+		this.choicesStartSelector = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "By Selection", 'value': 1},
+			{'label': "After Timer", 'value': 2},
+			{'label': "Immediate", 'value': 3}];  
+	}
+	else {
+		this.choicesStartSelector = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "Immediate", 'value': 3}];  
+	}
+				
 	this.controller.setupWidget("StartSelector",	{'label': "Auto Start",
 		'labelPlacement': "left", 'choices': this.choicesStartSelector},
 		this.modelStartSelector);
@@ -157,13 +172,20 @@ EditmodeAssistant.prototype.setup = function() {
 	Mojo.Event.listen(this.controller.get("StartSelector"), Mojo.Event.propertyChange, 
 		this.setModeData.bind(this, false));
 		
-	this.modelCloseSelector = {'value': this.mode.autoClose, 'disabled': false};
+	this.modelCloseSelector = {'value': this.mode.autoCloseMode, 'disabled': false};
 
-	this.choicesCloseSelector = [
-		{'label': "Only Manually", 'value': 0},
-		{'label': "By Selection", 'value': 1},
-		{'label': "After Timer", 'value': 2},
-		{'label': "Immediate", 'value': 3}];  
+	if(this.mode.type == "normal") {
+		this.choicesCloseSelector = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "By Selection", 'value': 1},
+			{'label': "After Timer", 'value': 2},
+			{'label': "Immediate", 'value': 3}];  
+	}
+	else {
+		this.choicesCloseSelector = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "Immediate", 'value': 3}];  
+	}
 
 	this.controller.setupWidget("CloseSelector",	{'label': "Auto Close", 
 		'labelPlacement': "left", 'choices': this.choicesCloseSelector},
@@ -192,8 +214,8 @@ EditmodeAssistant.prototype.setup = function() {
 	this.modelAppsSelector = {'value': this.mode.miscAppsMode, 'disabled': false};
 
 	this.choicesAppsSelector = [
-		{'label': "On Startup", 'value': 0},
-		{'label': "Everytime", 'value': 1}];  
+		{'label': "Everytime", 'value': 0},
+		{'label': "On Startup", 'value': 1} ];  
 
 	this.controller.setupWidget("AppsSelector", {'label': "Applications", 
 		'labelPlacement': "left", 'choices': this.choicesAppsSelector},
@@ -206,13 +228,53 @@ EditmodeAssistant.prototype.setup = function() {
 // SETTINGS
 //
 
-	this.modelChargingSelector = {'value': this.mode.settings.charging, 'disabled': false};
-	
-	this.choicesChargingSelector = [
-		{'label': "Lock Screen", 'value': 1},
-		{'label': "Always On", 'value': 2},
-		{'label': "Turn Off", 'value': 3}];  
+	// Mode notify selector
 
+	this.modelNotifySelector = {'value': this.mode.settings.notify, 'disabled': false};
+
+	if(this.mode.type == "normal") {
+		this.choicesNotifySelector = [
+			{'label': "Default", 'value': 0},
+			{'label': "Disabled", 'value': 1},
+			{'label': "Use Banner", 'value': 2}/*,
+			{'label': "System Alert", 'value': 3},
+			{'label': "Short Vibrate", 'value': 4}*/];  
+	}
+	else {
+		this.choicesNotifySelector = [
+			{'label': "Do Not Set", 'value': 0},
+			{'label': "Disabled", 'value': 1},
+			{'label': "Use Banner", 'value': 2}/*,
+			{'label': "System Alert", 'value': 3},
+			{'label': "Short Vibrate", 'value': 4}*/];  
+	}
+		
+	this.controller.setupWidget("NotifySelector", {'label': "Notify", 
+		'labelPlacement': "left", 'choices': this.choicesNotifySelector}, 
+		this.modelNotifySelector);
+
+	Mojo.Event.listen(this.controller.get("NotifySelector"), Mojo.Event.propertyChange, 
+		this.setModeData.bind(this, false));
+		
+	// On charger selector
+
+	this.modelChargingSelector = {'value': this.mode.settings.charging, 'disabled': false};
+
+	if(this.mode.type == "normal") {
+		this.choicesChargingSelector = [
+			{'label': "Default", 'value': 0},
+			{'label': "Lock Screen", 'value': 1},
+			{'label': "Always On", 'value': 2},
+			{'label': "Turn Off", 'value': 3}];  
+	}
+	else {
+		this.choicesChargingSelector = [
+			{'label': "Do Not Set", 'value': 0},
+			{'label': "Lock Screen", 'value': 1},
+			{'label': "Always On", 'value': 2},
+			{'label': "Turn Off", 'value': 3}];  
+	}
+		
 	this.controller.setupWidget("ChargingSelector",	{'label': "On Charger", 
 		'labelPlacement': "left", 'choices': this.choicesChargingSelector}, 
 		this.modelChargingSelector);
@@ -225,7 +287,7 @@ EditmodeAssistant.prototype.setup = function() {
 	this.modelSettingsList = {'items': this.mode.settingsList};
 	
 	this.controller.setupWidget("SettingsList", {
-		'itemTemplate': 'editmode/listitem-settings',
+		'itemTemplate': 'templates/listitem-lists',
 		'swipeToDelete': false, 'reorderable': false},
 		this.modelSettingsList);
 
@@ -249,9 +311,14 @@ EditmodeAssistant.prototype.setup = function() {
 // SETTINGS LIST ITEM
 //
 
+	if(this.mode.type == "normal")
+		this.controller.defaultChoiseLabel = "Default";
+	else
+		this.controller.defaultChoiseLabel = "Do Not Set";
+
 	for(var i = 0; i < this.settings.length; i++)
 		this.settings[i].config.setup(this.controller);
-
+	
 //
 // APPLICATIONS
 //
@@ -292,7 +359,7 @@ EditmodeAssistant.prototype.setup = function() {
 	this.modelAppsList = {'items': this.mode.appsList};
 	
 	this.controller.setupWidget("AppsList", {
-		'itemTemplate': 'editmode/listitem-apps',
+		'itemTemplate': 'templates/listitem-lists',
 		'swipeToDelete': true, 'reorderable': true,
 		'autoconfirmDelete': true},
 		this.modelAppsList);
@@ -327,28 +394,13 @@ EditmodeAssistant.prototype.setup = function() {
 // TRIGGERS
 //
 
-	// Block selector
-
-	this.modelBlockSelector = {'value': this.mode.triggers.block, 'disabled': false};
-
-	this.choicesBlockSelector = [
-		{'label': "No Blocking", 'value': 0},
-		{'label': "Other Modes", 'value': 1}];  
-
-	this.controller.setupWidget("BlockSelector",	{ 'label': "Block", 
-		'labelPlacement': 'left', 'choices': this.choicesBlockSelector},
-		this.modelBlockSelector);	
-	
-	Mojo.Event.listen(this.controller.get("BlockSelector"), Mojo.Event.propertyChange, 
-		this.setModeData.bind(this, false));
-
 	// Trigger selector
 
 	this.modelRequiredSelector = {'value': this.mode.triggers.required, 'disabled': false};
 
 	this.choicesTriggerSelector = [
-		{'label': "All Unique", 'value': 1},
-		{'label': "One Trigger", 'value': 2}];  
+		{'label': "All Unique", 'value': 0},
+		{'label': "One Trigger", 'value': 1}];  
 
 	this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
 		'labelPlacement': "left", 'choices': this.choicesTriggerSelector},
@@ -357,12 +409,29 @@ EditmodeAssistant.prototype.setup = function() {
 	Mojo.Event.listen(this.controller.get("RequiredSelector"), Mojo.Event.propertyChange, 
 		this.setModeData.bind(this, false));
 
+	// Block selector
+
+	this.modelBlockSelector = {'value': this.mode.triggers.block, 'disabled': false};
+
+	this.choicesBlockSelector = [
+		{'label': "No Blocking", 'value': 0},
+		{'label': "Other Modes", 'value': 1},
+		{'label': "Normal Modes", 'value': 2},
+		{'label': "Modifier Modes", 'value': 3}];  
+
+	this.controller.setupWidget("BlockSelector",	{ 'label': "Block Mode", 
+		'labelPlacement': 'left', 'choices': this.choicesBlockSelector},
+		this.modelBlockSelector);	
+	
+	Mojo.Event.listen(this.controller.get("BlockSelector"), Mojo.Event.propertyChange, 
+		this.setModeData.bind(this, false));
+
 	// Triggers list
 
 	this.modelTriggersList = {'items': this.mode.triggersList};
 	
 	this.controller.setupWidget("TriggersList", {
-		'itemTemplate': "editmode/listitem-triggers",
+		'itemTemplate': "templates/listitem-lists",
 		'swipeToDelete': false, 'reorderable': false},
 		this.modelTriggersList);
 
@@ -375,9 +444,6 @@ EditmodeAssistant.prototype.setup = function() {
 			'swipeToDelete': true, 'autoconfirmDelete': true,
 			'reorderable': false, 'itemsProperty': id});
 	}
-
-	Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.listTap, 
-		this.handleListTap.bind(this, "triggers"));
 
 	Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.listDelete, 
 		this.handleListDelete.bind(this, "triggers"));
@@ -398,33 +464,31 @@ EditmodeAssistant.prototype.setup = function() {
 EditmodeAssistant.prototype.getModeData = function() {
 	var cfgIndex = 0;
 
-	if(this.type == "custom") {
-		var mode = {
-			'name': "", 'type': "custom",
+	if(this.type == "default") {
+			var mode = {
+			'name': "", 'type': "default", 
+					
+			'miscOnStartup': 0, 'miscAppsMode': 1,
+
+			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
 		
-			'notifyMode': 1, 'autoStart': 1, 'autoClose': 1,
-		
-			'settings': {'mode': 0, 'charging': 1}, 'settingsList': [],
-		
-			'apps': {'start':0, 'close': 1}, 'appsList': [],
-		
-			'triggers': {'block': 0, 'required': 1}, 'triggersList': []
+			'apps': {'start':0, 'close': 0}, 'appsList': []
 		};
 	}
 	else {
-		var mode = {
-			'name': "", 'type': "default",
+			var mode = {
+			'name': "", 'type': "normal", 
 		
-			'notifyMode': 1, 'miscOnStartup': 1, 'miscAppsMode': 1,
+			'autoStartMode': 1, 'autoCloseMode': 1,
 		
-			'settings': {'mode': 0, 'charging': 1}, 'settingsList': [],
+			'settings': {'notify': 0, 'charging': 0}, 'settingsList': [],
 		
 			'apps': {'start':0, 'close': 1}, 'appsList': [],
 		
-			'triggers': {'block': 0, 'required': 1}, 'triggersList': []
-		};
+			'triggers': {'required': 0, 'block': 0}, 'triggersList': []
+		};		
 	}
-
+	
 	for(var i = 0; i < this.settings.length; i++) {
 		var id = this.settings[i].id;
 		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
@@ -437,7 +501,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 		mode.settingsList.push(setting);
 	}
 
-	if(this.type == "custom") {
+	if(this.type != "default") {
 		for(var i = 0; i < this.triggers.length; i++) {
 			var id = this.triggers[i].id;
 			var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
@@ -451,7 +515,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 		}
 	}
 
-	if(this.type == "custom") {
+	if(this.type != "default") {
 		if(this.modeidx == undefined)
 			return mode;
 	
@@ -487,28 +551,18 @@ EditmodeAssistant.prototype.getModeData = function() {
 	mode.name =  config.name;
 	mode.type =  config.type;
 						
-	mode.notifyMode =  config.notifyMode;
-	
-	if(this.type == "custom") {
-		mode.autoStart = config.autoStart;
-		mode.autoClose = config.autoClose;
-	}
-	else {
+	if(this.type == "default") {
 		mode.miscOnStartup = config.miscOnStartup;
 		mode.miscAppsMode = config.miscAppsMode;
 	}
-				
-	mode.settings.mode = 0;
-	mode.settings.charging =  config.settings.charging;
-						
-	mode.apps.start = config.apps.start;
-	mode.apps.close = config.apps.close;
-	
-	if(this.type == "custom") {
-		mode.triggers.block = config.triggers.block;
-		mode.triggers.required = config.triggers.required;
+	else {
+		mode.autoStartMode = config.autoStartMode;
+		mode.autoCloseMode = config.autoCloseMode;
 	}
-
+				
+	mode.settings.notify = config.settings.notify;
+	mode.settings.charging = config.settings.charging;
+						
 	for(var i = 0; i < this.settings.length; i++) {
 		for(var j = 0; j < config.settingsList.length; j++) {
 			if(this.settings[i].id == config.settingsList[j].extension) {
@@ -525,41 +579,51 @@ EditmodeAssistant.prototype.getModeData = function() {
 			}
 		}
 	}
-	
+
+	mode.apps.start = config.apps.start;
+	mode.apps.close = config.apps.close;
+
 	for(var i = 0; i < config.appsList.length; i++) {
 		for(var j = 0; j < this.applications.length; j++) {
 			if(this.applications[j].id == "default")
 				cfgIndex = j;
 			else if(this.applications[j].appid == config.appsList[i].appid) {
 				cfgIndex = j;
-				
+			
 				break;
 			}
 		}
-			
+		
 		var source = config.appsList[i];
 		eval("var target = mode.appsList[i]['" + this.applications[cfgIndex].id + "']");
 
 		var data = this.applications[cfgIndex].config.load(source);
-		
+	
 		data.extension = this.applications[cfgIndex].id;
-		
+	
 		target.push(data);
 	}
-
-	for(var i = 0; i < this.triggers.length; i++) {
-		for(var j = 0; j < config.triggersList.length; j++) {
-			if(this.triggers[i].id == config.triggersList[j].type) {
-				var source = config.triggersList[j];
-				eval('var target = mode.triggersList[i].' + this.triggers[i].id);
+	
+	if(this.type != "default") {
+		mode.triggers.block = config.triggers.block;
+		mode.triggers.required = config.triggers.required;
+	
+		for(var i = 0; i < this.triggers.length; i++) {
+			for(var j = 0; j < config.triggersList.length; j++) {
+				if(this.triggers[i].id == config.triggersList[j].extension) {
+					var source = config.triggersList[j];
+					eval('var target = mode.triggersList[i].' + this.triggers[i].id);
 			
-				this.triggers[i].config.load(target, source);
-
-				target[target.length - 1].type = this.triggers[i].id;
+					var data = this.triggers[i].config.load(source);
+				
+					data.extension = this.triggers[i].id;
+				
+					target.push(data);
+				}
 			}
 		}
 	}
-
+	
 	return mode;
 }
 
@@ -580,67 +644,55 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 
 		this.controller.sceneScroller.mojo.setState(tmp);
 	}
-	
-	if(this.type == "custom") {
-		var config = this.config.modesConfig[this.modeidx];
 
-		var mode = {
-			'name': "", 'type': "custom",
-		
-			'notifyMode': 1, 'autoStart': 1, 'autoClose': 1,
-		
-			'settings': {'mode': 0, 'charging': 1}, 'settingsList': [],
-		
-			'apps': {'start':0, 'close': 1}, 'appsList': [],
-		
-			'triggers': {'block': 0, 'required': 1}, 'triggersList': []
-		};
-	}
-	else {
+	if(this.type == "default") {
 		var config = this.config.defaultMode;
 
 		var mode = {
-			'name': "", 'type': "default",
+			'name': "", 'type': "default", 
 		
-			'notifyMode': 1, 'miscOnStartup': 1, 'miscAppsMode': 1,
+			'miscOnStartup': 0, 'miscAppsMode': 1,
 		
-			'settings': {'mode': 0, 'charging': 1}, 'settingsList': [],
+			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
+		
+			'apps': {'start':0, 'close': 0}, 'appsList': []
+		};
+	}
+	else {
+		var config = this.config.modesConfig[this.modeidx];
+
+		var mode = {
+			'name': "", 'type': "normal", 
+		
+			'autoStartMode': 1, 'autoCloseMode': 1,
+		
+			'settings': {'notify': 0, 'charging': 0}, 'settingsList': [],
 		
 			'apps': {'start':0, 'close': 1}, 'appsList': [],
 		
-			'triggers': {'block': 0, 'required': 1}, 'triggersList': []
+			'triggers': {'required': 0, 'block': 0}, 'triggersList': []
 		};
 	}
 
-	if(this.type == "custom") {
+	if(this.type != "default") {
 		this.checkModeName();
 	}
 
 	mode.name = this.modelNameText.value;
-	mode.type = this.type;
+	mode.type = this.modelTypeSelector.value;
 	
-	mode.notifyMode = this.modelNotifySelector.value;
-	
-	if(this.type == "custom") {
-		mode.autoStart = this.modelStartSelector.value;
-		mode.autoClose = this.modelCloseSelector.value;
-	}
-	else {
+	if(this.type == "default") {
 		mode.miscOnStartup = this.modelStartupSelector.value;
 		mode.miscAppsMode = this.modelAppsSelector.value;			
 	}
-	
-	mode.settings.mode = 0;
-	mode.settings.charging = this.modelChargingSelector.value;
-		
-	mode.apps.start = this.modelAppsStartSelector.value;
-	mode.apps.close = this.modelAppsCloseSelector.value;								
-	
-	if(this.type == "custom") {
-		mode.triggers.block = this.modelBlockSelector.value;
-		mode.triggers.required = this.modelRequiredSelector.value;
+	else {
+		mode.autoStartMode = this.modelStartSelector.value;
+		mode.autoCloseMode = this.modelCloseSelector.value;
 	}
 	
+	mode.settings.notify = 	this.modelNotifySelector.value;
+	mode.settings.charging = this.modelChargingSelector.value;
+		
 	for(var i = 0; i < this.settings.length; i++) {
 		eval('var source = this.mode.settingsList[i].' + this.settings[i].id + '[0]');
 	
@@ -655,29 +707,35 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		}
 	}
 
+	mode.apps.start = this.modelAppsStartSelector.value;
+	mode.apps.close = this.modelAppsCloseSelector.value;								
+
 	for(var i = 0; i < this.mode.appsList.length; i++) {
 		for(var j = 0; j < this.applications.length; j++) {
 			if(eval("this.mode.appsList[i]['" + this.applications[j].id + "']") != undefined) {
 				cfgIndex = j;
-				
+			
 				break;
 			}
 		}
-		
+	
 		eval("var source = this.mode.appsList[i]['" + this.applications[cfgIndex].id + "'][0]");
 
 		if(source != undefined) {
 			var target = mode.appsList;
-			
+		
 			var data = this.applications[cfgIndex].config.save(source);
-			
+		
 			target.extension = this.applications[cfgIndex].id;
-			
+		
 			target.push(data);
 		}
 	}
-	
-	if(this.type == "custom") {
+		
+	if(this.type != "default") {
+		mode.triggers.block = this.modelBlockSelector.value;
+		mode.triggers.required = this.modelRequiredSelector.value;
+
 		for(var i = 0; i < this.triggers.length; i++) {
 			eval('var list = this.mode.triggersList[i].' + this.triggers[i].id);
 			
@@ -686,10 +744,12 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		
 				if(source != undefined) {
 					var target = mode.triggersList;
-				
-					this.triggers[i].config.save(source, target);
-				
-					target[target.length - 1].type = this.triggers[i].id;
+
+					var data = this.triggers[i].config.save(source);
+			
+					data.extension = this.triggers[i].id;
+			
+					target.push(data);
 				}
 			}
 		}
@@ -714,15 +774,80 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 
 //
 
+EditmodeAssistant.prototype.setModeType = function(event) {
+	if(event.value == "normal") {
+		this.type = "normal";
+	
+		this.modelStartSelector.value = 1;
+		this.modelCloseSelector.value = 1;
+		
+		this.modelStartSelector.choices = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "By Selection", 'value': 1},
+			{'label': "After Timer", 'value': 2},
+			{'label': "Immediate", 'value': 3} ];  
+
+		this.modelCloseSelector.choices = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "By Selection", 'value': 1},
+			{'label': "After Timer", 'value': 2},
+			{'label': "Immediate", 'value': 3} ];  
+
+		this.choicesNotifySelector[0].label = "Default";
+		this.choicesChargingSelector[0].label = "Default";
+
+		this.controller.defaultChoiseLabel = "Default";
+
+		for(var i = 0; i < this.settings.length; i++)
+			this.settings[i].config.setup(this.controller);
+	}
+	else {
+		this.type = "modifier";
+		
+		this.modelStartSelector.value = 3;
+		this.modelCloseSelector.value = 3;
+
+		this.modelStartSelector.choices = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "Immediate", 'value': 3} ];  
+
+		this.modelCloseSelector.choices = [
+			{'label': "Only Manually", 'value': 0},
+			{'label': "Immediate", 'value': 3} ];  
+
+		this.choicesNotifySelector[0].label = "Do Not Set";
+		this.choicesChargingSelector[0].label = "Do Not Set";
+
+		this.controller.defaultChoiseLabel = "Do Not Set";
+
+		for(var i = 0; i < this.settings.length; i++)
+			this.settings[i].config.setup(this.controller);
+	}
+	
+	this.controller.modelChanged(this.modelStartSelector, this);
+	this.controller.modelChanged(this.modelCloseSelector, this);
+
+	this.controller.modelChanged(this.modelNotifySelector, this);
+	this.controller.modelChanged(this.modelChargingSelector, this);
+	
+	this.controller.modelChanged(this.modelSettingsList, this);
+	
+	this.setModeData(false);	
+}
+
+//
+
 EditmodeAssistant.prototype.retrieveCurrentSettings = function(index, target, settings) {
 	// Store settings from last round if returned by the extension.
 
 	if(settings != undefined) {
-		settings.extensions = this.settings[index - 1].id;
-	
 		eval("this.mode.settingsList[index - 1]." + this.settings[index - 1].id + ".clear()");
 		
-		eval("this.mode.settingsList[index - 1]." + this.settings[index - 1].id + ".push(settings)");
+		var config = this.settings[index - 1].config.load(settings);
+
+		config.extension = this.settings[index - 1].id;
+
+		eval("this.mode.settingsList[index - 1]." + this.settings[index - 1].id + ".push(config)");
 
 		this.setModeData(true);
 	}
@@ -774,26 +899,28 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			return;
 		}
 	}
-
+	else
+		this.setModeData(true);
+	
 	if((event.type == Mojo.Event.command) || (event.type == Mojo.Event.back)) {
 		if((event.command == "configuration") || (event.type == Mojo.Event.back)) {
 			this.currentView = "Configuration";
 
 			this.modelCommandMenu.items.clear();
 
-			if(this.type == "custom") {			
-				this.modelCommandMenu.items.push({'width': 5});
-				this.modelCommandMenu.items.push({'label': "Settings", 'command': "settings", 'width': 100});
-				this.modelCommandMenu.items.push({'label': "Apps", 'command': "applications", 'width': 80});
-				this.modelCommandMenu.items.push({'label': 'Triggers', 'command': "triggers", 'width': 100});
-				this.modelCommandMenu.items.push({'width': 5});
-			}
-			else {
+			if(this.type == "default") {			
 				this.modelCommandMenu.items.push({'width': 35});
 				this.modelCommandMenu.items.push({'label': "Settings", 'command': "settings", 'width': 110});
 				this.modelCommandMenu.items.push({'width': 30});
 				this.modelCommandMenu.items.push({'label': "Apps", 'command': "applications", 'width': 110});
 				this.modelCommandMenu.items.push({'width': 35});
+			}
+			else {
+				this.modelCommandMenu.items.push({'width': 5});
+				this.modelCommandMenu.items.push({'label': "Settings", 'command': "settings", 'width': 100});
+				this.modelCommandMenu.items.push({'label': "Apps", 'command': "applications", 'width': 80});
+				this.modelCommandMenu.items.push({'label': 'Triggers', 'command': "triggers", 'width': 100});
+				this.modelCommandMenu.items.push({'width': 5});				
 			}
 
 			this.controller.modelChanged(this.modelCommandMenu, this);
@@ -883,13 +1010,12 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 				var settingItems = [];
 				
 				settingItems.push({'label': "Append All Settings", 'command': "everything"});
+				settingItems.push({'label': "Remove All Settings", 'command': "nosettings"});
 							
 				for(var i = 0; i < this.settings.length; i++) {
 					if(eval("this.mode.settingsList[i]." + this.settings[i].id + ".length") == 0)
 						settingItems.push({'label': this.settings[i].config.label(), 'command': i});
 				}
-
-				settingItems.push({'label': "Remove All Settings", 'command': "nosettings"});
 	
 				this.controller.popupSubmenu({
 					'onChoose': this.handleSettingsChoose.bind(this), 'items': settingItems});
@@ -1005,31 +1131,18 @@ EditmodeAssistant.prototype.handleAppsChoose = function(index) {
 EditmodeAssistant.prototype.handleTriggersChoose = function(index) {
 	if(index != undefined) {
 		eval("var list = this.mode.triggersList[index]." + this.triggers[index].id);
-
-		this.triggers[index].config.append(list, this.setModeData.bind(this, true));
 		
-		list[list.length - 1].type = this.triggers[index].id;
+		var data = this.triggers[index].config.config();
+
+		data.extension = this.triggers[index].id;
+
+		list.push(data);
+		
+		this.setModeData(true);
 	}
 }
 
 //
-
-EditmodeAssistant.prototype.handleListTap = function(list, event) {
-	if(event != undefined) {
-		 if(list == "triggers") {
-			for(var i = 0; i < this.triggers.length; i++) {
-				if(eval("event.model." + this.triggers[i].id) != undefined) {
-					eval("var list = this.mode.triggersList[i]." + this.triggers[i].id);
-					
-					this.triggers[i].config.tapped(list[event.index], event.originalEvent, 
-						this.setModeData.bind(this, true));
-		
-					break;
-				}
-			}
-		}
-	}
-}
 
 EditmodeAssistant.prototype.handleListChange = function(list, event) {
 	if(event != undefined) {
@@ -1037,20 +1150,6 @@ EditmodeAssistant.prototype.handleListChange = function(list, event) {
 			// Sliders don't have model with them.
 		
 			this.setModeData(true);
-		}
-		else {
-			if(list == "triggers") {
-				for(var i = 0; i < this.triggers.length; i++) {
-					if(event.model.type == this.triggers[i].id) {
-						eval("var list = this.mode.triggersList[i]." + this.triggers[i].id);
-					
-						this.triggers[i].config.changed(event.model, event, 
-							this.setModeData.bind(this, true));
-		
-						break;
-					}
-				}
-			}
 		}
 	}
 }
@@ -1083,8 +1182,6 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 	else if(list == "apps") {
 		for(var i = 0; i < this.applications.length; i++) {
 			if(eval("event.model.items[event.index]['" + this.applications[i].id + "']") != undefined) {
-				eval("var list = this.mode.appsList[event.index]['" + this.applications[i].id + "']");
-				
 				this.mode.appsList.splice(event.index,1);
 		
 				this.setModeData(true);
@@ -1098,15 +1195,14 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 			if(eval("event.model." + this.triggers[i].id) != undefined) {
 				eval("var list = this.mode.triggersList[i]." + this.triggers[i].id);
 				
-				this.triggers[i].config.remove(list, event.index, 
-					this.setModeData.bind(this, true));
-		
+				list.splice(event.index, 1);
+
+				this.setModeData(true);
+
 				break;
 			}
 		}
 	}
-	
-	this.setModeData(false);
 }
 
 //
@@ -1114,6 +1210,13 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 EditmodeAssistant.prototype.checkModeName = function() {
 	if(this.modelNameText.value.length == 0)
 		this.modelNameText.value = 'New Mode';
+
+	if((this.modelNameText.value == "Current Mode") || 
+		(this.modelNameText.value == "Default Mode") || 
+		(this.modelNameText.value == "Previous Mode"))
+	{
+		this.modelNameText.value = 'Reserved Mode Name';
+	}
 
 	for(var i = 0; i < 100; i++) {
 		if(i == 0)
@@ -1130,7 +1233,7 @@ EditmodeAssistant.prototype.checkModeName = function() {
 			}
 		}
 
-		if((exists) || ((this.type == "custom") && (name == "Default Mode")))
+		if(exists)
 			continue;
 		else {
 			if(i > 0)

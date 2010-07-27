@@ -9,23 +9,19 @@ function TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNoti
 //
 
 TimeofdayTrigger.prototype.init = function(config) {
-	// Re-schedule and setup all timers for timeout triggers. 
+	// Re-schedule and setup all timers for timeofday triggers. 
 
 	this.config = config;
 
-	this.reload();
-}
-
-TimeofdayTrigger.prototype.reload = function(modes) {
-	// Re-schedule and setup all timers for timeout trigger. 
+	// Re-schedule and setup all timers for timeofday trigger. 
 
 	// FIXME: should cancel timer that was set earlier (if changed in config)
-
+	
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
- 			if(this.config.modesConfig[i].triggersList[j].type == "timeofday") {
+ 			if(this.config.modesConfig[i].triggersList[j].extension == "timeofday") {
 				var limits = this.getTimeOfDayLimits(this.config.modesConfig[i].triggersList[j], true);
- 				
+
  				this.alarms.setupAlarmTimeout("timeofday", limits.startTime, limits.startTime.getTime() / 1000);
  				this.alarms.setupAlarmTimeout("timeofday", limits.closeTime, limits.closeTime.getTime() / 1000);
 			}
@@ -33,18 +29,20 @@ TimeofdayTrigger.prototype.reload = function(modes) {
 	}
 }
 
-TimeofdayTrigger.prototype.shutdown = function() {
-	// Disable all timeout trigger timers.
+TimeofdayTrigger.prototype.shutdown = function(config) {
+	// Disable all timeofday trigger timers.
+
+	this.config = config;
 
 	// FIXME: keep track of timers and close them here and in reload?
 
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "timeofday") {
+			if(this.config.modesConfig[i].triggersList[j].extension == "timeofday") {
 				var limits = this.getTimeOfDayLimits(this.config.modesConfig[i].triggersList[j], true);
 
-				this.clearAlarmTimeout("timeofday", limits.startTime);
-				this.clearAlarmTimeout("timeofday", limits.closeTime);
+				this.alarms.clearAlarmTimeout("timeofday", limits.startTime);
+				this.alarms.clearAlarmTimeout("timeofday", limits.closeTime);
 			}
 		}
 	}
@@ -66,33 +64,37 @@ TimeofdayTrigger.prototype.check = function(config) {
 TimeofdayTrigger.prototype.execute = function(timestamp, launchCallback) {
 	Mojo.Log.info("Timeout trigger received: " + timestamp);
 
-	// Process timeout event for generating the launcherModes list for the launcher.
+	// Process timeofday event for generating the launcherModes list for the launcher.
 
 	// Find the corresponding mode config(s) that matches the timestamp parameter.
-	// Check that time trigger is enabled and if yes then re-schedule the timeout.
+	// Check that time trigger is enabled and if yes then re-schedule the timeofday.
 
 	// Find the corresponding mode config(s) that matches the timestamp parameter.
-	// Check that the time trigger is enabled and if yes then re-schedule the timeout.
+	// Check that the time trigger is enabled and if yes then re-schedule the timeofday.
 
 	var startModes = new Array();
-	var closeMode = false;
+	var closeModes = new Array();
 
-	for(var i = 0; i < this.config.modesConfig.length ; i++) {	
+	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "timeofday") {
+			if(this.config.modesConfig[i].triggersList[j].extension == "timeofday") {
 				var current = this.getTimeOfDayLimits(this.config.modesConfig[i].triggersList[j], true);
 				var limits = this.getTimeOfDayLimits(this.config.modesConfig[i].triggersList[j], false);
 								
 				if((current.startTime.getTime() / 1000) == timestamp) {
-					startModes.push(this.config.modesConfig[i]);	
+					if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+					{
+						startModes.push(this.config.modesConfig[i]);
+					}
 					
 					this.alarms.setupAlarmTimeout("timeofday", limits.startTime, limits.startTime.getTime() / 1000);
 				}
 				else if((current.closeTime.getTime() / 1000) == timestamp) {
-					if((this.config.currentMode) && 
-						(this.config.currentMode.name == this.config.modesConfig[i].name))
+					if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
 					{
-						closeMode = true;		
+						closeModes.push(this.config.modesConfig[i]);
 					}
 					
 					this.alarms.setupAlarmTimeout("timeofday", limits.closeTime, limits.closeTime.getTime() / 1000);
@@ -100,8 +102,8 @@ TimeofdayTrigger.prototype.execute = function(timestamp, launchCallback) {
 			}
 		}
 	}
-	
-	launchCallback(startModes, closeMode);
+
+	launchCallback(startModes, closeModes);
 }
 
 //
@@ -112,9 +114,9 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 	// so we need to figure out the correct dates for the limits.
 
 	var curTime = new Date();
-	var startTime = new Date(trigger.timeoutStart * 1000);
-	var closeTime = new Date(trigger.timeoutClose * 1000);
-
+	var startTime = new Date(trigger.timeofdayStart * 1000);
+	var closeTime = new Date(trigger.timeofdayClose * 1000);
+	
 	curTime.setSeconds(0); curTime.setMilliseconds(0);
 
 	// Hours, Minutes, Seconds and Milliseconds should be correct (set in editmode).
@@ -152,7 +154,7 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 	
 	// Fix the startTime / closeTime according to the setup (workdays / weekends).
 
-	if(trigger.timeoutDays == 1) {
+	if(trigger.timeofdayDays == 1) {
 		if(startTime.getDay() == 0) {
 			startTime.setDate(startTime.getDate() + 1);
 			closeTime.setDate(closeTime.getDate() + 1);
@@ -168,7 +170,7 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 			closeTime.setDate(closeTime.getDate() + (6 - closeTime.getDay()));
 		}
 	}
-	else if(trigger.timeoutDays == 2) {
+	else if(trigger.timeofdayDays == 2) {
 		if((startTime.getDay() >= 1) && (startTime.getDay() <= 5)) {
 			var days = 6 - startTime.getDay();
 			
@@ -187,9 +189,9 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 			}
 		}
 	}
-	else if(trigger.timeoutDays == 3) {
+	else if(trigger.timeofdayDays == 3) {
 		for(var i = 0; i < 7; i++) {
-			if(trigger.timeoutCustom[startTime.getDay()] != true) {
+			if(trigger.timeofdayCustom[startTime.getDay()] != true) {
 				startTime.setDate(startTime.getDate() + 1);
 				closeTime.setDate(closeTime.getDate() + 1);
 			}
@@ -198,7 +200,7 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 		
 				if(startTime.getTime() == closeTime.getTime()) {
 					for(var j = 0; j < 7; j++) {
-						if(trigger.timeoutCustom[closeTime.getDay()] == true) {
+						if(trigger.timeofdayCustom[closeTime.getDay()] == true) {
 							closeTime.setDate(closeTime.getDate() + 1);
 						}
 						else {
@@ -221,7 +223,7 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 		if(closeTime.getTime() <= curTime.getTime())
 			closeTime.setDate(closeTime.getDate() + 1);
 
-		if(trigger.timeoutDays == 1) {
+		if(trigger.timeofdayDays == 1) {
 			if(startTime.getDay() == 0) {
 				startTime.setDate(startTime.getDate() + 1);
 				closeTime.setDate(closeTime.getDate() + 1);
@@ -232,16 +234,16 @@ TimeofdayTrigger.prototype.getTimeOfDayLimits = function(trigger, current) {
 			}	
 		}
 
-		else if(trigger.timeoutDays == 2) {
+		else if(trigger.timeofdayDays == 2) {
 			if((startTime.getDay() >= 1) && (startTime.getDay() <= 5)) {
 				startTime.setDate(startTime.getDate() + (6 - startTime.getDay()));
 				closeTime.setDate(closeTime.getDate() + (6 - closeTime.getDay()));
 			}
 		}
 
-		else if(trigger.timeoutDays == 3) {
+		else if(trigger.timeofdayDays == 3) {
 			for(var i = 0; i < 7; i++) {
-				if(trigger.timeoutCustom[startTime.getDay()] != true) {
+				if(trigger.timeofdayCustom[startTime.getDay()] != true) {
 					startTime.setDate(startTime.getDate() + 1);
 					closeTime.setDate(closeTime.getDate() + 1);
 				}

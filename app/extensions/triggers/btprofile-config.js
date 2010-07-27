@@ -1,83 +1,66 @@
-function BTProfileConfig() {
+function BtprofileConfig() {
+}
+
+BtprofileConfig.prototype.version = function() {
+	return "1.0";
 }
 
 //
 
-BTProfileConfig.prototype.label = function() {
+BtprofileConfig.prototype.label = function() {
 	return "Bluetooth Profile Trigger";
 }
 
 //
 
-BTProfileConfig.prototype.setup = function(controller) {
-    
+BtprofileConfig.prototype.setup = function(controller) {
 	this.choicesProfileSelector = [
 		{'label': "Stereo Music", 'value': "a2dp"},
 		{'label': "AV Remote Control", 'value': "avrcp"},
 		{'label': "Hands-Free", 'value': "hfg"},
-                {'label': "Headset", 'value': "hsp"},
+		{'label': "Headset", 'value': "hsp"},
 		{'label': "Personal Area Network", 'value': "pan"},
-		{'label': "Phone Book Access", 'value': "pba"}
-		//{'label': "", 'value': ""}
-	];
+		{'label': "Phone Book Access", 'value': "pba"} ];
 
-	controller.setupWidget(
-		"ProfileSelector",
-		{
-			'label': "Profile",
-			'labelPlacement': "left",
-			'modelProperty': "profile",
-			'choices': this.choicesProfileSelector
-		}
-	);
+	controller.setupWidget("BtprofileProfileSelector", {'label': "Profile",
+		'labelPlacement': "left", 'modelProperty': "btprofileProfile",
+		'choices': this.choicesProfileSelector});
         
 	this.choicesProfileStateSelector = [
 		{'label': "Connected", 'value': 1},
 		{'label': "Disconnected", 'value': 0},
-                {'label': "Any", 'value': 2}
-	];  
+		{'label': "Any", 'value': 2} ];  
 
-	controller.setupWidget(
-		"ProfileStateSelector",
-		{
-			'label': "State",
-			'labelPlacement': "left",
-			'modelProperty': "profilestate",
-			'choices': this.choicesProfileStateSelector
-		}
-	);        
+	controller.setupWidget("BtprofileStateSelector", {'label': "State",
+		'labelPlacement': "left", 'modelProperty': "btprofileState",
+		'choices': this.choicesProfileStateSelector});        
 }
 
 //
 
-BTProfileConfig.prototype.load = function(config, data) {
-	config.push({'profile': data.profile, 'profilestate': data.profilestate});
-}
-
-BTProfileConfig.prototype.save = function(config, data) {
-	data.push({'profile': config.profile, 'profilestate': config.profilestate});
-}
-
-//
-
-BTProfileConfig.prototype.append = function(config, saveCallback) {
-	config.push({'profile': "a2dp", 'profilestate': 1});
+BtprofileConfig.prototype.load = function(preferences) {
+	var config = {
+		'btprofileProfile': preferences.btprofileProfile,
+		'btprofileState': preferences.btprofileState };
 	
-	saveCallback(true);
+	return config;
 }
 
-BTProfileConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback(true);
+BtprofileConfig.prototype.save = function(config) {
+	var preferences = {
+		'btprofileProfile': config.btprofileProfile,
+		'btprofileState': config.btprofileState };
+	
+	return preferences;
 }
 
 //
 
-BTProfileConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
-
-BTProfileConfig.prototype.tapped = function(config, event, saveCallback) {
+BtprofileConfig.prototype.config = function() {
+	var config = {
+		'btprofileProfile': "a2dp",
+		'btprofileState': 1 };
+	
+	return config;
 }
 

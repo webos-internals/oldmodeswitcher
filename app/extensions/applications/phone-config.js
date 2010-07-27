@@ -2,19 +2,22 @@ function PhoneConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 }
 
+PhoneConfig.prototype.version = function() {
+	return "1.0";
+}
+
+PhoneConfig.prototype.appid = function() {
+	return "com.palm.app.phone";
+}
+
 //
 
 PhoneConfig.prototype.init = function() {
 }
 
-PhoneConfig.prototype.data = function(data) {
-}
-
 //
 
 PhoneConfig.prototype.setup = function(controller) {
-	// Mode selector
-
 	this.choicesPhoneLaunchSelector = [
 		{'label': "On Mode Start", value: 1},
 		{'label': "On Mode Close", value: 2} ];  
@@ -22,12 +25,23 @@ PhoneConfig.prototype.setup = function(controller) {
 	controller.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesPhoneLaunchSelector} );
-
-	// URL text field
 			
 	controller.setupWidget("PhoneNumberText", { 'hintText': "Enter phone number...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchNumber"} );
+}
+
+//
+
+PhoneConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0, 
+		'launchNumber': "" };
+	
+	return config;
 }
 
 //
@@ -69,6 +83,8 @@ PhoneConfig.prototype.save = function(config) {
 	}
 
 	var preferences = {
+		'url': "",
+		'method': "",
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode,
@@ -77,18 +93,5 @@ PhoneConfig.prototype.save = function(config) {
 		'closeParams': closeParams };
 	
 	return preferences;
-}
-
-//
-
-PhoneConfig.prototype.config = function(launchPoint) {
-	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0, 
-		'launchNumber': "" };
-	
-	return config;
 }
 

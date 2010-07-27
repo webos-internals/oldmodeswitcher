@@ -1,156 +1,125 @@
 function ScreenSetting(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
-	
-	this.labels = new Array("screen brightness", "screen timeout", "blink notify", "wallpaper");
 }
 
 //
 
 ScreenSetting.prototype.get = function(callback) {
-	var settings = {"screenBrightnessLevel": 0, "screenTurnOffTimeout": 0, "screenBlinkNotify": 0, "screenWallpaperName": "Do Not Set*", "screenWallpaperPath": ""};
+	var settings = {};
 	
-	this.getSystemSettings(0, 0, settings, callback);
+	this.getSystemSettings(0, settings, callback);
 }
 
 ScreenSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, 0, settings, callback);
+	this.setSystemSettings(0, settings, callback);
 }
 
 //
 
-ScreenSetting.prototype.getSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, retry, settings, callback);
+ScreenSetting.prototype.getSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
 	
 	if(request == 0) {
-		this.service.request('palm://com.palm.display/control/', { method: 'getProperty',
-			parameters:{properties:['maximumBrightness']}, onComplete: completeCallback });
+		this.service.request("palm://com.palm.display/control/", {'method': "getProperty",
+			'parameters': {'properties': ["maximumBrightness", "timeout"]}, 
+			'onComplete': completeCallback});
 	}
 	else if(request == 1) {
-		this.service.request('palm://com.palm.display/control/', { method: 'getProperty',
-			parameters:{properties:['timeout']}, onComplete: completeCallback });
-	}
-	else if(request == 2) {
-		this.service.request('palm://com.palm.systemservice/', { method: 'getPreferences', 
-			parameters: {'subscribe':false, 'keys': ["BlinkNotifications", "wallpaper"]}, onComplete: completeCallback });
+		this.service.request("palm://com.palm.systemservice/", {'method': "getPreferences", 
+			'parameters': {'subscribe': false, 'keys': ["BlinkNotifications", 
+			"showAlertsWhenLocked", "wallpaper"]}, 'onComplete': completeCallback});
 	}
 	else
 		callback(settings);
 }
 
-ScreenSetting.prototype.handleGetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValue == undefined)) {
-		// System request was succesfull so store the data and move to next request.
-		
-		Mojo.Log.info("Succesful " + this.labels[request] + " request");
-		
+ScreenSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
+	if(response.returnValue) {
 		if(request == 0) {
 			settings.screenBrightnessLevel = response.maximumBrightness;
-		}
-		else if(request == 1) {
 			settings.screenTurnOffTimeout = response.timeout;
 		}
-		else if(request == 2) {
+		else if(request == 1) {
 			if(response.BlinkNotifications)
 				settings.screenBlinkNotify = 1;
 			else
 				settings.screenBlinkNotify = 0;			
 
-			//settings.screenWallpaperName = response.wallpaper.wallpaperName;
-			//settings.screenWallpaperPath = response.wallpaper.wallpaperFile;
-		}
-		
-		this.getSystemSettings(++request, 0, settings, callback);
-	}
-	else {
-		// System request failed so retry or skip the request.
+			if(response.showAlertsWhenLocked)
+				settings.screenLockedNotify = 1;
+			else
+				settings.screenLockedNotify = 0;			
 
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.getSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.getSystemSettings(++request, 0, settings, callback);
+			if(response.wallpaper.wallpaperName.length != 0) {
+				settings.screenWallpaper = {
+					'name': response.wallpaper.wallpaperName,
+					'path': response.wallpaper.wallpaperFile };
+			}
 		}
 	}
+
+	this.getSystemSettings(++request, settings, callback);
 }
 
 //
 
-ScreenSetting.prototype.setSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
+ScreenSetting.prototype.setSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
 	
 	if(request == 0) {
-		var brightness = settings.screenBrightnessLevel;
+		if((settings.screenBrightnessLevel == undefined) && (settings.screenTurnOffTimeout == undefined))
+			this.setSystemSettings(++request, settings, callback);
+		else {
+			var params = {};
+
+			if(settings.screenBrightnessLevel != undefined)
+				params.maximumBrightness = settings.screenBrightnessLevel;
+			
+			if(settings.screenTurnOffTimeout != undefined)
+				params.timeout = settings.screenTurnOffTimeout;
 		
-		this.service.request('palm://com.palm.display/control/', { method: 'setProperty',
-			parameters: {'maximumBrightness': brightness},
-			onComplete: completeCallback });
+			this.service.request("palm://com.palm.display/control/", {'method': "setProperty",
+				'parameters': params, 'onComplete': completeCallback });
+		}
 	}
 	else if(request == 1) {
-		if(settings.screenTurnOffTimeout == 0)
-			this.setSystemSettings(++request, 0, settings, callback);
-		else {
-			var timeout = settings.screenTurnOffTimeout;
-	
-			this.service.request('palm://com.palm.display/control/', { method: 'setProperty',
-				parameters: {'timeout': timeout},
-				onComplete: completeCallback });
+		if((settings.screenBlinkNotify == undefined) && (settings.screenLockedNotify == undefined) &&
+			(settings.screenWallpaper == undefined))
+		{
+			this.setSystemSettings(++request, settings, callback);
 		}
-	}
-	else if(request == 2) {
-		if(settings.screenBlinkNotify == 0)
-			this.setSystemSettings(++request, 0, settings, callback);
 		else {
-			if(settings.screenBlinkNotify == 1)
-				var blinkNotify = true;
-			else
-				var blinkNotify = false;
+			var params = {};
 			
-			this.service.request("palm://com.palm.systemservice/", { method: 'setPreferences', 
-				parameters: {"BlinkNotifications": blinkNotify}, onComplete: completeCallback });
-		}
-	}
-	else if(request == 3) {
-		if(settings.screenWallpaperName == "Do Not Set*")
-			this.setSystemSettings(++request, 0, settings, callback);
-		else {
-			var wallpaper = {
-				wallpaperName: settings.screenWallpaperName,
-				wallpaperFile: settings.screenWallpaperPath
+			if(settings.screenBlinkNotify != undefined) {
+				if(settings.screenBlinkNotify == 1)
+					params.BlinkNotifications = true;
+				else
+					params.BlinkNotifications = false;
 			}
-		
-			this.service.request("palm://com.palm.systemservice/", { method: 'setPreferences', 
-				parameters: {"wallpaper": wallpaper}, onComplete: completeCallback });
+			
+			if(settings.screenLockedNotify != undefined) {
+				if(settings.screenLockedNotify == 1)
+					params.showAlertsWhenLocked = true;
+				else
+					params.showAlertsWhenLocked = false;
+			}
+			
+			if(settings.screenWallpaper != undefined) {
+				params.wallpaper = {
+					'wallpaperName': settings.screenWallpaper.name,
+					'wallpaperFile': settings.screenWallpaper.path };
+			}
+			
+			this.service.request("palm://com.palm.systemservice/", {'method': "setPreferences", 
+				'parameters': params, 'onComplete': completeCallback});
 		}
 	}
 	else
 		callback();
 }
 
-ScreenSetting.prototype.handleSetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValuer == undefined)) {
-		// System request was succesful so move to next request.
-		
-		Mojo.Log.info("Succesful " + this.labels[request] + " request");
-		
-		this.setSystemSettings(++request, 0, settings, callback);
-	}
-	else {
-		// System request failed so retry or skip the request.
-		
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.setSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.setSystemSettings(++request, 0, settings, callback);
-		}
-	}
+ScreenSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
+	this.setSystemSettings(++request, settings, callback);
 }	
 

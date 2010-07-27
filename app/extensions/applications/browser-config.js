@@ -2,12 +2,17 @@ function BrowserConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 }
 
+BrowserConfig.prototype.version = function() {
+	return "1.0";
+}
+
+BrowserConfig.prototype.appid = function() {
+	return "com.palm.app.browser";
+}
+
 //
 
 BrowserConfig.prototype.init = function() {
-}
-
-BrowserConfig.prototype.data = function(data) {
 }
 
 //
@@ -28,6 +33,30 @@ BrowserConfig.prototype.setup = function(controller) {
 	controller.setupWidget("BrowserURLText", { 'hintText': "Enter URL to load...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchURL"});
+
+	// Delay selector
+	
+	this.choicesBrowserDelaySelector = [
+		{'label': "No Delay", value: 0},
+		{'label': "15 Seconds", value: 15},
+		{'label': "30 Seconds", value: 30} ];  
+
+	controller.setupWidget("BrowserDelaySelector", {'label': "Delay", 
+		'labelPlacement': "left", 'modelProperty': "launchDelay",
+		'choices': this.choicesBrowserDelaySelector} );
+}
+
+//
+
+BrowserConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0, 
+		'launchURL': "" };
+	
+	return config;
 }
 
 //
@@ -69,6 +98,8 @@ BrowserConfig.prototype.save = function(config) {
 	}
 
 	var preferences = {
+		'url': "",
+		'method': "",
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode, 
@@ -77,18 +108,5 @@ BrowserConfig.prototype.save = function(config) {
 		'closeParams': closeParams };
 	
 	return preferences;
-}
-
-//
-
-BrowserConfig.prototype.config = function(launchPoint) {
-	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0, 
-		'launchURL': "" };
-	
-	return config;
 }
 

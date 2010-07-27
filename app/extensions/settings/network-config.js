@@ -1,6 +1,10 @@
 function NetworkConfig() {
 }
 
+NetworkConfig.prototype.version = function() {
+	return "1.0";
+}
+
 //
 
 NetworkConfig.prototype.label = function() {
@@ -10,10 +14,8 @@ NetworkConfig.prototype.label = function() {
 //
 
 NetworkConfig.prototype.setup = function(controller) {
-	// Network type and data roaming selectors.
-	
 	this.choicesNetworkTypeSelector = [
-		{'label': "Do Not Set", 'value': 0},
+		{'label': controller.defaultChoiseLabel, 'value': -1},
 		{'label': "Automatic", 'value': 1},
 		{'label': "2G Only", 'value': 2},
 		{'label': "3G Only", 'value': 3} ];  
@@ -23,53 +25,65 @@ NetworkConfig.prototype.setup = function(controller) {
 		'choices': this.choicesNetworkTypeSelector});
 
 	this.choicesDataRoamingSelector = [
-		{'label': "Do Not Set", 'value': 0},
+		{'label': controller.defaultChoiseLabel, 'value': -1},
 		{'label': "Enabled", 'value': 1},
 		{'label': "Disabled", 'value': 2} ];  
 
-	controller.setupWidget("DataRoamingSelector", {'label': "Data Roaming", 
+	controller.setupWidget("NetworkDataSelector", {'label': "Data Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkData",
 		'choices': this.choicesDataRoamingSelector});
 
 	this.choicesVoiceRoamingSelector = [
-		{'label': "Do Not Set", 'value': 0},
+		{'label': controller.defaultChoiseLabel, 'value': -1},
 		{'label': "Automatic", 'value': 1},
 		{'label': "Home Only", 'value': 2},
 		{'label': "Roam Only", 'value': 3} ];  
 
-	controller.setupWidget("VoiceRoamingSelector", {'label': "Voice Roaming", 
+	controller.setupWidget("NetworkVoiceSelector", {'label': "Voice Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkVoice",
 		'choices': this.choicesVoiceRoamingSelector});
 }
 
 //
 
-NetworkConfig.prototype.load = function(preferences) {
+NetworkConfig.prototype.config = function() {
 	var config = {
-		'networkType': preferences.networkType,
-		'networkData': preferences.networkData, 
-		'networkVoice': preferences.networkVoice };
+		'networkType': -1, 
+		'networkData': -1, 
+		'networkVoice': -1 };
+	
+	return config;
+}
+
+//
+
+NetworkConfig.prototype.load = function(preferences) {
+	var config = this.config();
+	
+	if(preferences.networkType != undefined)
+		config.networkType = preferences.networkType;
+
+	if(preferences.networkData != undefined)
+		config.networkData = preferences.networkData;
+	
+	if(preferences.networkVoice != undefined)
+		config.networkVoice = preferences.networkVoice;
 	
 	return config;
 }
 
 NetworkConfig.prototype.save = function(config) {
-	var preferences = {
-		'networkType': config.networkType,
-		'networkData': config.networkData, 
-		'networkVoice': config.networkVoice };
+	var preferences = {};
+	
+	if(config.networkType != -1)
+		preferences.networkType = config.networkType;
+
+	if(config.networkData != -1)
+		preferences.networkData = config.networkData;
+
+	if(config.networkVoice != -1)
+		preferences.networkVoice = config.networkVoice;
 	
 	return preferences;
-}
-
-//
-
-NetworkConfig.prototype.config = function() {
-	var config = {
-		'networkType': 0, 
-		'networkData': 0, 
-		'networkVoice': 0 };
-	
-	return config;
 }
 

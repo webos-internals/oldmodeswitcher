@@ -1,153 +1,96 @@
 function MessagingSetting(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
-	
-	this.labels = new Array("instant message", "message sound");
 }
 
 //
 
 MessagingSetting.prototype.get = function(callback) {
-	var settings = {"messagingIMStatus": 0, "messagingSoundMode": 0, "messagingRingtoneName": "Do Not Set", "messagingRingtonePath": ""};
+	var settings = {};
 	
-	this.getSystemSettings(0, 0, settings, callback);
+	this.getSystemSettings(0, settings, callback);
 }
 
 MessagingSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, 0, settings, callback);
+	this.setSystemSettings(0, settings, callback);
 }
 
 //
 
-MessagingSetting.prototype.getSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, retry, settings, callback);
+MessagingSetting.prototype.getSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
 	
 	if(request == 0) {
-		this.service.request('palm://com.palm.messaging/', { method: 'getAccountList',
-			parameters: {'subscribe': false}, onComplete: completeCallback });
+		this.service.request("palm://com.palm.messaging/", {'method': "getAllMessagingPreferences", 
+			'parameters': {'subscribe':false}, 'onComplete': completeCallback});
 	}
 	else if(request == 1) {
-		this.service.request("palm://com.palm.messaging/", { method: 'getNotificationPreferences', 
-			parameters: {'subscribe':false}, onComplete: completeCallback });
+		this.service.request('palm://com.palm.messaging/', { 'method': "getAccountList",
+			'parameters': {'subscribe': false}, 'onComplete': completeCallback });
 	}
-//	else if(request == 2) {
-//		this.service.request("palm://com.palm.messaging/", { method: '...', 
-//			parameters: {'subscribe':false}, onComplete: completeCallback });
-//	}
 	else
 		callback(settings);
 }
 
-MessagingSetting.prototype.handleGetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValue == undefined)) {
-		// System request was succesfull so store the data and move to next request.
-		
-		Mojo.Log.info("Succesful " + this.labels[request] + " request");
-		
+MessagingSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
+	if(response.returnValue) {
 		if(request == 0) {
-			if(response.count > 0) {
-				if(response.list[0].availability == 0)
-					settings.messagingIMStatus = 1;
-				else if(response.list[0].availability == 2)
-					settings.messagingIMStatus = 2;
-				else if(response.list[0].availability == 4)
-					settings.messagingIMStatus = 3;
+			settings.messagingAlert = response.messagingPrefs.enableNotificationSound;
+		
+			if((response.messagingPrefs.notificationRingtoneName != undefined) && 
+				(response.messagingPrefs.notificationRingtoneName.length != 0))
+			{
+				settings.messagingRingtone = {
+					'name': response.messagingPrefs.notificationRingtoneName,
+					'path': response.messagingPrefs.notificationRingtonePath };
 			}
 		}
 		else if(request == 1) {
-			if(response.isEnabledNotificationSound == 0)
-				settings.messagingSoundMode = 4;
-			else if(response.isEnabledNotificationSound == 1)
-				settings.messagingSoundMode = 2;
-			else if(response.isEnabledNotificationSound == 2)
-				settings.messagingSoundMode = 3;
-			else if(response.isEnabledNotificationSound == 3)
-				settings.messagingSoundMode = 1;
+			if(response.list.length > 0) {
+				settings.messagingIMStatus = response.list[0].availability;
+			}
 		}
-//		else if(request == 2) {
-//			settings.messagingRingtoneName = response.messagetone.name;
-//			settings.messagingRingtonePath = response.messagetone.fullPath;
-//		}		
-		
-		this.getSystemSettings(++request, 0, settings, callback);
 	}
-	else {
-		// System request failed so retry or skip the request.
 
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.getSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.getSystemSettings(++request, 0, settings, callback);
-		}
-	}
+	this.getSystemSettings(++request, settings, callback);
 }
 
 //
 
-MessagingSetting.prototype.setSystemSettings = function(request, retry, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, retry, settings, callback);
+MessagingSetting.prototype.setSystemSettings = function(request, settings, callback) {
+	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
 	
-	if(request == 0) {
-		if(settings.messagingIMStatus == 0)
-			this.setSystemSettings(++request, 0, settings, callback);		
+	if(request == 1) {
+		if((settings.messagingAlert == undefined) && (settings.messagingRingtone == undefined))
+			this.setSystemSettings(++request, settings, callback);		
 		else {
-			if(settings.messagingIMStatus == 1)
-				var availability = 0;
-			else if(settings.messagingIMStatus == 2)
-				var availability = 2;
-			else if(settings.messagingIMStatus == 3)
-				var availability = 4;
-	
-			this.service.request('palm://com.palm.messaging/', { method: 'setMyAvailability', 
-				parameters: {"availability": availability}, onComplete: completeCallback });
+			var params = {};
+			
+			if(settings.messagingAlert != undefined)
+				params.isEnabledNotificationSound = settings.messagingAlert;
+			
+			if(settings.messagingRingtone != undefined) {
+				params.ringtoneName = settings.messagingRingtone.name;
+				params.ringtonePath = settings.messagingRingtone.path;
+			}
+		
+			this.service.request("palm://com.palm.messaging/", {'method': "setNotificationPreferences", 
+				'parameters': params, 'onComplete': completeCallback});
 		}
 	}
-	else if(request == 1) {
-		if(settings.messagingSoundMode == 0)
-			this.setSystemSettings(++request, 0, settings, callback);		
+	else if(request == 0) {
+		if(settings.messagingIMStatus == undefined)
+			this.setSystemSettings(++request, settings, callback);		
 		else {
-			if(settings.messagingSoundMode == 1)
-				var enabled = 3;
-			else if(settings.messagingSoundMode == 2)
-				var enabled = 1;
-			else if(settings.messagingSoundMode == 3)
-				var enabled = 2;
-			else if(settings.messagingSoundMode == 4)
-				var enabled = 0;
-	
-			this.service.request('palm://com.palm.messaging/', { method: 'setNotificationPreferences', 
-				parameters: {"isEnabledNotificationSound": enabled}, onComplete: completeCallback });
+			this.service.request("palm://com.palm.messaging/", {'method': "setMyAvailability", 
+				'parameters': {'availability': settings.messagingIMStatus}, 
+				'onComplete': completeCallback});
 		}
 	}
 	else
 		callback();
 }
 
-MessagingSetting.prototype.handleSetResponse = function(request, retry, settings, callback, response) {
-	if((response.returnValue) || (response.returnValue == undefined)) {
-		// System request was succesful so move to next request.
-		
-		Mojo.Log.info("Succesful " + this.labels[request] + " request");
-		
-		this.setSystemSettings(++request, 0, settings, callback);
-	}
-	else {
-		// System request failed so retry or skip the request.
-		
-		if(retry < 2) {
-			Mojo.Log.warn("Retrying " + this.labels[request] + " request");
-			
-			this.setSystemSettings(request, ++retry, settings, callback);
-		}
-		else {
-			Mojo.Log.error("Skipping " + this.labels[request] + " request");
-			
-			this.setSystemSettings(++request, 0, settings, callback);
-		}
-	}
+MessagingSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
+	this.setSystemSettings(++request, settings, callback);
 }
 

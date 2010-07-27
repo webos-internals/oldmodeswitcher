@@ -1,243 +1,301 @@
-function BTProfileTrigger(ServiceRequestWrapper) {
+function BtprofileTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
-	this.serviceCalls = [];
+	
 	this.profile = "none";
-	this.triggertype = "btprofile";
-	this.profileconnected = false;
-	this.monitorNotificationHandler = this.handleMonitorNotifications.bind(this);
-	this.profNotificationHandler = this.handleStatus.bind(this);
+	this.connected = false;
+	this.profileState = 0;
 	
 	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 }
 
 //
 
-BTProfileTrigger.prototype.init = function(config) {
+BtprofileTrigger.prototype.init = function(config) {
+	this.log("init: config:",Object.toJSON(config));
+
 	this.config = config;
-	this.log("init: config:",Object.toJSON(this.config));
 	
-	//Subscribe to bluetooth radio state notifications.
-	this.subscribeMonitorNotifications("register");
+	this.checkRadioState();
 }
 
-BTProfileTrigger.prototype.reload = function(modes) {
-}
+BtprofileTrigger.prototype.shutdown = function(config) {
+	this.config = config;
 
-BTProfileTrigger.prototype.shutdown = function() {
-	//Cancel all notification subscriptions.
-	this.subscribeStatus("");
-	this.subscribeMonitorNotifications("");
+	this.subscribeRadioStatus("cancel");
+	
+	this.subscribeMonitorNotifications("cancel");
 }
 
 //
 
-BTProfileTrigger.prototype.check = function(config) {
-	
+BtprofileTrigger.prototype.check = function(config) {
 	this.log("check: config",Object.toJSON(config));
 	this.log("check: this.profile:",this.profile);
-	this.log("check: this.profilestate:",this.profilestate);
-	this.log("check: this.profileconnected:",this.profileconnected);
+	this.log("check: this.profileState:",this.profileState);
+	this.log("check: this.connected:",this.connected);
 	
-	if(this.profile == config.profile && (this.profilestate == config.profilestate || config.profilestate == 2)){
+	if((this.profile == config.profile) && 
+		(this.profileState == config.profileState || config.profileState == 2))
+	{
 		this.log("check: true")
-		return true;
-	
-	//Check for bluetooth switching off while profile is connected.
-	}else if(this.profileconnected && (this.profilestate == 0 || config.profilestate == 2)){
-		this.log("check: true2")
+		
 		return true;
 	}
+	else if((this.connected) && 
+		(this.profileState == 0 || config.profileState == 2))
+	{
+		// Check for bluetooth switching off while profile is connected.
+
+		this.log("check: true2")
+		
+		return true;
+	}
+	
 	this.log("check: false")
+	
 	return false;
 }
 
 //
 
-BTProfileTrigger.prototype.execute = function(profile, launchCallback) {
-	this.log("Bluetooth profile trigger received: " + profile);
+BtprofileTrigger.prototype.execute = function(profile, launchCallback) {
+	Mojo.Log.info("Btprofile trigger received: " + profile);
 
-	// Form a list of modes that the trigger involves and are valid.
+	var startModes = new Array();
+	var closeModes = new Array();
 
-	var modes = new Array();
-
-	var close = false;
-
-	for(var i = 0; i < this.config.currentMode.triggersList.length; i++) {
-		if(this.config.currentMode.triggersList[i].type == this.triggertype) {
-			close = true;
-			
-			break;
-		}		
-	}
-	
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == this.triggertype) {
-				modes.push(this.config.modesConfig[i]);
+			if(this.config.modesConfig[i].triggersList[j].extension == "btprofile") {
+				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+				{
+					startModes.push(this.config.modesConfig[i]);
+				}
+				else {
+					closeModes.push(this.config.modesConfig[i]);
+				}
 				
 				break;
 			}
 		}
 	}
 
-	launchCallback(modes, close);
+	launchCallback(startModes, closeModes);
 }
 
 //
 
-BTProfileTrigger.prototype.subscribeMonitorNotifications = function(register) {
-	// Subscribe / unsubscribe for radio state notifications
-	if(register == "register"){
-		if (!this.monitorServiceCall) {
-			this.log("Subscribe to service notifications")
-			this.monitorServiceCall = this.btMojoService("palm://com.palm.btmonitor/monitor/subscribenotifications", {
-				subscribe: true
-			    },
-			this.monitorNotificationHandler, true);
-			
-		}
-	}else{
-		
-		this.profileconnected = false;
-		
-		if (this.monitorServiceCall) {
-		    this.log("Unsubscribing service notifications")
-		    this.monitorServiceCall.cancel();
-		    this.monitorServiceCall = null;
-		}
-	}
-
+BtprofileTrigger.prototype.checkRadioState = function() {
+	new Mojo.Service.Request("palm://com.palm.btmonitor/monitor/", {'method': "getradiostate", 
+		'parameters': {}, 'onComplete': this.handleRadioState.bind(this)});
 }
 
-BTProfileTrigger.prototype.subscribeStatus = function(register) {
-	// Subscribe to profile Notifications
-	//Bluetooth radio must be on for these so only cal when you know it's on.
+BtprofileTrigger.prototype.handleRadioState = function(response) {
+	this.log("handleInitRadioState:","response:", Object.toJSON(response));
 	
-	this.log("subscribeStatus: register:", register);
-	if(register == "register"){
-		if (!this.subscribtionStatus) {
-			this.log("Subscribe to profile notifications")
-		    this.subscribtionStatus = this.btMojoService("palm://com.palm.bluetooth/prof/subscribenotifications", {
-			subscribe: true
-		    },
-		    this.profNotificationHandler, true);
-		}		
-	}else{
-		// Unsubscribe for profile notifications
+	this.log("handleInitRadioState:","handleInitRadioState:", "Subscribing to radio state notifications.");
+	
+	// Subscribe to bluetooth radio state notifications.
+
+	this.subscribeMonitorNotifications("register");
+	
+	if(response.radio == "on"){
+		// Radio already on so no notification have been recieved to start monitoring for profile messages.
 		
-		if (this.subscribtionStatus) {
-		    this.log("Unsubscribing profile notifications")
-		    this.subscribtionStatus.cancel();
-		    this.subscribtionStatus = null;
+		this.log("handleInitRadioState:","handleInitRadioState:", "Radio already on.");
+		this.log("handleInitRadioState:","handleInitRadioState:", "Manually starting profile notifications");
+
+		// Manually start profile monitoring notifications.
+		
+		this.subscribeRadioStatus("register");
+	}
+	else
+		this.log("handleInitRadioState:","handleInitRadioState:", "Radio is not on");
+
+	this.log("handleInitRadioState:","handleInitRadioState:", "done.");
+}
+
+//
+
+BtprofileTrigger.prototype.subscribeMonitorNotifications = function(register) {
+	// Subscribe / unsubscribe for radio state notifications.
+	
+	if(register == "register") {
+		if(!this.monitorServiceCall) {
+			this.log("Subscribe to service notifications")
+			
+			this.monitorServiceCall = new Mojo.Service.Request("palm://com.palm.btmonitor/monitor/", {
+				'method': "subscribenotifications", 'parameters': {'subscribe': true},
+				'onComplete': this.handleMonitorNotifications.bind(this)});
+		}
+	}
+	else {
+		this.connected = false;
+		
+		if(this.monitorServiceCall) {
+			this.log("Unsubscribing service notifications")
+			
+			this.monitorServiceCall.cancel();
+			this.monitorServiceCall = null;
 		}
 	}
 }
 
-// Mojo service wrapper function
-BTProfileTrigger.prototype.btMojoService = function(url, params, cb) {
-    this.serviceCalls[url] = new Mojo.Service.Request(url, {
-        onSuccess: cb,
-        onFailure: cb,
-        parameters: params,
-    });
-    return this.serviceCalls[url];
-}
-
-BTProfileTrigger.prototype.handleMonitorNotifications = function(payload) {
-	//Bluetooth radio state notification handler.
+BtprofileTrigger.prototype.handleMonitorNotifications = function(response) {
+	// Bluetooth radio state notification handler.
 	
 	this.log("handleMonitorNotifications.");
-	this.log("handleMonitorNotifications: continuing with valid payload.", Object.toJSON(payload));
+	this.log("handleMonitorNotifications: continuing with valid response.", Object.toJSON(response));
 	
-	if(!payload){return};
+	if(!response)
+		return;
 	
-	//Samples:
-	//{"returnValue": true, "subscribed": true, "radio": "on"}
-	//{"notification": "notifnradiooff", "error": 0}
+	// Samples:
+	// {"returnValue": true, "subscribed": true, "radio": "on"}
+	// {"notification": "notifnradiooff", "error": 0}
 	
-	if(payload.notification){
-	    this.log("payload.notification:",payload.notification)
-	    if(payload.notification == "notifnradioon"){
-		    this.log("Bluetooth radio is on. Requesting subscription for profile notifications.");
-		    this.subscribeStatus("register");
-		    return;
+	if(response.notification || response.radio) {
+		this.log("response.notification:",response.notification)
 	    
-	    /*
-	     Check for bluetooth switch off when connected to selected profile.
-	     When connected to a profile and the bluetooth radio is switched off
-	     we do not recieve the diconnect message.
-	    */
-	    }else if(this.profileconnected && payload.notification == "notifnradioturningoff"){
+		if(response.notification == "notifnradioon" || response.radio == "on") {
+			this.log("Bluetooth radio is on. Requesting subscription for profile notifications.");
+			
+			this.subscribeRadioStatus("register");
+			
+			return;
+		}
+		else if(this.connected && response.notification == "notifnradioturningoff") {
+    		/*
+			Check for bluetooth switch off when connected to selected profile.
+			When connected to a profile and the bluetooth radio is switched off
+			we do not recieve the diconnect message.
+			*/
+
+			this.connected = false;
 		    
-		    this.profileconnected = false;
-		    
-		    this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			    'parameters': {'id': this.appid, 'params': {
-				    'action': "trigger", 'event': this.triggertype, 'data': this.profile}}
-		    });
-		    
-		    return;
-	    }
+			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+			    'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+			    	'event': "btprofile", 'data': this.profile}}});
+
+			return;
+		}
 	}
+
 	this.log("Canceling subscription for profile notifications.");
-	this.subscribeStatus("");
+
+	this.subscribeRadioStatus("cancel");
 }
 
-BTProfileTrigger.prototype.handleStatus = function(payload) {
+//
+
+
+BtprofileTrigger.prototype.subscribeRadioStatus = function(register) {
+	// Subscribe to profile Notifications.
 	
-	//Handle bluetooth profile notifications.
+	// Bluetooth radio must be on for these so only cal when you know it's on.
 	
-	//Samples:
-	//
+	this.log("subscribeRadioStatus: register:", register);
+	
+	if(register == "register") {
+		if(!this.subscribtionStatus) {
+			this.log("Subscribe to profile notifications")
+			
+			this.subscribtionStatus = new Mojo.Service.Request("palm://com.palm.bluetooth/prof/", {
+				'method': "subscribenotifications", 'parameters': {'subscribe': true},
+				'onComplete': this.handleRadioStatus.bind(this)});
+		}
+	}
+	else {
+		// Unsubscribe for profile notifications.
+		
+		if (this.subscribtionStatus) {
+			this.log("Unsubscribing profile notifications")
+		    
+			this.subscribtionStatus.cancel();
+			this.subscribtionStatus = null;
+		}
+	}
+}
+
+BtprofileTrigger.prototype.handleRadioStatus = function(response) {
+	
+	// Handle bluetooth profile notifications.
+	
+	// Samples:
 	// {"returnValue": true, "subscribed": true}
 	// {"notification": "notifnconnected", "profile": "hfg", "address": "40:2b:a1:5d:e9:82", "name": "Headset", "error": 0}
 	// {"notification": "notifnconnected", "profile": "a2dp", "address": "40:2b:a1:5d:e9:82", "name": "Headset", "error": 0}
 	// {"notification": "notifndisconnected", "profile": "a2dp", "address": "40:2b:a1:5d:e9:82", "name": "Headset", "error": 0}
 	// {"notification": "notifndisconnected", "profile": "hfg", "address": "40:2b:a1:5d:e9:82", "name": "Headset", "error": 0}
-	//
 	
-	this.log("handleStatus: payload:", Object.toJSON(payload));
+	this.log("handleRadioStatus: response:", Object.toJSON(response));
 	
-	if(!payload){return};
-	if(payload.returnValue){return};
+	if((!response) ||	(!response.returnValue))
+		return;
 	
-	if(payload.profile){
+	if(response.profile) {
+		var profile = response.profile;
 		
-		var profile = payload.profile;
-		var connected = payload.notification == "notifnconnected";
-		var disconnected = payload.notification == "notifndisconnected";
-		var activatetrigger = connected == true || disconnected == true;
+		if(response.notification == "notifnconnected")
+			var connected = true;
+		else
+			var connected = false;
+
+		if(connected) {
+			if(response.error){
+				if(parseFloat(response.error) !== 0){
+					this.log("handleRadioStatus: response: error:", response.error);
+					
+					connected = false;
+				}
+			}
+		}
 		
-		this.log("handleStatus: config:", Object.toJSON(this.config))
-		this.log("handleStatus: profile:" + profile,"handleStatus: connected:" + connected,"handleStatus: disconnected:" + disconnected,"handleStatus: activatetrigger:" + activatetrigger);
+		if(response.notification == "notifndisconnected")
+			var disconnected = true;
+		else
+			var disconnected = false;
+
+		if((connected == true) || (disconnected == true))
+			var activatetrigger = true;
+		else
+			var activatetrigger = false;
 		
-		//Only act of connected or disconnected notifications.
-		if(connected || disconnected){
-			
+		this.log("handleRadioStatus: config:", Object.toJSON(this.config))
+		this.log("handleRadioStatus: profile:" + profile,"handleRadioStatus: connected:" + connected,"handleRadioStatus: disconnected:" + disconnected,"handleRadioStatus: activatetrigger:" + activatetrigger);
+		
+		// Only act of connected or disconnected notifications.
+		
+		if(connected || disconnected) {
 			this.profile = profile;
-			this.profileconnected = connected;
+			this.connected = connected;
 			
 			this.log("connected || disconnected");
 			
-			//Store profile state
-			if(connected){
-				this.profilestate = 1;
-			}else{
-				//Disconnected
-				this.profilestate = 0;
-			}
-			this.log("this.profilestate:",this.profilestate);
+			// Store profile state.
+
+			if(connected) 
+				this.profileState = 1;
+			else
+				this.profileState = 0;
+
+			this.log("this.profileState:",this.profileState);
 			this.log("Sending trigger notification...")
-			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': this.appid, 'params': {
-					'action': "trigger", 'event': this.triggertype, 'data': this.profile}} });
+			
+			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+				'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+					'event': "btprofile", 'data': this.profile}}});
 		}
 		
 		return;
 	}
+	
 	this.log("No action taken for status notification.");
 }
 
-BTProfileTrigger.prototype.log = function(param, param2, param3, param4) {
-	Mojo.Log.error("BTProfileTrigger DEBUG:", param, param2, param3, param4);
+//
+
+BtprofileTrigger.prototype.log = function(param, param2, param3, param4) {
+	//Mojo.Log.error("BtprofileTrigger DEBUG:", param, param2, param3, param4);
 }

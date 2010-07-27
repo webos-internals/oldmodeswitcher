@@ -1,4 +1,4 @@
-function ChargerTrigger(ServiceRequestWrapper) {
+function ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
 
 	this.charger = "none";
@@ -18,10 +18,9 @@ ChargerTrigger.prototype.init = function(config) {
 	this.subscribeChargerStatus();
 }
 
-ChargerTrigger.prototype.reload = function(modes) {
-}
+ChargerTrigger.prototype.shutdown = function(config) {
+	this.config = config;
 
-ChargerTrigger.prototype.shutdown = function() {
 	if(this.subscribtionChargerStatus)
 		this.subscribtionChargerStatus.cancel();
 }
@@ -31,6 +30,9 @@ ChargerTrigger.prototype.shutdown = function() {
 ChargerTrigger.prototype.check = function(config) {
 	var charger = 0;
 
+	var appController = Mojo.Controller.getAppController();
+	var orientation = appController.getScreenOrientation();
+	
 	if(this.charger == "puck")
 		charger = 1;
 	else if(this.charger == "wall")
@@ -38,10 +40,16 @@ ChargerTrigger.prototype.check = function(config) {
 	else if(this.charger == "pc")
 		charger = 3;	
 
-	if(config.chargerCharger == charger)
+	if((config.chargerCharger == charger) && ((config.chargerOrientation == 0) ||
+		((config.chargerOrientation == 1) && (orientation == "left")) || 
+		((config.chargerOrientation == 2) && (orientation == "right")) || 
+		((config.chargerOrientation == 3) && (orientation == "up")) || 
+		((config.chargerOrientation == 4) && (orientation == "down"))))
+	{
 		return true;
-
-	return false; 		
+	}
+	else
+		return false; 		
 }
 
 //
@@ -49,50 +57,50 @@ ChargerTrigger.prototype.check = function(config) {
 ChargerTrigger.prototype.execute = function(connected, launchCallback) {
 	Mojo.Log.info("Charger trigger received: " + connected);
 
-	// Form a list of modes that the trigger involves and are valid.
+	var startModes = new Array();
+	var closeModes = new Array();
 
-	var modes = new Array();
-
-	if(this.charger == "none") {
-		for(var i = 0; i < this.config.currentMode.triggersList.length; i++) {
-			if(this.config.currentMode.triggersList[i].type == "charger") {
-				launchCallback(modes, true);
-					
-				break;
-			}		
-		}
-	}
-	else {
-		for(var i = 0; i < this.config.modesConfig.length; i++) {
-			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-				if(this.config.modesConfig[i].triggersList[j].type == "charger") {
-					modes.push(this.config.modesConfig[i]);
-					
-					break;
+	for(var i = 0; i < this.config.modesConfig.length; i++) {
+		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+			if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
+				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+				{
+					startModes.push(this.config.modesConfig[i]);
 				}
+				else {
+					closeModes.push(this.config.modesConfig[i]);
+				}
+				
+				break;
 			}
 		}
-
-		launchCallback(modes, false);
 	}
+
+	launchCallback(startModes, closeModes);
+}
+
+//
+
+ChargerTrigger.prototype.handleOrientation = function(event) {
+    Mojo.Log.error("OOOO change position: ", event.position, " pitch: ", event.pitch,
+        " roll: ", event.roll);
 }
 
 //
 
 ChargerTrigger.prototype.subscribeChargerStatus = function() {
-	// Subscribe to Charger Notifications
-	this.subscribtionChargerStatus = this.service.request('palm://com.palm.bus/signal/', { 
-		method: 'addmatch', parameters: {"category":"/com/palm/power","method":"chargerStatus"},
-		onSuccess: this.handleChargerStatus.bind(this)});
+	this.subscribtionChargerStatus = new Mojo.Service.Request("palm://com.palm.bus/signal/", { 
+		'method': "addmatch", 'parameters': {'category': "/com/palm/power", 'method': "chargerStatus"},
+		'onSuccess': this.handleChargerStatus.bind(this)});
 		
-	// Get the Initial Value for charger status (returned as signals)
-	this.requestChargerStatus = this.service.request('palm://com.palm.power/com/palm/power/', {
-		method: 'chargerStatusQuery' });
+	this.requestChargerStatus = new Mojo.Service.Request("palm://com.palm.power/com/palm/power/", {
+		'method': "chargerStatusQuery"});
 }
 
-ChargerTrigger.prototype.handleChargerStatus = function(payload) {
-	if(payload.type) {
-		this.powerSource[payload.type] = payload.connected;
+ChargerTrigger.prototype.handleChargerStatus = function(response) {
+	if(response.type) {
+		this.powerSource[response.type] = response.connected;
 		
 		// Save last connected state, needed for the charger trigger.
 
@@ -103,8 +111,8 @@ ChargerTrigger.prototype.handleChargerStatus = function(payload) {
 		if((this.powerSource['usb'] == true) || 
 			(this.powerSource['inductive'] == true))
 		{
-			if((connected == "none") && (payload.name)) {
-				this.charger = payload.name;
+			if((connected == "none") && (response.name)) {
+				this.charger = response.name;
 
 				this.handleChargerEvent(connected);
 			}
@@ -147,13 +155,20 @@ ChargerTrigger.prototype.handleChargerEvent = function(connected) {
 	else if((this.charger == "pc") || (connected == "pc"))
 		charger = 3;
 
-	for(var i = 0; i < this.config.currentMode.triggersList.length; i++) {
-		if(this.config.currentMode.triggersList[i].type == "charger") {
-			if(this.config.currentMode.triggersList[i].chargerCharger == charger) {
-				timeout = this.config.currentMode.triggersList[i].chargerDelay * 1000;
-				break;
+	for(var i = 0; i < this.config.modesConfig.length; i++) {
+		if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
+					if(this.config.modesConfig[i].triggersList[j].chargerCharger == charger) {
+						timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
+				
+						break;
+					}
+				}		
 			}
-		}		
+			
+			break;
+		}
 	}
 	
 	this.timeoutTrigger = setTimeout(this.handleChargerTrigger.bind(this), timeout);
@@ -166,8 +181,8 @@ ChargerTrigger.prototype.handleChargerTrigger = function() {
 
 	if(this.triggerEvent == this.charger) {
 		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			'parameters': {'id': this.appid, 'params': {
-				'action': "trigger", 'event': "charger", 'data': this.charger}} });
+			'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+				'event': "charger", 'data': this.charger}}});
 	}
 
 	this.triggerEvent = null;

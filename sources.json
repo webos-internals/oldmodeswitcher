@@ -7,6 +7,10 @@
 	},
 
 	{
+		"source": "app\/assistants\/scene-assistant.js"
+	},
+
+	{
 		"source": "app\/assistants\/config-assistant.js", 
 		"scenes": "config"
 	},
@@ -46,10 +50,22 @@
 		"source": "app\/extensions/settings\/airplane-setting.js"
 	},
 	{
+		"source": "app\/extensions/settings\/calendar-config.js"
+	},
+	{
+		"source": "app\/extensions/settings\/calendar-setting.js"
+	},
+	{
 		"source": "app\/extensions/settings\/connection-config.js"
 	},
 	{
 		"source": "app\/extensions/settings\/connection-setting.js"
+	},
+	{
+		"source": "app\/extensions/settings\/email-config.js"
+	},
+	{
+		"source": "app\/extensions/settings\/email-setting.js"
 	},
 	{
 		"source": "app\/extensions/settings\/messaging-config.js"
@@ -64,16 +80,22 @@
 		"source": "app\/extensions/settings\/network-setting.js"
 	},
 	{
-		"source": "app\/extensions/settings\/ringtone-config.js"
+		"source": "app\/extensions/settings\/ringer-config.js"
 	},
 	{
-		"source": "app\/extensions/settings\/ringtone-setting.js"
+		"source": "app\/extensions/settings\/ringer-setting.js"
 	},
 	{
 		"source": "app\/extensions/settings\/screen-config.js"
 	},
 	{
 		"source": "app\/extensions/settings\/screen-setting.js"
+	},
+	{
+		"source": "app\/extensions/settings\/security-config.js"
+	},
+	{
+		"source": "app\/extensions/settings\/security-setting.js"
 	},
 	{
 		"source": "app\/extensions/settings\/sound-config.js"

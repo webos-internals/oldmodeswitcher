@@ -1,8 +1,6 @@
 function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
-	
 	this.alarms = SystemAlarmsWrapper;
-	
 	this.notifier = SystemNotifierWrapper;
 	
 	this.previous = true;
@@ -22,7 +20,7 @@ LocationTrigger.prototype.init = function(config) {
 
 	for(var i = 0; i <this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "location") {
+			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
 				this.alarms.setupDelayTimeout("location", 5, "none");
 				
 				break;
@@ -31,22 +29,10 @@ LocationTrigger.prototype.init = function(config) {
 	}
 }
 
-LocationTrigger.prototype.reload = function(modes) {
-	// Re-schedule and setup all timers including the location timeout. 
-
-	for(var i = 0; i <this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "location") {
-				this.alarms.setupDelayTimeout("location", 5, "none");
-				
-				break;
-			}
-		}
-	}
-}
-
-LocationTrigger.prototype.shutdown = function() {
+LocationTrigger.prototype.shutdown = function(config) {
 // Disable location timer and all timeout trigger timers.
+
+	this.config = config;
 
 	this.alarms.clearDelayTimeout("location");
 }
@@ -82,7 +68,7 @@ LocationTrigger.prototype.execute = function(tracking, launchCallback) {
 
 	for(var i = 0; i <this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "location") {
+			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
 				if((this.config.modesConfig[i].triggersList[j].locationLatitude != 0) &&
 					(this.config.modesConfig[i].triggersList[j].locationLongitude != 0))
 				{
@@ -98,32 +84,23 @@ LocationTrigger.prototype.execute = function(tracking, launchCallback) {
 	if(accuracy != 0) {
 		// This will call handleLocationTrigger on successful retrieval.
 
-		this.fetchCurrentLocation(count, accuracy, tracking, launchCallback);
+		//this.fetchCurrentLocation(count, accuracy, tracking, launchCallback);
 	}
 }
 
 //
 
 LocationTrigger.prototype.fetchCurrentLocation = function(count, accuracy, tracking, launchCallback) {
-	this.service.request('palm://com.palm.power/com/palm/power', { 
-		'method': "activityStart", 'parameters': {'id': this.appid,'duration_ms': 60000}});
+	this.service.request("palm://com.palm.power/com/palm/power", {'method': "activityStart", 
+		'parameters': {'id': this.appid, 'duration_ms': 60000}});
 
 	if(count < 5) {
 		if(this.requestLocation)
 			this.requestLocation.cancel();
 
-		this.requestLocation = this.service.request('palm://com.palm.location/', {
-			'method': "getCurrentPosition",
-			'parameters': {'accuracy': accuracy},
-			'onSuccess': function(tracking, launchCallback, event){
-				this.latitude = event.latitude;
-				this.longitude = event.longitude;
-				
-				this.handleLocationTrigger(tracking, launchCallback);
-			}.bind(this, tracking, launchCallback),
-			'onFailure': function(count, accuracy, tracking, launchCallback){
-				this.fetchCurrentLocation(count + 1, accuracy, tracking, launchCallback);
-			}.bind(this, count, accuracy, tracking, launchCallback)});
+		this.requestLocation = this.service.request("palm://com.palm.location/", {
+			'method': "getCurrentPosition", 'parameters': {'accuracy': accuracy},
+			'onComplete': this.handleCurrentLocation.bind(this, count, accuracy, tracking, launchCallback)});
 	}
 	else {
 		// Failed to get location so lets try again after 5 minutes.
@@ -135,9 +112,22 @@ LocationTrigger.prototype.fetchCurrentLocation = function(count, accuracy, track
 	}
 }
 
+LocationTrigger.prototype.handleCurrentLocation = function(count, accuracy, tracking, launchCallback, response) {
+	if(response.returnValue) {
+		this.latitude = response.latitude;
+		this.longitude = response.longitude;
+				
+		this.handleLocationTrigger(tracking, launchCallback);
+	}
+	else
+		this.fetchCurrentLocation(++count, accuracy, tracking, launchCallback);
+}
+
+//
+
 LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallback) {
 	var startModes = new Array();
-	var closeMode = false;
+	var closeModes = new Array();
 
 	var time = 24*60*60;
 	
@@ -157,7 +147,7 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 		var hasValidTriggers = false;
 		
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].type == "location") {
+			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
 				hasLocationTriggers = true;
 			
 				if(this.check(this.config.modesConfig[i].triggersList[j]))
@@ -215,7 +205,7 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 				for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 					// FIXME: maybe get back the usage of time triggers in calculating the next time...
 								
-					if(this.config.modesConfig[i].triggersList[j].type == "location") {
+					if(this.config.modesConfig[i].triggersList[j].extension == "location") {
 						tmpTime = this.calculateTimeEstimation(this.config.modesConfig[i].triggersList[j]);
 
 						// If calculated time 0 it means that some other trigger is holding on.

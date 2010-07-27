@@ -2,12 +2,15 @@
  *    ConfigAssistant - Mode Launcher's Default Configuration Scene
  */
 
-function ConfigAssistant() {
+function ConfigAssistant(action, modeidx) {
 	/* This is the creator function for your scene assistant object. It will be passed all the 
 	 * additional parameters (after the scene name) that were passed to pushScene. The reference
 	 * to the scene controller (this.controller) has not be established yet, so any initialization
 	 * that needs the scene controller should be done in the setup function below. 
 	 */
+
+	this.action = action;
+	this.modeidx = modeidx;
 
 	this.appControl = Mojo.Controller.getAppController();
 	this.appAssistant = this.appControl.assistant;
@@ -20,8 +23,6 @@ function ConfigAssistant() {
 	
 	this.activated = this.config.modeSwitcher.activated;
 	
-	this.edited = new Array();
-
 	for(var i = 0; i < this.applications.length; i++) {
 		this.applications[i].config.init();
 	}
@@ -96,7 +97,7 @@ ConfigAssistant.prototype.setup = function() {
 	this.modelModesList = {items: this.config.modesConfig};
 	
 	this.controller.setupWidget("ModesList", {
-		itemTemplate: 'config/listitem-mode',
+		itemTemplate: 'templates/listitem-modes',
 		swipeToDelete: true,
 		autoconfirmDelete: false,
 		reorderable: true},
@@ -141,17 +142,13 @@ ConfigAssistant.prototype.setup = function() {
 		Mojo.Log.error("DEBUG: Mode Switcher Rerieving Settings");
 
 		this.mode = {
-			name: "Default Mode", type: "default",
-			
-			notifyMode: 1,	autoStart: 3, autoClose: 3,
+			'name': "Default Mode", 'type': "default", 
 
-			miscOnStartup: 0, miscAppsMode: 0,
+			'miscOnStartup': 0, 'miscAppsMode': 1,						
+
+			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
 			
-			settings: {mode: 0, charging: 1}, settingsList: [],
-			
-			apps: {start:0, close: 0}, appsList: [],
-			
-			triggers: {block: 0, required: 1}, triggersList: []
+			'apps': {'start':0, 'close': 0}, 'appsList': []
 		};
 
 		this.modelDefModeButton.disabled = true;
@@ -172,6 +169,11 @@ ConfigAssistant.prototype.setup = function() {
 
 				this.retrieveDefaultSettings(0);
 			}.bind(this, this.appControl, this.appAssistant)}); 
+	}
+	else if(this.action == "edit") {
+		var type = this.config.modesConfig[this.modeidx].type;
+	
+		this.controller.stageController.pushScene("editmode", type, this.modeidx);
 	}
 }
 
@@ -202,9 +204,10 @@ ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
 
 		this.controller.modelChanged(this.modelDefModeButton, this);		
 
+		this.appAssistant.config.currentMode = this.mode;
 		this.appAssistant.config.defaultMode = this.mode;
 		
-		this.appAssistant.saveConfigData("defaultMode");
+		this.appAssistant.saveConfigData();
 	}
 }
 
@@ -239,10 +242,10 @@ ConfigAssistant.prototype.setConfigData = function() {
 ConfigAssistant.prototype.handleModesListTap = function(event) {
 	var index = event.model.items.indexOf(event.item);
 
-	if (index >= 0) {
-		this.edited.push(this.config.modesConfig[index].name);
+	var type = this.config.modesConfig[index].type;
 
-		this.controller.stageController.pushScene("editmode", "custom", index);
+	if (index >= 0) {
+		this.controller.stageController.pushScene("editmode", type, index);
 	}
 }
 
@@ -264,12 +267,10 @@ ConfigAssistant.prototype.handleRemoveModeFromList = function(event) {
 }
 
 ConfigAssistant.prototype.handleAddModeButtonPress = function() {
-	this.controller.stageController.pushScene("editmode", "custom");
+	this.controller.stageController.pushScene("editmode", "normal");
 }
 
 ConfigAssistant.prototype.handleDefModeButtonPress = function() {
-	this.edited.push("Default Mode");
-
 	this.controller.stageController.pushScene("editmode", "default", 0);
 }
 
@@ -311,17 +312,17 @@ ConfigAssistant.prototype.cleanup = function(event) {
 	if((this.activated == 0) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
 			method: 'launch', parameters: {"id": this.appAssistant.appid, "params": {
-				"action": "control", "event": "init", "modes": this.edited}} });
+				"action": "control", "event": "init"}} });
 	}
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
 			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
-				"action": "control", "event": "reload", "modes": this.edited}} });
+				"action": "control", "event": "reload"}} });
 	}
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 0)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
 			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
-				"action": "control", "event": "shutdown", "modes": this.edited}} });
+				"action": "control", "event": "shutdown"}} });
 	}
 }
 

@@ -40,7 +40,7 @@ ScreenControl.prototype.setMode = function(mode) {
 	
 	this.checkDisplayBlock();
 	
-	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
+	this.subscribeLockStatus = new Mojo.Service.Request('palm://com.palm.systemmanager/', {
 		method: 'getLockStatus', parameters: {'subscribe': true},
 		onSuccess: this.handleDisplayStatus.bind(this) });
 }
@@ -50,13 +50,13 @@ ScreenControl.prototype.setMode = function(mode) {
 ScreenControl.prototype.subscribeChargerStatus = function() {
 	// Subscribe to charger status notifications
 	
-	this.subscribeChargerStatus = this.service.request('palm://com.palm.bus/signal/', {
+	this.subscribeChargerStatus = new Mojo.Service.Request('palm://com.palm.bus/signal/', {
 		method: 'addmatch', parameters: {"category":"/com/palm/power","method":"chargerStatus"},
 		onSuccess: this.handleChargerStatus.bind(this)});
 		
 	// Get the initial value for charger status 
 	
-	this.requestChargerStatus = this.service.request('palm://com.palm.power/com/palm/power/', {
+	this.requestChargerStatus = new Mojo.Service.Request('palm://com.palm.power/com/palm/power/', {
 		method: 'chargerStatusQuery' });
 }
 
@@ -92,11 +92,11 @@ ScreenControl.prototype.handleChargerStatus = function(payload) {
 //
 
 ScreenControl.prototype.subscribeDisplayStatus = function() {
-	this.subscribeDisplayStatus = this.service.request('palm://com.palm.display/control/', {
+	this.subscribeDisplayStatus = new Mojo.Service.Request('palm://com.palm.display/control/', {
 		method: 'status', parameters: {'subscribe': true}, 
 		onSuccess: this.handleDisplayStatus.bind(this) });
 
-	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
+	this.subscribeLockStatus = new Mojo.Service.Request('palm://com.palm.systemmanager/', {
 		method: 'getLockStatus', parameters: {'subscribe': true},
 		onSuccess: this.handleDisplayStatus.bind(this) });
 }
@@ -143,7 +143,7 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 			if(retry < 3) {
 				retry++;
 
-				this.setupTouchPanelState = this.service.request('palm://com.palm.hidd/HidTouchpanel/', {
+				this.setupTouchPanelState = new Mojo.Service.Request('palm://com.palm.hidd/HidTouchpanel/', {
 					method: 'State', parameters:{'mode':'set', 'value':'on'},
 					onFailure: this.setupDisplayState.bind(this, state, retry),
 					onComplete: function() {this.setupTouchPanelState = null;}.bind(this) });
@@ -156,13 +156,13 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 				this.setupTouchPanelState.cancel();
 
 			if(retry < 3) {
-				this.setupTouchPanelState = this.service.request('palm://com.palm.hidd/HidTouchpanel/', {
+				this.setupTouchPanelState = new Mojo.Service.Request('palm://com.palm.hidd/HidTouchpanel/', {
 					method: 'State', parameters:{'mode':'set', 'value':'off'},
 					onSuccess: function(payload) {
 						if(this.setupBacklightState)
 							this.setupBacklightState.cancel();
 
-						this.setupBacklightState = this.service.request('palm://com.palm.power/backlight/', {
+						this.setupBacklightState = new Mojo.Service.Request('palm://com.palm.power/backlight/', {
 							method: 'set', parameters:{keypad: {brightness: 0}, display: {brightness: -1}},
 							onFailure: this.setupDisplayState.bind(this, state, ++retry),
 							onComplete: function() {this.setupBacklightState = null;}.bind(this) });	
@@ -196,7 +196,7 @@ ScreenControl.prototype.setupDisplayBlock = function(state, retry) {
 				this.requestDisplayBlock.cancel();
 
 			if(retry < 3) {
-				this.requestDisplayBlock = this.service.request('palm://com.palm.display/control/', {
+				this.requestDisplayBlock = new Mojo.Service.Request('palm://com.palm.display/control/', {
 					method: "setProperty", parameters: {"requestBlock": true, "client": "modeswitcher"},
 					onFailure: this.setupDisplayBlock.bind(this, state, ++retry),
 					onComplete: function() {this.requestDisplayBlock = null;}.bind(this) });
@@ -211,7 +211,7 @@ ScreenControl.prototype.setupDisplayBlock = function(state, retry) {
 				this.requestDisplayBlock.cancel();
 
 			if(retry < 3) {
-				this.requestDisplayBlock = this.service.request('palm://com.palm.display/control/', {
+				this.requestDisplayBlock = new Mojo.Service.Request('palm://com.palm.display/control/', {
 					method: "setProperty", parameters: {"requestBlock": false, "client": "modeswitcher"},
 					onFailure: this.setupDisplayBlock.bind(this, state, ++retry),
 					onComplete: function() {this.requestDisplayBlock = null;}.bind(this) });

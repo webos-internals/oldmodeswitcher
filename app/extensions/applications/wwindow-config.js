@@ -1,42 +1,65 @@
-function WWindowConfig(ServiceRequestWrapper) {
+function WwindowConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 }
 
-//
-
-WWindowConfig.prototype.init = function() {
+WwindowConfig.prototype.version = function() {
+	return "1.0";
 }
 
-WWindowConfig.prototype.data = function(data) {
+WwindowConfig.prototype.appid = function() {
+	return "com.hiddenworldhut.weatherwindow";
 }
 
 //
 
-WWindowConfig.prototype.setup = function(controller) {
-	// Mode selector
+WwindowConfig.prototype.init = function() {
+}
 
-	this.choicesWWindowLaunchSelector = [
+//
+
+WwindowConfig.prototype.setup = function(controller) {
+	this.choicesWwindowLaunchSelector = [
 		{'label': "On Mode Start", value: 1},
 		{'label': "On Mode Close", value: 2} ];  
 
-	controller.setupWidget("WWindowLaunchSelector", {'label': "Launch", 
+	controller.setupWidget("WwindowLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
-		'choices': this.choicesWWindowLaunchSelector} );
-
-	// Action selector
+		'choices': this.choicesWwindowLaunchSelector} );
 	
-	this.choicesWWindowActionSelector = [
+	this.choicesWwindowActionSelector = [
 		{'label': "Do Nothing", value: 0},
 		{'label': "Get Weather", value: 1} ];  
 
-	controller.setupWidget("WWindowActionSelector", {'label': "Action", 
+	controller.setupWidget("WwindowActionSelector", {'label': "Action", 
 		'labelPlacement': "left", 'modelProperty': "launchAction",
-		'choices': this.choicesWWindowActionSelector} );
+		'choices': this.choicesWwindowActionSelector} );
+
+	this.choicesWwindowtDelaySelector = [
+		{'label': "No Delay", value: 0},
+		{'label': "15 Seconds", value: 15},
+		{'label': "30 Seconds", value: 30} ];  
+
+	controller.setupWidget("WwindowDelaySelector", {'label': "Delay", 
+		'labelPlacement': "left", 'modelProperty': "launchDelay",
+		'choices': this.choicesWwindowDelaySelector} );
 }
 
 //
 
-WWindowConfig.prototype.load = function(preferences) {
+WwindowConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 1, 
+		'launchDelay': 0,
+		'launchAction': 1 };
+	
+	return config;
+}
+
+//
+
+WwindowConfig.prototype.load = function(preferences) {
 	var launchAction = 0;
 	
 	if(preferences.launchMode == 1) {
@@ -59,7 +82,7 @@ WWindowConfig.prototype.load = function(preferences) {
 	return config;
 }
 
-WWindowConfig.prototype.save = function(config) {
+WwindowConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
@@ -73,6 +96,8 @@ WWindowConfig.prototype.save = function(config) {
 	}
 
 	var preferences = {
+		'url': "",
+		'method': "",
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode,
@@ -81,18 +106,5 @@ WWindowConfig.prototype.save = function(config) {
 		'closeParams': closeParams };
 	
 	return preferences;
-}
-
-//
-
-WWindowConfig.prototype.config = function(launchPoint) {
-	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0,
-		'launchAction': 1 };
-	
-	return config;
 }
 

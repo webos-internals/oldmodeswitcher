@@ -7,32 +7,34 @@
 			<div class="palm-list">	
 				<div class='palm-row first'>
 					<div class='palm-row-wrapper'>
-						<div class="label left" x-mojo-loc=''>Brightness</div>
-						<div class="title right">#{screenBrightnessLevel}</div>
-					
-						<div name="ScreenSlider" x-mojo-element="Slider" class="palm-slider"></div>
+						<div name="ScreenBrightnessSelector" x-mojo-element="ListSelector"></div>					
+						<div name="ScreenBrightnessSlider" x-mojo-element="Slider" class="palm-slider"></div>
 					</div>
 				</div>
 				<div class='palm-row'>
 					<div class='palm-row-wrapper'>
-						<div name="TimeoutSelector" x-mojo-element="ListSelector"></div>
+						<div name="ScreenTimeoutSelector" x-mojo-element="ListSelector"></div>
 					</div>
 				</div>
 				<div class='palm-row'>
 					<div class='palm-row-wrapper'>
-						<div name="BlinkSelector" x-mojo-element="ListSelector"></div>
+						<div name="ScreenBlinkSelector" x-mojo-element="ListSelector"></div>
+					</div>
+				</div>
+				<div class='palm-row'>
+					<div class='palm-row-wrapper'>
+						<div name="ScreenLockedSelector" x-mojo-element="ListSelector"></div>
 					</div>
 				</div>
 				<div class='palm-row last'>
 					<div class='palm-row-wrapper'>
-						<div class="label left" x-mojo-loc=''>Wallpaper</div>
-						<div class="title right" id="WallpaperSelect">#{screenWallpaperName}</div>
+						<div name="ScreenWallpaperSelector" x-mojo-element="ListSelector"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 		
-		<div style="min-height:5px"></div>
+		<div style="min-height:6px;"></div>
 		
 	</div>
 </div>

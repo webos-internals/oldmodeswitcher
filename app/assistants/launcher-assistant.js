@@ -3,7 +3,7 @@
 */
 
 
-function LauncherAssistant(event, startModes, closeMode) {
+function LauncherAssistant(startModes, closeMode, modifiers) {
 	/* This is the creator function for your scene assistant object. It will be passed all the 
 	 * additional parameters (after the scene name) that were passed to pushScene. The reference
 	 * to the scene controller (this.controller) has not be established yet, so any initialization
@@ -17,10 +17,15 @@ function LauncherAssistant(event, startModes, closeMode) {
 
 	this.config = this.appAssistant.config;	
 
-	this.event = event;
+	if(startModes.length > 0)
+		this.event = "start";
+	else
+		this.event = "close";
 	
 	this.start = startModes;
 	this.close = closeMode;
+
+	this.modifiers = modifiers;
 
 	this.modeidx = 0;
 }    
@@ -33,12 +38,8 @@ LauncherAssistant.prototype.setup = function() {
 
 	// Buttons
 	
-	if(this.event == "start") {
-		if(this.config.currentMode)
-			this.modelStartButton = {label: "Switch Mode", buttonClass : 'affirmative popupbutton', disabled : false};
-		else
-			this.modelStartButton = {label: "Start Mode", buttonClass : 'affirmative popupbutton', disabled : false};
-	}
+	if(this.event == "start")
+		this.modelStartButton = {label: "Switch Mode", buttonClass : 'affirmative popupbutton', disabled : false};
    else
    	this.modelStartButton = {label: "Close Mode", buttonClass : 'affirmative popupbutton', disabled : false};
    	     
@@ -47,10 +48,7 @@ LauncherAssistant.prototype.setup = function() {
 	Mojo.Event.listen(this.controller.get('StartButton'), Mojo.Event.tap, 
 		this.handleStartButtonPress.bind(this));
 
-   if(this.event == "start")
-		this.modelSelectButton = {label: "Default Mode", buttonClass : 'popupbutton', disabled : false};
-	else
-		this.modelSelectButton = {label: this.config.currentMode.name, buttonClass : 'popupbutton', disabled : true};
+	this.modelSelectButton = {label: "Default Mode", buttonClass : 'popupbutton', disabled : false};
   
    this.controller.setupWidget('SelectButton', {}, this.modelSelectButton);
 
@@ -73,10 +71,7 @@ LauncherAssistant.prototype.setup = function() {
 LauncherAssistant.prototype.setupStart = function() {
 	clearTimeout(this.timer);
 
-	if(this.config.currentMode)
-		this.modelStartButton.label = "Switch Mode";
-	else
-		this.modelStartButton.label = "Start Mode";
+	this.modelStartButton.label = "Switch Mode";
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
@@ -116,14 +111,14 @@ LauncherAssistant.prototype.setupClose = function() {
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
-	this.modelSelectButton.label = this.config.currentMode.name;
+	this.modelSelectButton.label = this.close.name;
 	
 	this.controller.modelChanged(this.modelSelectButton, this);
 	
 	this.counterCancel = this.config.modeSwitcher.timerClose;
 	this.counterClose = this.config.modeSwitcher.timerClose;
 
-	if(this.config.currentMode.autoClose == 2)
+	if(this.close.autoClose == 2)
 	{
 		this.updateCloseTimer();
 		
@@ -151,10 +146,7 @@ LauncherAssistant.prototype.updateCancelTimer = function() {
 
 LauncherAssistant.prototype.updateStartTimer = function() {
 	if(this.counterStart >= 0) {
-		if(this.config.currentMode)
-			this.modelStartButton.label = "Switch Mode (" + this.counterStart-- + ")";
-		else
-			this.modelStartButton.label = "Start Mode (" + this.counterStart-- + ")";
+		this.modelStartButton.label = "Switch Mode (" + this.counterStart-- + ")";
 			
 		this.controller.modelChanged(this.modelStartButton, this);
 		
@@ -185,10 +177,7 @@ LauncherAssistant.prototype.handleSelectButtonPress = function() {
 	clearTimeout(this.timer);
 
 	if(this.event == "start") {
-		if(this.config.currentMode)
-			this.modelStartButton.label = "Switch Mode";
-		else
-			this.modelStartButton.label = "Start Mode";
+		this.modelStartButton.label = "Switch Mode";
 		
 		this.controller.modelChanged(this.modelStartButton, this);
 
@@ -240,14 +229,25 @@ LauncherAssistant.prototype.cleanup = function(event) {
 	 */    
 
 	if(this.event == "start") {
+		var data = {'original': this.start[this.modeidx].name, "modifiers": this.modifiers};
+
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
 			'parameters': {'id': this.appid, 'params': {
-				'action': "execute", 'event': "start", 'name': this.start[this.modeidx].name}} });
+				'action': "launcher", 'event': "start", 'data': data}}});
 	}
 	else if(this.event == "close") {
+		var data = {'original': this.close.name, "modifiers": this.modifiers};
+	
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
 			'parameters': {'id': this.appid, 'params': {
-				'action': "execute", 'event': "close", 'name': this.config.currentMode.name}} });
+				'action': "launcher", 'event': "close", 'data': data}} });
+	}
+	else {
+		var data = {'original': this.config.currentMode.name , "modifiers": this.modifiers};
+	
+		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
+			'parameters': {'id': this.appid, 'params': {
+				'action': "launcher", 'event': "cancel", 'data': data}} });
 	}
 }
 

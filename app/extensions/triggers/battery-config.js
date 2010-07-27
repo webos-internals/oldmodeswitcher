@@ -1,6 +1,10 @@
 function BatteryConfig() {
 }
 
+BatteryConfig.prototype.version = function() {
+	return "1.0";
+}
+
 //
 
 BatteryConfig.prototype.label = function() {
@@ -23,7 +27,7 @@ BatteryConfig.prototype.setup = function(controller) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	controller.setupWidget("HighLimitSelector", {'label': "High Limit", 
+	controller.setupWidget("BatteryHighSelector", {'label': "High Limit", 
 		'labelPlacement': "left", 'modelProperty': "batteryHigh",
 		'choices': this.choicesHighLimitSelector});
 	
@@ -40,43 +44,36 @@ BatteryConfig.prototype.setup = function(controller) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	controller.setupWidget("LowLimitSelector", {'label': "Low Limit", 
+	controller.setupWidget("BatteryLowSelector", {'label': "Low Limit", 
 		'labelPlacement': "left", 'modelProperty': "batteryLow",
 		'choices': this.choicesLowLimitSelector});
 }
 
 //
 
-BatteryConfig.prototype.load = function(config, data) {
-	config.push({'batteryHigh': data.batteryHigh, 
-		'batteryLow': data.batteryLow});
-}
-
-BatteryConfig.prototype.save = function(config, data) {
-	data.push({'batteryHigh': config.batteryHigh, 
-		'batteryLow': config.batteryLow});
-}
-
-//
-
-BatteryConfig.prototype.append = function(config, saveCallback) {
-	config.push({'batteryHigh': 100, 'batteryLow': 0});
+BatteryConfig.prototype.load = function(preferences) {
+	var config = {
+		'batteryHigh': preferences.batteryHigh,
+		'batteryLow': preferences.batteryLow };
 	
-	saveCallback(true);
+	return config;
 }
 
-BatteryConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback(true);
+BatteryConfig.prototype.save = function(config) {
+	var preferences = {
+		'batteryHigh': config.batteryHigh,
+		'batteryLow': config.batteryLow };
+	
+	return preferences;
 }
 
 //
 
-BatteryConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
-
-BatteryConfig.prototype.tapped = function(config, event, saveCallback) {
+BatteryConfig.prototype.config = function() {
+	var config = {
+		'batteryHigh': 100,
+		'batteryLow': 0 };
+	
+	return config;
 }
 

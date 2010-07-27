@@ -1,22 +1,34 @@
 function GovnahConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.choicesGovnahStartSelector = [];
-	this.choicesGovnahCloseSelector = [];
+	this.choicesGovnahStartSelector = [{'label': "No profiles", 'value': "none"}];
+	this.choicesGovnahCloseSelector = [{'label': "No profiles", 'value': "none"}];
+}
+
+GovnahConfig.prototype.version = function() {
+	return "1.0";
+}
+
+GovnahConfig.prototype.appid = function() {
+	return "org.webosinternals.govnah";
 }
 
 //
 
 GovnahConfig.prototype.init = function() {
-	this.service.request('palm://com.palm.applicationManager', {
-		method: 'launch', parameters: { id: 'org.webosinternals.govnah', params: {
-				type: 'get-profiles', returnid: 'com.palm.org.e-lnx.wee.apps.modeswitcher'}}} );
+	this.service.request('palm://org.webosinternals.govnah/', {
+		method: 'getProfiles', parameters: {returnid: 'com.palm.org.e-lnx.wee.apps.modeswitcher'} });
 }
 
 GovnahConfig.prototype.data = function(data) {
 	this.choicesGovnahStartSelector.clear();
 	this.choicesGovnahCloseSelector.clear();
 	
+	if(data.profiles.length > 0) {
+		this.choicesGovnahStartSelector.clear();
+		this.choicesGovnahCloseSelector.clear();
+	}
+		
 	for(var i = 0; i < data.profiles.length; i++) {
 		this.choicesGovnahStartSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
 
@@ -38,6 +50,20 @@ GovnahConfig.prototype.setup = function(controller) {
 	controller.setupWidget("GovnahCloseSelector", {'label': "On Close", 
 		'labelPlacement': "left", 'modelProperty': "closeProfile",
 		'choices': this.choicesGovnahCloseSelector});
+}
+
+//
+
+GovnahConfig.prototype.config = function(launchPoint) {
+	var config = {
+		'name': launchPoint.title, 
+		'appid': launchPoint.id, 
+		'launchMode': 0, 
+		'launchDelay': 0, 
+		'startProfile': 0, 
+		'closeProfile': 0 };
+	
+	return config;
 }
 
 //
@@ -71,10 +97,12 @@ GovnahConfig.prototype.save = function(config) {
 	var startParams = "";
 	var closeParams = "";
 	
-	startParams = "{type: 'set-profile', profileid: '" + config.startProfile + "'}";
-	closeParams = "{type: 'set-profile', profileid: '" + config.closeProfile + "'}";
+	startParams = "{profileid: '" + config.startProfile + "'}";
+	closeParams = "{profileid: '" + config.closeProfile + "'}";
 
 	var preferences = {
+		'url': "palm://org.webosinternals.govnah/",
+		'method': "setProfile",
 		'name': config.name,
 		'appid': config.appid, 
 		'launchMode': config.launchMode, 
@@ -83,19 +111,5 @@ GovnahConfig.prototype.save = function(config) {
 		'closeParams': closeParams };
 	
 	return preferences;
-}
-
-//
-
-GovnahConfig.prototype.config = function(launchPoint) {
-	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 0, 
-		'launchDelay': 0, 
-		'startProfile': 1, 
-		'closeProfile': 1 };
-	
-	return config;
 }
 

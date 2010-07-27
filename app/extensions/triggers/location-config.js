@@ -1,6 +1,10 @@
 function LocationConfig() {
 }
 
+LocationConfig.prototype.version = function() {
+	return "1.0";
+}
+
 //
 
 LocationConfig.prototype.label = function() {
@@ -20,74 +24,69 @@ LocationConfig.prototype.setup = function(controller) {
 		{'label': "1500 Meters", 'value': 1500},
 		{'label': "2000 Meters", 'value': 2000}];  
 
-	controller.setupWidget("RadiusSelector", {'label': "Radius", 
+	controller.setupWidget("LocationRadiusSelector", {'label': "Radius", 
 		'labelPlacement': "left", 'modelProperty': "locationRadius",
 		'choices': this.choicesRadiusSelector});
 }
 
 //
 
-LocationConfig.prototype.load = function(config, data) {
-	config.push({"locationRadius": data.locationRadius, 
-		"locationLatitude": data.locationLatitude,
-		"locationLongitude": data.locationLongitude});
+LocationConfig.prototype.load = function(preferences) {
+	var config = {
+		'locationRadius': preferences.locationRadius,
+		'locationLatitude': preferences.locationLatitude,
+		'locationLongitude': preferences.locationLongitude };
+	
+	return config;
 }
 
-LocationConfig.prototype.save = function(config, data) {
-	data.push({"locationRadius": config.locationRadius, 
-		"locationLatitude": config.locationLatitude,
-		"locationLongitude": config.locationLongitude});
-}
-
-//
-
-LocationConfig.prototype.append = function(config, saveCallback) {
-	var cfg = {"locationRadius": 200, "locationLatitude": "(locating)", "locationLongitude": "(locating)"};
-
-	config.push(cfg);
-
-	saveCallback(true);
-
-	this.fetchCurrentLocation(cfg, saveCallback, 0);
-}
-
-LocationConfig.prototype.remove = function(config, index, saveCallback) {
-	config.splice(index,1);
-
-	saveCallback(true);
+LocationConfig.prototype.save = function(config) {
+	var preferences = {
+		'locationRadius': config.locationRadius,
+		'locationLatitude': config.locationLatitude,
+		'locationLongitude': config.locationLongitude };
+	
+	return preferences;
 }
 
 //
 
-LocationConfig.prototype.changed = function(config, event, saveCallback) {
-	saveCallback();
-}
+LocationConfig.prototype.config = function() {
+	var config = {
+		'locationRadius': 200,
+		'locationLatitude': "(locating)",
+		'locationLongitude': "(locating)" };
 
-LocationConfig.prototype.tapped = function(config, event, saveCallback) {
+	this.fetchCurrentLocation(config, 0);
+		
+	return config;
 }
 
 //
 
-LocationConfig.prototype.fetchCurrentLocation = function(cfg, saveCallback, retry) {
+LocationConfig.prototype.fetchCurrentLocation = function(config, retry) {
 	if(retry < 10) {
 		this.controller.serviceRequest("palm://com.palm.location/", {
-			method:"getCurrentPosition",
-			parameters:{Accuracy: 1},
-			onSuccess: function(cfg, saveCallback, event){
-				cfg.locationLatitude = Math.round(event.latitude*1000000)/1000000;
-				cfg.locationLongitude = Math.round(event.longitude*1000000)/1000000;
-					
-				saveCallback(true);
-			}.bind(this, cfg, saveCallback),
-			onFailure: function(cfg, saveCallback, retry){
-				this.fetchCurrentLocation(cfg, saveCallback, ++retry);
-			}.bind(this, cfg, saveCallback, retry)});
+			'method': "getCurrentPosition", 'parameters': {'Accuracy': 1},
+			'onSuccess': this.handleCurrentLocation.bind(this, config, 0),
+			'onFailure': this.handleCurrentLocation.bind(this, config, ++retry)});
 	}
 	else {
-		cfg.locationLatitude = "(failed)";
-		cfg.locationLongitude = "(failed)";
-					
-		saveCallback();
+		config.locationLatitude = "(failed)";
+		config.locationLongitude = "(failed)";
+		
+		this.controller.get("TriggersList").mojo.invalidateItems(0);
 	}
+}
+
+LocationConfig.prototype.handleCurrentLocation = function(config, retry, response) {
+	if(retry == 0) {
+		config.locationLatitude = Math.round(response.latitude*1000000)/1000000;
+		config.locationLongitude = Math.round(response.longitude*1000000)/1000000;
+				
+		this.controller.get("TriggersList").mojo.invalidateItems(0);
+	}
+	else
+		this.fetchCurrentLocation(config, retry);
 }
 

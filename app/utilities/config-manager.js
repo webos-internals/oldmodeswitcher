@@ -7,8 +7,6 @@ function ConfigManager(serviceRequestWrapper) {
 ConfigManager.prototype.load = function(params, callback) {	
 	// Load all requested system preferences.
 
-	Mojo.Log.error("DEBUG: Mode Switcher Loading Config");
-
 	Mojo.Log.info("Loading config from system preferences");
 
 	var keys = new Array();
@@ -29,8 +27,6 @@ ConfigManager.prototype.load = function(params, callback) {
 ConfigManager.prototype.save = function(params, target) {
 	// Save all requested system preferences.
 	
-	Mojo.Log.error("DEBUG: Mode Switcher Saving Config");
-
 	Mojo.Log.info("Saving config to system preferences");
 
 	var parameters = {};
@@ -38,19 +34,19 @@ ConfigManager.prototype.save = function(params, target) {
 	for(var key in params) {
 		var config = params[key];
 		
-		if((config == null) || ((config instanceof Array) && (config.length == 0)))
+		if(config == null)
 			config = "none";
 
 		if((target == undefined) || (target == key) || (this.requestSave)) {
 			Mojo.Log.info("Adding config for saving: " + key);
-		
+
 			eval("parameters." + key + " = config");
 		}
 	}
 	
 	if(this.requestSave)	
 		this.requestSave.cancel();
-				
+
 	this.requestSave = this.service.request('palm://com.palm.systemservice/', {
 		'method': 'setPreferences', 'parameters': parameters,
 		onSuccess: function() {Mojo.Log.info("Config saved succesfully");}, 
@@ -62,8 +58,6 @@ ConfigManager.prototype.save = function(params, target) {
 
 ConfigManager.prototype.handleConfigData = function(params, callback, payload) {
 	// Handle all requested system preferences.
-
-	Mojo.Log.error("DEBUG: Mode Switcher Handling Config");
 
 	for(var key in params) {
 		eval("var config = payload." + key);

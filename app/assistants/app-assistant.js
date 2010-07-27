@@ -10,8 +10,8 @@ function AppAssistant(appController) {
 	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 
 	this.config = {}; 
-	
-	this.initiated = false;
+
+	this.initialized = false;
 
 	this.modesList = new Array();
 
@@ -43,83 +43,64 @@ AppAssistant.prototype.setup = function() {
 	
 	// Default configuration.
 		
-	this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1.0, cfgVersion: 1.1}; 
+	this.config.modeSwitcher = {
+		'activated': 0,
+		'timerStart': 10, 
+		'timerClose': 10, 
+		'modeLocked': "no",
+		'apiVersion': "1.0", 
+		'cfgVersion': "1.0" }; 
 	
-	this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;	
+	this.config.modesConfig = new Array();
+	
+	this.config.currentMode = null; 
+	this.config.defaultMode = null; 
+	
+	this.config.modifierModes = new Array();
+	
+	// Load available extensions.
 
-	// Available applications extensions.
+	var types = ["setting", "application", "trigger"];
 
-	ExtDefaultConfig = new DefaultConfig(ServiceRequestWrapper); 
-	ExtBrowserConfig = new BrowserConfig(ServiceRequestWrapper); 
-	ExtGovnahConfig = new GovnahConfig(ServiceRequestWrapper);
-	ExtModeSWConfig = new ModeSWConfig(ServiceRequestWrapper);
-	ExtPhoneConfig = new PhoneConfig(ServiceRequestWrapper);  
-	ExtWWindowConfig = new WWindowConfig(ServiceRequestWrapper);
+	for(var i = 0; i < types.length; i++) {
+		if(types[i] == "setting") {
+			var extensions = ["airplane", "calendar", "connection", "email", 
+				"messaging", "network", "ringer", "screen", "security", "sound"];
+		}
+		else if(types[i] == "application") {
+			var extensions = ["default", "browser", "govnah", 
+				"modesw", "phone", "wwindow"];		
+		}
+		else if(types[i] == "trigger") {
+			var extensions = ["battery", "btprofile", "charger", 
+				"location", "timeofday", "wireless"];
+		}
 		
-	this.applications.push({"id": "default", "appid": "default", "config": ExtDefaultConfig});
-	this.applications.push({"id": "browser", "appid": "com.palm.app.browser", "config": ExtBrowserConfig});
-	//this.applications.push({"id": "govnah", "appid": "org.webosinternals.govnah", "config": ExtGovnahConfig});
-	this.applications.push({"id": "modesw", "appid": "com.palm.org.e-lnx.wee.apps.modeswitcher", "config": ExtModeSWConfig});
-	this.applications.push({"id": "phone", "appid": "com.palm.app.phone", "config": ExtPhoneConfig});
-	this.applications.push({"id": "wwindow", "appid": "com.hiddenworldhut.weatherwindow", "config": ExtWWindowConfig});
-		
-	// Available setting group extensions.
-
-	ExtConnectionConfig = new ConnectionConfig(); 
-	ExtConnectionSetting = new ConnectionSetting(ServiceRequestWrapper); 
-
-	ExtAirplaneConfig = new AirplaneConfig(); 
-	ExtAirplaneSetting = new AirplaneSetting(ServiceRequestWrapper);
+		for(var j = 0; j < extensions.length; j++) {
+			var id = extensions[j];
+			var ext = id.charAt(0).toUpperCase() + id.slice(1);
 	
-	ExtMessagingConfig = new MessagingConfig(); 
-	ExtMessagingSetting = new MessagingSetting(ServiceRequestWrapper);
-	
-	ExtNetworkConfig = new NetworkConfig(); 
-	ExtNetworkSetting = new NetworkSetting(ServiceRequestWrapper);
-	
-	ExtRingtoneConfig = new RingtoneConfig(); 
-	ExtRingtoneSetting = new RingtoneSetting(ServiceRequestWrapper);
-	
-	ExtScreenConfig = new ScreenConfig(); 
-	ExtScreenSetting = new ScreenSetting(ServiceRequestWrapper);
-	
-	ExtSoundConfig = new SoundConfig(); 
-	ExtSoundSetting = new SoundSetting(ServiceRequestWrapper);
+			var config = eval("new " + ext + "Config(ServiceRequestWrapper);");
+				
+			if(types[i] == "setting")	
+				var setting = eval ("new " + ext + "Setting(ServiceRequestWrapper);");
+			else if(types[i] == "trigger")
+				var trigger = eval ("new " + ext + "Trigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);");
 			
-	this.settings.push({"id": "airplane", "config": ExtAirplaneConfig, "setting": ExtAirplaneSetting});
-	this.settings.push({"id": "connection", "config": ExtConnectionConfig, "setting": ExtConnectionSetting});
-	this.settings.push({"id": "messaging", "config": ExtMessagingConfig, "setting": ExtMessagingSetting});
-	this.settings.push({"id": "network", "config": ExtNetworkConfig, "setting": ExtNetworkSetting});
-	this.settings.push({"id": "ringtone", "config": ExtRingtoneConfig, "setting": ExtRingtoneSetting});
-	this.settings.push({"id": "screen", "config": ExtScreenConfig, "setting": ExtScreenSetting});
-	this.settings.push({"id": "sound", "config": ExtSoundConfig, "setting": ExtSoundSetting});
-
-	// Available trigger extensions.
-
-	ExtBatteryConfig = new BatteryConfig(); 
-	ExtBatteryTrigger = new BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtBTProfileConfig = new BTProfileConfig(); 
-	ExtBTProfileTrigger = new BTProfileTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtChargerConfig = new ChargerConfig(); 
-	ExtChargerTrigger = new ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-	 
-	ExtLocationConfig = new LocationConfig(); 
-	ExtLocationTrigger = new LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtTimeofdayConfig = new TimeofdayConfig(); 
-	ExtTimeofdayTrigger = new TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	ExtWirelessConfig = new WirelessConfig(); 
-	ExtWirelessTrigger = new WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);
-
-	this.triggers.push({"id": "battery", "config": ExtBatteryConfig, "trigger": ExtBatteryTrigger});
-	this.triggers.push({"id": "btprofile", "config": ExtBTProfileConfig, "trigger": ExtBTProfileTrigger});
-	this.triggers.push({"id": "charger", "config": ExtChargerConfig, "trigger": ExtChargerTrigger});
-	this.triggers.push({"id": "location", "config": ExtLocationConfig, "trigger": ExtLocationTrigger});
-	this.triggers.push({"id": "timeofday", "config": ExtTimeofdayConfig, "trigger": ExtTimeofdayTrigger});
-	this.triggers.push({"id": "wireless", "config": ExtWirelessConfig, "trigger": ExtWirelessTrigger});
+			if(config.version() == this.config.modeSwitcher.apiVersion) {
+				Mojo.Log.info("Loading " + types[i] + " extension: " + id);
+	
+				if(types[i] == "setting")
+					this.settings.push({"id": id, "config": config, "setting": setting});
+				else if(types[i] == "application")
+					this.applications.push({"id": id, "appid": config.appid(), "config": config});
+				else if(types[i] == "trigger")
+					this.triggers.push({"id": id, "config": config, "trigger": trigger});
+			}
+			else
+				Mojo.Log.error("Invalid extension version: " + id);
+		}
+	}
 }
 
 AppAssistant.prototype.cleanup = function() {
@@ -132,22 +113,19 @@ AppAssistant.prototype.cleanup = function() {
 
 //
 
-AppAssistant.prototype.screenOrientationChanged = function() {
-}
-
-//
-
 AppAssistant.prototype.handleLaunch = function(params) {
 	if((params) && (params.launchedAtBoot == true)) {
 		// Load config and init Mode Switcher.
 
 		Mojo.Log.error("DEBUG: Mode Switcher Launched At Boot");
 
+		this.initiating = true;
+
 		var callback = this.updateConfigData.bind(this);
 
 		ConfigManagerWrapper.load(this.config, callback);
 	}
-	else if(this.initiated) {
+	else if(this.initialized) {
 		// Handle normal Mode Switcher launch.
 
 		Mojo.Log.error("DEBUG: Mode Switcher Started Normally " + Object.toJSON(params));
@@ -155,7 +133,7 @@ AppAssistant.prototype.handleLaunch = function(params) {
 		this.executeLaunch(params);
 	}
 	else
-		Mojo.Log.error("DEBUG: Mode Switcher Not Launched Yet");
+		Mojo.Log.warn("Mode Switcher not running on background");
 }
 
 //
@@ -167,18 +145,38 @@ AppAssistant.prototype.executeLaunch = function(params) {
 	var stageController = this.controller.getStageController("config");
 	var appController = Mojo.Controller.getAppController();
 
-	if(!params) {
+	if((!params) || (params.action == "config")) {
+		var mode = null;
+
+		if((params.action == "config") && (params.event == "edit")) {
+			for(var i = 0; i < this.config.modesConfig.length; i++) {
+				if(this.config.modesConfig[i].name == params.name) {
+					mode = i;
+					
+					break;
+				}
+			}
+		}
+
 		if(stageController) {
 			Mojo.Log.info("Main config stage allready exists");
 
-			stageController.popScenesTo("config");
+			if(mode == null)
+				stageController.popScenesTo("config");
+			else
+				stageController.swapScene("config", "edit", mode);
+
 			stageController.activate();
 		}
 		else {
 			Mojo.Log.info("Creating main stage for config");
 			
 			var mainScene = function(stageController) {
-				stageController.pushScene("config");};
+				if(mode == null)
+					stageController.pushScene("config");
+				else
+					stageController.pushScene("config", "edit", mode);
+			};
 				
 			var stageArgs = {name: "config", lightweight: true};
 			
@@ -186,97 +184,188 @@ AppAssistant.prototype.executeLaunch = function(params) {
 				mainScene.bind(this), "card");
 		}
 	}
-	else {
-		if(params.action == "control") {
-			if(params.event == "init") {
-				this.initModeSwitcher();
-			}
-			else if(params.event == "reload") {
-				this.reloadModeSwitcher(params.modes);
-			}
-			else if(params.event == "shutdown") {
-				this.shutdownModeSwitcher();
-			}
-		}
-			
-		else if(params.action == "execute") {
-			if(this.config.modeSwitcher.activated != 1)
-				return;
-			
-			if(params.event == "start")
-				this.executeStartMode(params.name);
-			else if(params.event == "close")
-				this.executeCloseMode(params.name);
-			else if(params.event == "toggle")
-				this.executeToggleMode(params.name);
-		}
 
-		else if(params.action == "trigger") {
-			if(this.config.modeSwitcher.activated != 1)
-				return;
+	else if(params.action == "control") {
+		if(params.event == "init") {
+			this.initModeSwitcher();
+		}
+		else if(params.event == "reload") {
+			this.reloadModeSwitcher();
+		}
+		else if(params.event == "shutdown") {
+			this.shutdownModeSwitcher();
+		}		
+		else if(params.event == "lock") {
+			this.lockModeSwitcher();
+		}
+		else if(params.event == "unlock") {
+			this.unlockModeSwitcher();
+		}
+	}
+			
+	else if(params.action == "execute") {
+		if(this.config.modeSwitcher.activated != 1)
+			return;
 
+		if(params.event == "start") {
+			this.executeStartMode(params.name);
+		}
+		else if(params.event == "close") {
+			this.executeCloseMode(params.name);
+		}
+		else if(params.event == "toggle") {
+			this.executeToggleMode(params.name);
+		}
+	}
+
+	else if(params.action == "trigger") {
+		if(this.config.modeSwitcher.activated != 1)
+			return;
+
+		if(params.event == "manual") {
+			this.triggerManualMode(params.data);
+		}
+		else {
 			var data = params.data;
-			var callback = this.handleLauncher.bind(this);
+			var cb = this.handleLauncher.bind(this);
 
 			for(var i = 0; i < this.triggers.length; i++) {
 				if(this.triggers[i].id == params.event) {
-					this.triggers[i].trigger.execute(data, callback);
+					this.triggers[i].trigger.execute(data, cb);
 					break;
 				}
 			}
 		}
-		
-		else if(params.type != undefined) {
-			for(var i = 0; i < this.applications.length; i++) {
+	}
+	
+	else if(params.action == "launcher") {
+		if((params.event == "cancel") || 
+			(params.event == "start") ||
+			(params.event == "close"))
+		{
+			var original = params.data.original;
+			var modifiers = params.data.modifiers;
+
+			this.processLauncher(original, modifiers);
+		}
+	}
+	
+	// FIXME: Hack for govnah extension data request
+	
+	else if(params.type == "govnah-profiles") {
+		for(var i = 0; i < this.applications.length; i++) {
+			if(this.applications[i].id == "govnah")
 				this.applications[i].config.data(params);
-			}
 		}
 	}
 }
 
 //
 
-AppAssistant.prototype.handleLauncher = function(startModes, closeMode) {
-	// Check that other triggers and config for start modes and close mode are valid.
-	
-	if((this.config.currentMode) && (this.config.currentMode.triggers.block == 1))
-		startModes.clear();
+AppAssistant.prototype.handleLauncher = function(startModes, closeModes) {
+	Mojo.Log.info("Handling launcher event: " + startModes.length + " " + closeModes.length);
 
+	var block = 0;
+	var current = this.config.defaultMode;
+	var modifiers = this.config.modifierModes.slice(0);
+	
+	if((this.config.modeSwitcher.modeLocked == "yes") || 
+		((startModes.length == 0) && (closeModes.length == 0)))
+	{
+		return;
+	}
+
+	// Determine the current mode and the trigger blocking setting from active modes.
+	
+	if(this.config.currentMode.type != "default") {
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if(this.config.modesConfig[i].name == this.config.currentMode.name)
+				current = this.config.modesConfig[i];
+
+			if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
+				(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
+			{
+				if(block != 1) {
+					if(((block == 2) && (this.config.modesConfig[i].triggers.block == 3)) ||
+						((block == 3) && (this.config.modesConfig[i].triggers.block == 2)))
+					{
+						block = 1;
+					}
+					else
+						block = this.config.modesConfig[i].triggers.block;		
+				}
+			}
+		}
+	}
+
+	// Check that other triggers and config for start modes and close modes are valid.
+	
 	for(var i = 0; i < startModes.length ; i++) {
-		if((startModes[i].autoStart == 0) || (startModes[i].triggersList.length == 0) || 
-			(!this.checkModeTriggers(startModes[i])) || 
-			((this.config.currentMode) && (this.config.currentMode.name == startModes[i].name)))
+		if(((current.type != "default") && (block == 1)) || 
+			((current.type == "normal") && (startModes[i].type == "normal") && (block == 2)) ||
+			((current.type == "modifier") && (startModes[i].type == "modifier") && (block == 3)))
 		{
+			Mojo.Log.error("DEBUG: Removing Blocked Mode");
+		
+			startModes.splice(i--, 1);
+		}
+		else if((startModes[i].autoStartMode == 0) || (startModes[i].triggersList.length == 0) || 
+			(!this.checkModeTriggers(startModes[i])) || (startModes[i].name == current.name) ||
+			(this.config.modifierModes.indexOf(startModes[i].name) != -1))
+		{
+			Mojo.Log.error("DEBUG: Removing Invalid Mode");
+			
+			startModes.splice(i--, 1);
+		}
+		else if(startModes[i].type == "modifier")
+		{
+			Mojo.Log.error("DEBUG: Removing Modifier Mode");
+		
+			modifiers.push(startModes[i].name);
 			startModes.splice(i--, 1);
 		}
 	}
 
-	if((!this.config.currentMode) || (this.config.currentMode.autoClose == 0) ||
-		(this.checkModeTriggers(this.config.currentMode)))
-	{
-		closeMode = false;
+	for(var i = 0; i < closeModes.length ; i++) {
+		if(((current.type != "default") && (block == 1)) || 
+			((current.type == "normal") && (closeModes[i].type == "normal") && (block == 2)) ||
+			((current.type == "modifier") && (closeModes[i].type == "modifier") && (block == 3)))
+		{
+			Mojo.Log.error("DEBUG: Removing Blocked Mode");
+		
+			closeModes.splice(i--, 1);
+		}
+		else if((closeModes[i].autoCloseMode == 0) || (closeModes[i].triggersList.length == 0) || 
+			(this.checkModeTriggers(closeModes[i])) || ((closeModes[i].name != current.name) &&
+			(this.config.modifierModes.indexOf(closeModes[i].name) == -1)))
+		{
+			Mojo.Log.error("DEBUG: Removing Invalid Mode " + this.checkModeTriggers(closeModes[i]));
+		
+			closeModes.splice(i--, 1);
+		}
+		else if(closeModes[i].type == "modifier")
+		{
+			Mojo.Log.error("DEBUG: Removing Modifier Mode");
+		
+			modifiers.splice(this.config.modifiersodes.indexOf(closeModes[i].name), 1);
+			closeModes.splice(i--, 1);
+		}
 	}
-	
+
 	// Check if we should do immediate start/close or execute the launcher scene.
 	// If immediate is set and there are other start/close actions then use launcher.
 
-	if(startModes.length > 0)
-	{
-		if((startModes.length == 1) && (startModes[0].autoStart == 3))
-			this.executeStartMode(startModes[0].name);
-		else
-			this.executeLauncher("start", startModes, closeMode);
-	}
-	else if(closeMode)
-	{
-		if(this.config.currentMode.autoClose == 3)
-			this.executeCloseMode(this.config.currentMode.name);
-		else 
-			this.executeLauncher("close", startModes, closeMode);
-	}
+	if((startModes.length == 1) && (startModes[0].autoStartMode == 3))
+		this.updateCurrentMode(startModes[0], modifiers);
+	else if((closeModes.length == 1) && (closeModes[0].autoCloseMode == 3))
+		this.updateCurrentMode(this.config.defaultMode, modifiers);
+	else if((startModes.length > 0) || (closeModes.length > 0))
+		this.executeLauncher(startModes, closeModes[0], modifiers);
+	else if(modifiers.length != this.config.modifierModes.length) 
+		this.updateCurrentMode(current, modifiers);
 }
 
-AppAssistant.prototype.executeLauncher = function(event, startModes, closeMode) {
+AppAssistant.prototype.executeLauncher = function(startModes, closeMode, modifiers) {
 	var stageController = this.controller.getStageController("launcher");
 	var appController = Mojo.Controller.getAppController();
 
@@ -289,7 +378,7 @@ AppAssistant.prototype.executeLauncher = function(event, startModes, closeMode) 
 		Mojo.Log.info("Creating main stage for launcher");
 
 		var launcherScene = function(stageController) {
-			stageController.pushScene("launcher", event, startModes, closeMode);};
+			stageController.pushScene("launcher", startModes, closeMode, modifiers);};
 			
 		var stageArgs = {name: "launcher", lightweight: true, height: 177};
 		
@@ -298,33 +387,60 @@ AppAssistant.prototype.executeLauncher = function(event, startModes, closeMode) 
 	}
 }
 
+AppAssistant.prototype.processLauncher = function(originalMode, modifierModes) {
+	var original = this.config.defaultMode;
+	var modifiers = new Array();
+
+	for(var i = 0; i < this.config.modesConfig.length; i++) {
+		if(this.config.modesConfig[i].name == originalMode) {
+			original = this.config.modesConfig[i];
+		}
+		else if(modifierModes.indexOf(this.config.modesConfig[i].name) != -1) {
+			modifiers.push(this.config.modesConfig[i]);
+		}
+	}
+	
+	this.updateCurrentMode(original, modifiers);
+}
+
 //
 
-AppAssistant.prototype.updateConfigData = function(params, callback, payload) {
+AppAssistant.prototype.updateConfigData = function() {
 	// FIXME: Remove at some point when everybody should have the stable version!
 
 	Mojo.Log.error("DEBUG: Mode Switcher Updating Config");
 	
 	if((this.config.modeSwitcher.cfgVersion == undefined) || 
-		(this.config.modeSwitcher.cfgVersion != 1.1))
+		(this.config.modeSwitcher.cfgVersion !== "1.0"))
 	{
+		//if(this.config.modeSwitcher.cfgVersion === "1.0") {
+		//}
+		//else {
+
 		Mojo.Log.error("DEBUG: Mode Switcher Resetting Old Config");
 
-		this.config.modeSwitcher = {activated: 0, timerStart: 10, timerClose: 10, apiVersion: 1.0, cfgVersion: 1.1}; 
-			
-		this.config.modesConfig = new Array(); this.config.currentMode = null; this.config.defaultMode = null;
+		this.config.modeSwitcher = {
+			'activated': 0, 
+			'timerStart': 10, 
+			'timerClose': 10, 
+			'modeLocked': "no", 
+			'apiVersion': "1.0", 
+			'cfgVersion': "1.0" }; 
 		
+		this.config.modesConfig = new Array();
+			
+		this.config.currentMode = null; 
+		this.config.defaultMode = null; 
+		
+		this.config.modifierModes = new Array();
+		//}
+
 		ConfigManagerWrapper.save(this.config);
 	}
 	
-	// Allow normal operation after configuration is loaded.
-
-	this.initiated = true;
-
-	// If mode switcher is activated then execute init.
+	// If mode switcher is activated then execute startup.
 	
-	if(this.config.modeSwitcher.activated == 1)
-		this.initModeSwitcher();
+	this.reloadModeSwitcher();
 }
 
 //
@@ -336,90 +452,88 @@ AppAssistant.prototype.initModeSwitcher = function() {
 
 	// On init inform the user even if notifications are disabled.
 
-	SystemNotifierWrapper.force();
+	SystemNotifierWrapper.override("startup");
 
 	// Initialize enabled trigger extensions on mode switcher init.
 
-	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].trigger.init(this.config);
+	clearTimeout(this.initTriggersTimer);
 	
-	if((this.config.currentMode == null) || 
-		(this.config.defaultMode.miscOnStartup == 1) ||
-		(!this.checkModeTriggers(this.config.currentMode)))
-	{
-		if((this.config.currentMode == null) || 
-			(this.config.currentMode.type != "default")) 
-		{
-			this.config.currentMode = null;
+	this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 30000);
 
-			this.executeStartMode("Default Mode");	
-		}
-		else
-			this.modeAppsStart(null, this.config.defaultMode, false);
-	}
-	else 	
-		this.modeAppsStart(null, this.config.currentMode, false);
+	// Start the default mode when Mode Switcher is initialized.
+	
+	this.config.modifierModes.clear();
+	
+	this.executeStartMode(this.config.defaultMode.name);
 }
 
-AppAssistant.prototype.reloadModeSwitcher = function(modes) {
+AppAssistant.prototype.reloadModeSwitcher = function() {
 	Mojo.Log.error("DEBUG: Reloading Mode Switcher");
 	
 	Mojo.Log.info("Reinitializing mode switcher");
 
-	// On reinit inform the user even if notifications are disabled.
-
-	SystemNotifierWrapper.force();
-
-	// Reinitialize enabled trigger extensions on mode switcher reinit.
-
-	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].trigger.reload(modes);
-
-	// Check the existence of the current mode and is it valid or not.
-
-	if(this.config.currentMode != null) {
-		// Check that the current mode still exists (not removed).
-	
-		for(var i = 0; i < this.config.modesConfig.length; i++) {
-			if((this.config.currentMode.name == this.config.modesConfig[i].name) ||
-				(this.config.currentMode.type == "default"))
-			{
-				// Find whether current mode has been edited or no.
+	if(this.config.modeSwitcher.activated != 1) {
+		this.initialized = true;
 		
-				for(var i = 0; i < modes.length; i++) {
-					if(modes[i] == this.config.currentMode.name) {
-						// Restart the mode if valid or close if not.
+		return;
+	}
 
-						if((this.config.currentMode.autoClose == 0) || 
-							(this.config.currentMode.type == "default") || 
-							(this.checkModeTriggers(this.config.currentMode)))
-						{
-							this.executeStartMode(this.config.currentMode.name);			
-						}
+	// On reload inform the user even if notifications are disabled.
 
-						break;
-					}
+	SystemNotifierWrapper.override("reload");
+
+	// Shutdown enabled trigger extensions for mode switcher reload.
+
+	clearTimeout(this.shutdownTriggersTimer);
+
+	this.shutdownTriggersTimer = setTimeout(this.shutdownModeTriggers.bind(this), 0);
+
+	// Check that original mode still exists and triggers are valid.
+
+	var original = this.config.defaultMode;
+	
+	if(this.config.currentMode.type == "normal") {
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+				if(this.config.modesConfig[i].type == "normal") {
+					if(this.checkModeTriggers(this.config.modesConfig[i]))
+						original = this.config.modesConfig[i]
 				}
-				
-				if((this.config.currentMode.autoClose != 0) && 
-					(this.config.currentMode.type == "custom") && 
-					(!this.checkModeTriggers(this.config.currentMode)))
-				{
-					this.executeCloseMode(this.config.currentMode.name);
-				}
-				 
-				// If not edited or restart / closing initiated.
-				
-				return;
+
+				break;
 			}
 		}
-		
-		// If reaches this far then current mode was deleted.
 	}
-	
-	// If no current mode then start default mode.
 
-	this.executeStartMode(this.config.defaultMode.name);
+	// Check that modifier modes still exists and triggers are valid.
+
+	var modifiers = new Array();
+
+	for(var i = 0; i < this.config.modifierModes.length; i++) {
+		for(var j = 0; j < this.config.modesConfig.length; j++) {
+			if(this.config.modifierModes[i] == this.config.modesConfig[j].name) {
+				if(this.config.modesConfig[j].type == "modifier") {
+					if(this.checkModeTriggers(this.config.modesConfig[j]))
+						modifiers.push(this.config.modesConfig[j]);
+				}
+			
+				break;
+			}
+		}
+	}
+
+	// Execute the actual updating of current mode (if there's changes).
+
+	this.updateCurrentMode(original, modifiers);
+	
+	// Initialize enabled trigger extensions after mode switcher reload.
+
+	clearTimeout(this.initTriggersTimer);
+	
+	if(this.initialized)
+		this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 0);
+	else
+		this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 30000);
 }
 
 AppAssistant.prototype.shutdownModeSwitcher = function() {
@@ -429,50 +543,53 @@ AppAssistant.prototype.shutdownModeSwitcher = function() {
 
 	// On shutdown inform the user even if notifications are disabled.
 
-	SystemNotifierWrapper.force();
+	SystemNotifierWrapper.override("shutdown");
 
 	// Shutdown enabled trigger extensions on mode switcher shutdown.
 
-	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].trigger.shutdown();
+	clearTimeout(this.shutdownTriggersTimer);
+	
+	this.shutdownTriggersTimer = setTimeout(this.shutdownModeTriggers.bind(this), 0);
 	
 	// Close the current mode (set system settings from default mode).
 
-	if(this.config.currentMode)
-		this.executeCloseMode(this.config.currentMode.name);
+	this.config.modifierModes.clear();
+	
+	this.executeCloseMode(this.config.defaultMode.name);
 }
 
 //
 
-AppAssistant.prototype.checkModeTriggers = function(mode) {
-	for(var i = 0; i < this.triggers.length; i++) {
-		if(mode.triggers.required == 1)
-			var triggerState = true;
-		else if(mode.triggers.required == 2)
-			var triggerState = false;
+AppAssistant.prototype.initModeTriggers = function() {
+	for(var i = 0; i < this.triggers.length; i++)
+		this.triggers[i].trigger.init(this.config);
+}
 
-		for(var j = 0; j < mode.triggersList.length; j++) {
-			if(mode.triggersList[j].type == this.triggers[i].id) {
-				triggerState = false;
-				
-				if(this.triggers[i].trigger.check(mode.triggersList[j])) {
-					triggerState = true;
-					
-					break;
-				}
-			}		
-		}
+AppAssistant.prototype.shutdownModeTriggers = function() {
+	for(var i = 0; i < this.triggers.length; i++)
+		this.triggers[i].trigger.shutdown(this.config);
+}
 
-		if((mode.triggers.required == 1) && (!triggerState))
-			return false;
-		else if((mode.triggers.required == 2) && (triggerState))
-			return true;
-	}
+//
 
-	if(mode.triggers.required == 1) 		
-		return true;
-	else if(mode.triggers.required == 2)
-		return false;
+AppAssistant.prototype.lockModeSwitcher = function() {
+	Mojo.Log.error("DEBUG: Locking Mode Switcher");
+	
+	Mojo.Log.info("Locking mode switcher");
+
+	this.config.modeSwitcher.modeLocked = "yes";
+	
+	ConfigManagerWrapper.save(this.config, "modeSwitcher");
+}
+
+AppAssistant.prototype.unlockModeSwitcher = function() {
+	Mojo.Log.error("DEBUG: Unlocking Mode Switcher");
+	
+	Mojo.Log.info("Unlocking mode switcher");
+	
+	this.config.modeSwitcher.modeLocked = "no";
+	
+	ConfigManagerWrapper.save(this.config, "modeSwitcher");
 }
 
 //
@@ -480,110 +597,170 @@ AppAssistant.prototype.checkModeTriggers = function(mode) {
 AppAssistant.prototype.executeStartMode = function(modeName) {
 	Mojo.Log.info("Start mode action received: " + modeName);
 
-	// Check and set state of old, new and cur modes.
+	// Check and find information for requested mode.
 
-	var oldmode = this.config.currentMode;
-	var newmode = null;
-	
+	var requestedMode = null;
+
 	if(modeName == "Default Mode") {
-		this.modesList.clear();
-	}
-	else if(oldmode) {
-		for(var i = 0; i < this.modesList.length; i++) {
-			if(this.modesList[i] == oldmode.name)
-				this.modesList.splice(i--, 1);
-		}
-		
-		this.modesList.push(oldmode.name);
-	}
-	
-	if(modeName == this.config.defaultMode.name) {
-		newmode = this.config.defaultMode;
-			
-//		this.modesList = new Array();
+		requestedMode = this.config.defaultMode;
 	}
 	else {
-		for(var i = 0 ; i < this.config.modesConfig.length ; i++) {
+		if(modeName == "Current Mode") {
+			modeName = this.config.currentMode.name;
+		}
+		else if(modeName == "Previous Mode") {
+			if(this.modesList.length > 1) {
+				modeName = this.modesList[this.modesList.length - 2];
+			}
+		}
+
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
 			if(this.config.modesConfig[i].name == modeName) {
-				newmode = this.config.modesConfig[i];
+				requestedMode = this.config.modesConfig[i];
+			
+				break;
+			}
+		}
+	}
+		
+	// If requested mode not found then do nothing.
+	
+	if(requestedMode == null)
+		return;
+	
+	// Define and locate original mode for update.
+
+	if(requestedMode.type != "modifier") {
+		var original = requestedMode;
+	}
+	else {
+		var original = this.config.defaultMode;
+		
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+				original = this.config.modesConfig[i];
+			
 				break;
 			}
 		}
 	}
 	
-	// If requested mode not found then do nothing.
+	// Generate list of modifier modes for update.
+
+	var modifiers = new Array();
+
+	for(var i = 0; i < this.config.modifierModes.length; i++) {
+		if(this.config.modifierModes[i] == modeName)
+			continue;
+
+		for(var j = 0; j < this.config.modesConfig.length; j++) {
+			if(this.config.modifierModes[i] == this.config.modesConfig[j].name) {
+				if(this.config.modesConfig[j].type == "modifier")
+					modifiers.push(this.config.modesConfig[j]);
+				
+				break;
+			}
+		}
+	}
 	
-	if(newmode == null)
-		return;
+	if(requestedMode.type == "modifier")
+		modifiers.push(requestedMode);
 
-	// Notify about the start action if configured.
+	// Initiate the actual updating of the mode.
 
-	SystemNotifierWrapper.notify("start", oldmode, newmode);
-
-	// Initiate the actual starting of the mode.
-
-	if(this.config.modeSwitcher.activated != 0)
-		this.config.currentMode = newmode;
-	else
-		this.config.currentMode = null;
-
-	this.modeChangeExecute(oldmode, newmode, 0);
+	this.updateCurrentMode(original, modifiers);
 }
 
 AppAssistant.prototype.executeCloseMode = function(modeName) {
 	Mojo.Log.info("Close mode action received: " + modeName);
 
-	// Check and set state of old, new and cur modes.
+	// Check that requested mode is currently active.
 
-	if(this.config.currentMode.name != modeName)
-		return;
+	var requestedMode = null;
 
-	var oldmode = this.config.currentMode;
-	var newmode = null;
-		
-	while(this.modesList.length > 0) {
-		modeName = this.modesList.pop();
-		
-		for(var i = 0; i < this.config.modesConfig.length; i++) {
+	if(modeName == "Default Mode") {
+		requestedMode = this.config.defaultMode;
+	}
+	else {
+		if(modeName == "Current Mode") {
+			modeName = this.config.currentMode.name;
+		}
+		else if(modeName == "Previous Mode") {
+			if(this.modesList.length > 1) {
+				modeName = this.modesList[this.modesList.length - 2];
+			}
+		}
+
+		for(var i = 0 ; i < this.config.modesConfig.length ; i++) {
 			if(this.config.modesConfig[i].name == modeName) {
-				if(this.checkModeTriggers(this.config.modesConfig[i]))
-					newmode = this.config.modesConfig[i];
-
+				requestedMode = this.config.modesConfig[i];
+		
 				break;
 			}
 		}
-		
-		if(newmode != null)
-			break;
-	}
+	}	
+	
+	// If requested mode not found then do nothing.
+	
+	if(requestedMode == null)
+		return;
+	
+	// Define and locate original mode for update.
 
-	if(newmode == null) {
-		this.modesList.clear();
+	if(requestedMode.type != "modifier") {
+		var original = this.config.defaultMode;
+	}
+	else {
+		var original = this.config.defaultMode;
+	
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+				original = this.config.modesConfig[i];
 		
-		newmode = this.config.defaultMode;
+				break;
+			}
+		}
 	}
 	
-	// Notify about the start action if configured.
+	// Generate list of modifier modes for update.
 
-	SystemNotifierWrapper.notify("close", oldmode, newmode);
+	var modifiers = new Array();
 
+	for(var i = 0; i < this.config.modifierModes.length; i++) {
+		if(this.config.modifierModes[i] == modeName)
+			continue;
+		
+		for(var j = 0; j < this.config.modesConfig.length; j++) {
+			if(this.config.modifierModes[i] == this.config.modesConfig[j].name) {
+				if(this.config.modesConfig[j].type == "modifier")
+					modifiers.push(this.config.modesConfig[j]);
+				
+				break;
+			}
+		}
+	}
+	
 	// Initiate the actual closing of the mode.
 
-	if(this.config.modeSwitcher.activated != 0)
-		this.config.currentMode = newmode;
-	else
-		this.config.currentMode = null;
-
-	this.modeChangeExecute(oldmode, newmode, 0);
+	this.updateCurrentMode(original, modifiers);
 }
 
 AppAssistant.prototype.executeToggleMode = function(modeName) {
 	Mojo.Log.info("Toggle mode action received: " + modeName);
 
-	SystemNotifierWrapper.force();
+	if(modeName == "Current Mode") {
+		modeName = this.config.currentMode.name;
+	}
+	else if(modeName == "Previous Mode") {
+		if(this.modesList.length > 1) {
+			modeName = this.modesList[this.modesList.length - 2];
+		}
+	}
 
 	if(this.config.currentMode != null) {
-		if(this.config.currentMode.name == modeName) {
+		if((this.config.currentMode.name == modeName) || 
+			(this.config.modifierModes.indexOf(modeName) != -1))
+		{
 			this.executeCloseMode(modeName);
 
 			return;
@@ -605,129 +782,248 @@ AppAssistant.prototype.executeToggleMode = function(modeName) {
 
 //
 
-AppAssistant.prototype.modeChangeExecute = function(oldmode, newmode, index) {
-	// Check the status of config execution and act accordingly.
+AppAssistant.prototype.triggerManualMode = function(modeName) {
+	Mojo.Log.info("Manual trigger action received: " + modeName);
+	
+	if(modeName == "Default Mode")
+		this.executeModeStart(this.config.defaultMode.name);
+	else {
+		if(modeName == "Current Mode") {
+			modeName = this.config.currentMode.name;
+		}
+		else if(modeName == "Previous Mode") {
+			if(this.modesList.length > 1) {
+				modeName = this.modesList[this.modesList.length - 2];
+			}
+		}
 
-	if(index < this.settings.length) {
-		// If newmode then settings taken from there, otherwise from defmode.
-
-		var settings = null;
-
-		if(newmode)
-			var mode = newmode;
-		else
-			var mode = this.config.defaultMode;
-
-		for(var i = 0; i < mode.settingsList.length; i++) {
-			if(mode.settingsList[i].extension == this.settings[index].id) {
-				
-				settings = mode.settingsList[i];
-			
+		for(var i = 0 ; i < this.config.modesConfig.length ; i++) {
+			if(this.config.modesConfig[i].name == modeName) {
+				if((this.config.currentMode.name != modeName) &&
+					(this.config.modifierModes.indexOf(modeName) == -1))
+				{
+					if(this.checkModeTriggers(this.config.modesConfig[i]))
+						this.executeStartMode(modeName);
+				}
+				else {
+					if(!this.checkModeTriggers(this.config.modesConfig[i]))
+						this.executeCloseMode(modeName);
+				}
+	
 				break;
 			}
 		}
+	}
+}
 
-		if(settings) {
-			// If config set in newmode then execute the config setting.
+//
+
+
+
+AppAssistant.prototype.updateCurrentMode = function(original, modifiers) {
+	// Save old mode and generate the new mode.
+
+	var oldModifierModes = this.config.modifierModes;
 	
-			Mojo.Log.info("Setting " + this.settings[index].id + " settings");
-		}
-		else {
-			// If newmode has no config set then check if it was set in oldmode.
+	var newModifierModes = new Array();
+
+	var oldCurrentMode = this.config.currentMode;
 	
-			if((oldmode) && (oldmode.type == "custom")) {
-				for(var i = 0; i < oldmode.settingsList.length; i++) {
-					if(oldmode.settingsList[i].extension == this.settings[index].id) {
-						settings = oldmode.settingsList[i];
-						
-						break;
-					}
-				}
-			}
-			
-			if((!oldmode) || (settings)) {
-				// If config set in oldmode then execute the config resetting.
+	var newCurrentMode = {
+		'name': original.name, 'type': original.type,
+		'settings': {}, 'settingsList': [],
+		'apps': original.apps, 'appsList': original.appsList };
 
-				for(var i = 0; i < this.config.defaultMode.settingsList.length; i++) {
-					if(this.config.defaultMode.settingsList[i].extension == this.settings[index].id) {
-						Mojo.Log.info("Resetting " + this.settings[index].id + " settings");
-
-						settings = this.config.defaultMode.settingsList[i];
-						break;
-					}
-				}
-			}
-		}
-
-		if(settings) {
-			var callback = this.modeChangeExecute.bind(this, oldmode, newmode, index + 1);
-
-			this.settings[index].setting.set(settings, callback);
-		}
-		else {
-			// If neither (old and new) mode has config set then skip it.
+	if(original.type == "default")
+		var modes = [this.config.defaultMode].concat(modifiers);
+	else
+		var modes = [this.config.defaultMode].concat([original], modifiers);
+	
+	for(var i = 0; i < modes.length; i++) {
+		if(modes[i].type == "modifier")
+			newModifierModes.push(modes[i].name);
+	
+		if(modes[i].settings.notify != 0)
+			newCurrentMode.settings.notify = modes[i].settings.notify;
 		
-			Mojo.Log.info("Skipping " + this.settings[index].id + " settings");	
+		if(modes[i].settings.charging != 0)
+			newCurrentMode.settings.charging = modes[i].settings.charging;
+
+		for(var j = 0; j < modes[i].settingsList.length; j++) {
+			var index = newCurrentMode.settingsList.length;
+		
+			for(var k = 0; k < newCurrentMode.settingsList.length; k++) {
+				if(newCurrentMode.settingsList[k].extension == modes[i].settingsList[j].extension) {
+					index = k;
+					break;
+				}
+			}
+		
+			if(index == newCurrentMode.settingsList.length) {
+				var settings = {};
+				
+				Object.extend(settings, modes[i].settingsList[j]);
+				
+				newCurrentMode.settingsList.push(settings);
+			}
+			else {
+				Object.extend(newCurrentMode.settingsList[k], modes[i].settingsList[j]);
+			}     	
+	  }
+	}
+	
+	// Save current mode and its modifiers.
+
+	this.config.modeSwitcher.modeLocked = "no";	
+	
+	this.config.currentMode = newCurrentMode;
+	
+	this.config.modifierModes = newModifierModes;
+	
+	ConfigManagerWrapper.save(this.config);
 			
-			this.modeChangeExecute(oldmode, newmode, index + 1);
+	// Execute the actual mode changing.
+
+	if(Object.toJSON(oldCurrentMode) != Object.toJSON(newCurrentMode))	
+		this.modeUpdateInit(oldCurrentMode, newCurrentMode);
+	else
+		this.updateRunningApps(oldCurrentMode, newCurrentMode);
+}
+
+AppAssistant.prototype.updateHistoryList = function(oldCurrentMode, newCurrentMode) {
+	// Add to list if this is a new mode.
+
+	if((oldCurrentMode.name != newCurrentMode.name) &&
+		(newCurrentMode.name != "Default Mode"))
+	{
+		if(this.modesList.length == 0)
+			this.modesList.push(newCurrentMode.name);
+		else {
+			if(this.modesList[this.modesList.length-1] != newCurrentMode.name) {
+				if(this.modesList.length == 10)
+					this.modesList.shift();
+
+				this.modesList.push(newCurrentMode.name);
+			}
+			else {
+				this.modesList.pop();
+			}
+		}
+	}
+}
+
+AppAssistant.prototype.updateRunningApps = function(oldCurrentMode, newCurrentMode) {
+	var oldApps = new Array();
+	var newApps = new Array();
+
+	var start = newCurrentMode.apps.start;
+	var close = oldCurrentMode.apps.close;
+
+	oldApps = oldCurrentMode.appsList;
+
+	if((!this.initialized) || 
+		(newCurrentMode.type != "default") || 
+		(newCurrentMode.miscAppsMode == 1))
+	{
+		newApps = newCurrentMode.appsList;
+	}
+
+	AppsManagerWrapper.update(oldApps, newApps, start, close, null);
+
+	this.initialized = true;
+}
+
+//
+
+AppAssistant.prototype.modeUpdateInit = function(oldCurrentMode, newCurrentMode) {
+	// Initiate the mode updating process.
+
+	Mojo.Log.info("Mode updating initialized");
+
+	// Notify about mode updating if configured.
+	
+	SystemNotifierWrapper.notify("init", oldCurrentMode, newCurrentMode);
+	
+	// Update the normal modes history list.
+
+	this.updateHistoryList(oldCurrentMode, newCurrentMode);
+
+	// Setup screen mode from current mode.
+	
+	if(newCurrentMode.settings.charging == 1)
+		ScreenControlWrapper.setMode("default");
+	else if(newCurrentMode.settings.charging == 2)
+		ScreenControlWrapper.setMode("alwayson");
+	else if(newCurrentMode.settings.charging == 3)
+		ScreenControlWrapper.setMode("turnoff");
+	
+	// Execute the actual mode updating process.
+	
+	this.modeUpdateExec(oldCurrentMode, newCurrentMode, 0);
+}
+
+AppAssistant.prototype.modeUpdateExec = function(oldCurrentMode, newCurrentMode, index) {
+	// Check the status of config execution and act accordingly.
+
+	if(index < newCurrentMode.settingsList.length) {
+		var callback = this.modeUpdateExec.bind(this, oldCurrentMode, newCurrentMode, index + 1);
+
+		for(var i = 0; i < this.settings.length; i++) {
+			if(this.settings[i].id == newCurrentMode.settingsList[index].extension) {
+				Mojo.Log.info("Setting settings: " + this.settings[i].id);
+				
+				this.settings[i].setting.set(newCurrentMode.settingsList[index], callback);
+				
+				break;
+			}
 		}
 	}
 	else {
-		// Settings done so start the applicaitons.
-	
-		this.modeAppsStart(oldmode, newmode, true);
+		this.modeUpdateDone(oldCurrentMode, newCurrentMode);	
 	}
 }
 
-AppAssistant.prototype.modeAppsStart = function(oldmode, newmode, notify) {
-	var newapps = new Array();
-	var start = 0;
-	var oldapps = new Array();
-	var close = 0;
+AppAssistant.prototype.modeUpdateDone = function(oldCurrentMode, newCurrentMode) {
+	Mojo.Log.info("Mode updating completed");
 
-	if(newmode) {
-		if((!oldmode) || (newmode.type == "custom") || 
-			(newmode.miscAppsMode == 1))
-		{
-			newapps = newmode.appsList;
+	// Update running apps according to config.
+
+	this.updateRunningApps(oldCurrentMode, newCurrentMode);
+
+	// Notify about mode updating if configured.
+	
+	SystemNotifierWrapper.notify("done", oldCurrentMode, newCurrentMode);
+}
+
+//
+
+AppAssistant.prototype.checkModeTriggers = function(mode) {
+
+	for(var i = 0; i < mode.triggersList.length; i++) {
+		var triggerState = false;
+
+		for(var j = 0; j < this.triggers.length; j++) {
+			if(mode.triggersList[i].extension == this.triggers[j].id) {
+				if(this.triggers[j].trigger.check(mode.triggersList[i])) {
+					triggerState = true;
+					
+					break;
+				}
+			}		
 		}
-		
-		start = newmode.apps.start;
+
+		if((mode.triggers.required == 0) && (!triggerState))
+			return false;
+		else if((mode.triggers.required == 1) && (triggerState))
+			return true;
 	}
 
-	if(oldmode) {
-		oldapps = oldmode.appsList;
-		close = oldmode.apps.close;
-	}
-
-	var callback = this.modeChangeDone.bind(this, oldmode, newmode);
-
-	if(notify)
-		AppsManagerWrapper.update(newapps, oldapps, start, close, callback);
-	else
-		AppsManagerWrapper.update(newapps, oldapps, start, close, null);
-}
-
-AppAssistant.prototype.modeChangeDone = function(oldmode, newmode) {
-	// Mode starting is now completely done so save curmode.
-
-	Mojo.Log.info("Mode switching completed");
-
-	ConfigManagerWrapper.save(this.config, "currentMode");
-	
-	ServiceRequestWrapper.request('palm://com.palm.power/com/palm/power', { 
-	method: 'activityEnd', parameters: {'id': this.appid} });
-
-	// Set the display mode according to config.
-
-	if(newmode.settings.charging == 1)
-		ScreenControlWrapper.setMode("default");
-	else if(newmode.settings.charging == 2)
-		ScreenControlWrapper.setMode("alwayson");
-	else if(newmode.settings.charging == 3)
-		ScreenControlWrapper.setMode("turnoff");
-
-	SystemNotifierWrapper.notify("done", oldmode, newmode);
+	if(mode.triggersList.length == 0)
+		return true; 		
+	else if(mode.triggers.required == 0) 		
+		return true;
+	else if(mode.triggers.required == 1)
+		return false;
 }
 
 //
