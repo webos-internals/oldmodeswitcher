@@ -3,23 +3,50 @@ function TemplateTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotif
 
 	this.service = ServiceRequestWrapper;
 
-	this.triggerState = 0;
+	this.callback = null;
+	this.initialized = false;
 	
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
+	this.config = null;
+	this.enabled = false;
+
+	this.triggerState = 0;
 }
 
 //
 
-TemplateTrigger.prototype.init = function(config) {
+TemplateTrigger.prototype.init = function(callback) {
 	// This function should subscribe to needed notifications and setup initial state.
 
+	this.callback = callback;
+
+	this.initialized = false;
+
+	this.subscribeTemplateNotifications();
+}
+
+TemplateTrigger.prototype.shutdown = function() {
+	// This function should unsubscribe the needed notifications and shutdown trigger.
+
+	this.initialized = false;
+	
+	if(this.subscriptionTemplateNotifications)
+		this.subscriptionTemplateNotifications.cancel();
+}
+
+//
+
+TemplateTrigger.prototype.enable = function(config) {
+	// This function should enable trigger (start notifying the app of trigger events).
+	
+	this.enabled = true;
+	
 	this.config = config;
 }
 
-TemplateTrigger.prototype.shutdown = function(config) {
-	// This function should unsubscribe the needed notifications and shutdown trigger.
+TemplateTrigger.prototype.disable = function() {
+	// This function should disable trigger (stop notifying the app of trigger events).
 
-	this.config = config;
+	this.enabled = false;
 }
 
 //
@@ -67,5 +94,40 @@ TemplateTrigger.prototype.execute = function(state, launchCallback) {
 	}
 
 	launchCallback(startModes, closeModes);
+}
+
+//
+
+TemplateTrigger.prototype.subscribeTemplateNotifications = function() {
+	// This function is a helper function that subscribes to wanted information.
+
+	this.subscriptionTemplateNotifications = new Mojo.Service.Request("url", {
+		'method': "method", 'parameters': {'subscribe': true},
+		'onSuccess': this.handleTemplateNotification.bind(this),
+		'onFailure': this.handleTriggerError.bind(this)});
+}
+
+TemplateTrigger.prototype.handleTemplateNotification = function(response) {
+	// This function is a helper function that parses the received information.
+	
+	if(!this.initialized) {
+		this.initialized = true;
+		this.callback(true);
+		this.callback = null;
+	}
+	else if((this.enabled) && (this.response)) {
+		this.triggerState = response.state;
+	
+		new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
+				'event': "template", 'data': this.triggerState}}});
+	}
+}
+
+TemplateTrigger.prototype.handleTemplateNotification = function(response) {
+	// This function helper function notifies app about failed initialization.
+	
+	this.callback(false);
+	this.callback = null;
 }
 

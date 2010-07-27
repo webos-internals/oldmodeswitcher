@@ -1,28 +1,48 @@
 function ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
 
+	this.callback = null;
+	this.initialized = false;
+
+	this.config = null;
+	this.enabled = false;
+	
 	this.charger = "none";
 
 	this.powerSource = {};
 	this.timeoutTrigger = null;
 	this.triggerEvent = null;
-	
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 }
 
 //
 
-ChargerTrigger.prototype.init = function(config) {
-	this.config = config;
+ChargerTrigger.prototype.init = function(callback) {
+	this.callback = callback;
+
+	this.initialized = false;
 
 	this.subscribeChargerStatus();
 }
 
-ChargerTrigger.prototype.shutdown = function(config) {
-	this.config = config;
+ChargerTrigger.prototype.shutdown = function() {
+	this.initialized = false;
+
+	this.charger = "none";
 
 	if(this.subscribtionChargerStatus)
 		this.subscribtionChargerStatus.cancel();
+}
+
+//
+
+ChargerTrigger.prototype.enable = function(config) {
+	this.config = config;
+	
+	this.enabled = true;
+}
+
+ChargerTrigger.prototype.disable = function() {
+	this.enabled = false;
 }
 
 //
@@ -82,17 +102,11 @@ ChargerTrigger.prototype.execute = function(connected, launchCallback) {
 
 //
 
-ChargerTrigger.prototype.handleOrientation = function(event) {
-    Mojo.Log.error("OOOO change position: ", event.position, " pitch: ", event.pitch,
-        " roll: ", event.roll);
-}
-
-//
-
 ChargerTrigger.prototype.subscribeChargerStatus = function() {
 	this.subscribtionChargerStatus = new Mojo.Service.Request("palm://com.palm.bus/signal/", { 
 		'method': "addmatch", 'parameters': {'category': "/com/palm/power", 'method': "chargerStatus"},
-		'onSuccess': this.handleChargerStatus.bind(this)});
+		'onSuccess': this.handleChargerStatus.bind(this),
+		'onFailure': this.handleTriggerError.bind(this)});
 		
 	this.requestChargerStatus = new Mojo.Service.Request("palm://com.palm.power/com/palm/power/", {
 		'method': "chargerStatusQuery"});
@@ -114,16 +128,28 @@ ChargerTrigger.prototype.handleChargerStatus = function(response) {
 			if((connected == "none") && (response.name)) {
 				this.charger = response.name;
 
-				this.handleChargerEvent(connected);
+				if(this.enabled)
+					this.handleChargerEvent(connected);
 			}
 		}
 		else {
 			this.charger = "none";
 			
-			if(connected != "none") 
+			if((this.enabled) && (connected != "none") )
 				this.handleChargerEvent(connected);
 		}
 	}
+
+	if(!this.initialized) {
+		this.initialized = true;
+		this.callback(true);
+		this.callback = null;
+	}
+}
+
+ChargerTrigger.prototype.handleTriggerError = function(response) {
+	this.callback(false);
+	this.callback = null;
 }
 
 //
@@ -181,7 +207,7 @@ ChargerTrigger.prototype.handleChargerTrigger = function() {
 
 	if(this.triggerEvent == this.charger) {
 		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 				'event': "charger", 'data': this.charger}}});
 	}
 

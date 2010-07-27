@@ -4,6 +4,15 @@ function NetworkSetting(ServiceRequestWrapper) {
 
 //
 
+NetworkSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+NetworkSetting.prototype.shutdown = function() {
+}
+
+//
+
 NetworkSetting.prototype.get = function(callback) {
 	var settings = {};
 	

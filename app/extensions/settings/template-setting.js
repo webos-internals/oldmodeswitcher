@@ -6,6 +6,18 @@ function TemplateSetting(ServiceRequestWrapper) {
 
 //
 
+TemplateSetting.prototype.init = function(callback) {
+	// This function should subscribe to needed notifications and setup initial state.
+
+	callback(true);
+}
+
+TemplateSetting.prototype.shutdown = function() {
+	// This function should unsubscribe the needed notifications and shutdown trigger.
+}
+
+//
+
 TemplateSetting.prototype.get = function(callback) {
 	// This function should retrieve current settings and return them through callback.
 

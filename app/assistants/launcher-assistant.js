@@ -13,8 +13,6 @@ function LauncherAssistant(startModes, closeMode, modifiers) {
 	this.appControl = Mojo.Controller.getAppController();
 	this.appAssistant = this.appControl.assistant;
 
-	this.appid = this.appAssistant.appid;
-
 	this.config = this.appAssistant.config;	
 
 	if(startModes.length > 0)
@@ -80,7 +78,7 @@ LauncherAssistant.prototype.setupStart = function() {
 
 	for(var i = 0 ; i < this.start.length ; i++)
 	{
-		if(this.start[i].autoStart == 2)
+		if(this.start[i].autoStartMode == 2)
 		{
 			this.modeidx = i;
 
@@ -118,7 +116,7 @@ LauncherAssistant.prototype.setupClose = function() {
 	this.counterCancel = this.config.modeSwitcher.timerClose;
 	this.counterClose = this.config.modeSwitcher.timerClose;
 
-	if(this.close.autoClose == 2)
+	if(this.close.autoCloseMode == 2)
 	{
 		this.updateCloseTimer();
 		
@@ -232,21 +230,21 @@ LauncherAssistant.prototype.cleanup = function(event) {
 		var data = {'original': this.start[this.modeidx].name, "modifiers": this.modifiers};
 
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
-			'parameters': {'id': this.appid, 'params': {
+			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {
 				'action': "launcher", 'event': "start", 'data': data}}});
 	}
 	else if(this.event == "close") {
 		var data = {'original': this.close.name, "modifiers": this.modifiers};
 	
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
-			'parameters': {'id': this.appid, 'params': {
+			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {
 				'action': "launcher", 'event': "close", 'data': data}} });
 	}
 	else {
 		var data = {'original': this.config.currentMode.name , "modifiers": this.modifiers};
 	
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
-			'parameters': {'id': this.appid, 'params': {
+			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {
 				'action': "launcher", 'event': "cancel", 'data': data}} });
 	}
 }

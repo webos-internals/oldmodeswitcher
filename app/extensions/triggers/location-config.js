@@ -5,10 +5,16 @@ LocationConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 LocationConfig.prototype.label = function() {
 	return "GPS Location Trigger";
+}
+
+//
+
+LocationConfig.prototype.activate = function() {
+}
+
+LocationConfig.prototype.deactivate = function() {
 }
 
 //

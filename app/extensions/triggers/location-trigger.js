@@ -1,19 +1,39 @@
 function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
+
 	this.alarms = SystemAlarmsWrapper;
+
 	this.notifier = SystemNotifierWrapper;
+
+	this.callback = null;
+	this.initialized = false;
+
+	this.config = null;
+	this.enabled = false;
 	
 	this.previous = true;
 	
 	this.latitude = 0;
 	this.longitude = 0;
-	
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 }
 
 //
 
-LocationTrigger.prototype.init = function(config) {
+LocationTrigger.prototype.init = function(callback) {
+	this.callback = callback;
+
+	this.initialized = true;
+	this.callback(true);
+	this.callback = null;
+}
+
+LocationTrigger.prototype.shutdown = function() {
+	this.initialized = false;
+}
+
+//
+
+LocationTrigger.prototype.enable = function(config) {
 	// Re-schedule and setup all timers including the location timeout. 
 
 	this.config = config;
@@ -29,10 +49,8 @@ LocationTrigger.prototype.init = function(config) {
 	}
 }
 
-LocationTrigger.prototype.shutdown = function(config) {
-// Disable location timer and all timeout trigger timers.
-
-	this.config = config;
+LocationTrigger.prototype.disable = function() {
+	// Disable location timer and all timeout trigger timers.
 
 	this.alarms.clearDelayTimeout("location");
 }
@@ -92,7 +110,7 @@ LocationTrigger.prototype.execute = function(tracking, launchCallback) {
 
 LocationTrigger.prototype.fetchCurrentLocation = function(count, accuracy, tracking, launchCallback) {
 	this.service.request("palm://com.palm.power/com/palm/power", {'method': "activityStart", 
-		'parameters': {'id': this.appid, 'duration_ms': 60000}});
+		'parameters': {'id': Mojo.Controller.appInfo.id, 'duration_ms': 60000}});
 
 	if(count < 5) {
 		if(this.requestLocation)

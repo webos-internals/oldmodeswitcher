@@ -15,9 +15,9 @@ GovnahConfig.prototype.appid = function() {
 
 //
 
-GovnahConfig.prototype.init = function() {
+GovnahConfig.prototype.activate = function() {
 	this.service.request('palm://org.webosinternals.govnah/', {
-		method: 'getProfiles', parameters: {returnid: 'com.palm.org.e-lnx.wee.apps.modeswitcher'} });
+		method: 'getProfiles', parameters: {returnid: Mojo.Controller.appInfo.id} });
 }
 
 GovnahConfig.prototype.data = function(data) {
@@ -34,6 +34,9 @@ GovnahConfig.prototype.data = function(data) {
 
 		this.choicesGovnahCloseSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
 	}
+}
+
+GovnahConfig.prototype.deactivate = function() {
 }
 
 //

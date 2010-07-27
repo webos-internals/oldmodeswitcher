@@ -5,6 +5,15 @@ function AirplaneSetting(ServiceRequestWrapper) {
 
 //
 
+AirplaneSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+AirplaneSetting.prototype.shutdown = function() {
+}
+
+//
+
 AirplaneSetting.prototype.get = function(callback) {
 	var settings = {};
 

@@ -396,67 +396,69 @@ EditmodeAssistant.prototype.setup = function() {
 
 	// Trigger selector
 
-	this.modelRequiredSelector = {'value': this.mode.triggers.required, 'disabled': false};
+	if(this.type != "default") {
+		this.modelRequiredSelector = {'value': this.mode.triggers.required, 'disabled': false};
 
-	this.choicesTriggerSelector = [
-		{'label': "All Unique", 'value': 0},
-		{'label': "One Trigger", 'value': 1}];  
+		this.choicesTriggerSelector = [
+			{'label': "All Unique", 'value': 0},
+			{'label': "One Trigger", 'value': 1}];  
 
-	this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
-		'labelPlacement': "left", 'choices': this.choicesTriggerSelector},
-		this.modelRequiredSelector);	
+		this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
+			'labelPlacement': "left", 'choices': this.choicesTriggerSelector},
+			this.modelRequiredSelector);	
 	
-	Mojo.Event.listen(this.controller.get("RequiredSelector"), Mojo.Event.propertyChange, 
-		this.setModeData.bind(this, false));
+		Mojo.Event.listen(this.controller.get("RequiredSelector"), Mojo.Event.propertyChange, 
+			this.setModeData.bind(this, false));
 
-	// Block selector
+		// Block selector
 
-	this.modelBlockSelector = {'value': this.mode.triggers.block, 'disabled': false};
+		this.modelBlockSelector = {'value': this.mode.triggers.block, 'disabled': false};
 
-	this.choicesBlockSelector = [
-		{'label': "No Blocking", 'value': 0},
-		{'label': "Other Modes", 'value': 1},
-		{'label': "Normal Modes", 'value': 2},
-		{'label': "Modifier Modes", 'value': 3}];  
+		this.choicesBlockSelector = [
+			{'label': "No Blocking", 'value': 0},
+			{'label': "Other Modes", 'value': 1},
+			{'label': "Normal Modes", 'value': 2},
+			{'label': "Modifier Modes", 'value': 3}];  
 
-	this.controller.setupWidget("BlockSelector",	{ 'label': "Block Mode", 
-		'labelPlacement': 'left', 'choices': this.choicesBlockSelector},
-		this.modelBlockSelector);	
+		this.controller.setupWidget("BlockSelector",	{ 'label': "Block Mode", 
+			'labelPlacement': 'left', 'choices': this.choicesBlockSelector},
+			this.modelBlockSelector);	
 	
-	Mojo.Event.listen(this.controller.get("BlockSelector"), Mojo.Event.propertyChange, 
-		this.setModeData.bind(this, false));
+		Mojo.Event.listen(this.controller.get("BlockSelector"), Mojo.Event.propertyChange, 
+			this.setModeData.bind(this, false));
 
-	// Triggers list
+		// Triggers list
 
-	this.modelTriggersList = {'items': this.mode.triggersList};
+		this.modelTriggersList = {'items': this.mode.triggersList};
 	
-	this.controller.setupWidget("TriggersList", {
-		'itemTemplate': "templates/listitem-lists",
-		'swipeToDelete': false, 'reorderable': false},
-		this.modelTriggersList);
+		this.controller.setupWidget("TriggersList", {
+			'itemTemplate': "templates/listitem-lists",
+			'swipeToDelete': false, 'reorderable': false},
+			this.modelTriggersList);
 
-	for(var i=0; i < this.triggers.length; i++) {
-		var id = this.triggers[i].id;
-		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
+		for(var i=0; i < this.triggers.length; i++) {
+			var id = this.triggers[i].id;
+			var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
 
-		this.controller.setupWidget(element, {
-			'itemTemplate': "../extensions/triggers/" + id + "-listitem",
-			'swipeToDelete': true, 'autoconfirmDelete': true,
-			'reorderable': false, 'itemsProperty': id});
+			this.controller.setupWidget(element, {
+				'itemTemplate': "../extensions/triggers/" + id + "-listitem",
+				'swipeToDelete': true, 'autoconfirmDelete': true,
+				'reorderable': false, 'itemsProperty': id});
+		}
+
+		Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.listDelete, 
+			this.handleListDelete.bind(this, "triggers"));
+
+		Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.propertyChange, 
+			this.handleListChange.bind(this, "triggers"));
+
+	//
+	// TRIGGERS LIST ITEM
+	//
+
+		for(var i = 0; i < this.triggers.length; i++)
+			this.triggers[i].config.setup(this.controller);
 	}
-
-	Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.listDelete, 
-		this.handleListDelete.bind(this, "triggers"));
-
-	Mojo.Event.listen(this.controller.get("TriggersList"), Mojo.Event.propertyChange, 
-		this.handleListChange.bind(this, "triggers"));
-
-//
-// TRIGGERS LIST ITEM
-//
-
-	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].config.setup(this.controller);
 }
 
 //
@@ -1267,6 +1269,18 @@ EditmodeAssistant.prototype.activate = function(event) {
 	/* Put in event handlers here that should only be in effect when this scene is active. 
 	 *	For  example, key handlers that are observing the document. 
 	 */
+
+	for(var i = 0; i < this.settings.length; i++) {
+		this.settings[i].config.activate();
+	}
+
+	for(var i = 0; i < this.applications.length; i++) {
+		this.applications[i].config.activate();
+	}
+
+	for(var i = 0; i < this.triggers.length; i++) {
+		this.triggers[i].config.activate();
+	}
 }
 	
 EditmodeAssistant.prototype.deactivate = function(event) {
@@ -1275,6 +1289,18 @@ EditmodeAssistant.prototype.deactivate = function(event) {
 	 */
 	
 	this.setModeData(false);
+	
+	for(var i = 0; i < this.settings.length; i++) {
+		this.settings[i].config.deactivate();
+	}
+
+	for(var i = 0; i < this.applications.length; i++) {
+		this.applications[i].config.deactivate();
+	}
+
+	for(var i = 0; i < this.triggers.length; i++) {
+		this.triggers[i].config.deactivate();
+	}
 }
 
 EditmodeAssistant.prototype.cleanup = function(event) {

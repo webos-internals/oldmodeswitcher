@@ -13,6 +13,14 @@ RingerConfig.prototype.label = function() {
 
 //
 
+RingerConfig.prototype.activate = function() {
+}
+
+RingerConfig.prototype.deactivate = function() {
+}
+
+//
+
 RingerConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 

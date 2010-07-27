@@ -1,8 +1,6 @@
 function SystemAlarms(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
-	
 	this.alarms = new Array();
 	this.delays = new Array();
 }
@@ -16,7 +14,7 @@ SystemAlarms.prototype.clearAlarmTimeouts = function(trigger) {
 SystemAlarms.prototype.clearAlarmTimeout = function(trigger, time) {
 	var timestamp = time.getTime() / 1000;
 
-	var key = this.appid + "." + trigger + "." + timestamp;
+	var key = Mojo.Controller.appInfo.id + "." + trigger + "." + timestamp;
 
 	Mojo.Log.info("Normal timeout for " + trigger + " event canceled");
 		
@@ -27,7 +25,7 @@ SystemAlarms.prototype.clearAlarmTimeout = function(trigger, time) {
 SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
 	var timestamp = time.getTime() / 1000;
 
-	var key = this.appid + "." + trigger + "." + timestamp;
+	var key = Mojo.Controller.appInfo.id + "." + trigger + "." + timestamp;
 	
 	// Setup the actual start / close timeout with the above time.
 
@@ -40,7 +38,7 @@ SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
  			'wakeup': true,
  			'key': key,
  			'uri': "palm://com.palm.applicationManager/launch",
- 			'params': {'id':this.appid, 'params': {
+ 			'params': {'id':Mojo.Controller.appInfo.id, 'params': {
  				'action':"trigger", 'event': trigger, 'data': data}},
 			'at': alarmStr} }); 
 }
@@ -48,7 +46,7 @@ SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
 //
 
 SystemAlarms.prototype.clearDelayTimeout = function(trigger) {
-	var key = this.appid + "." + trigger + ".delay";
+	var key = Mojo.Controller.appInfo.id + "." + trigger + ".delay";
 
 	Mojo.Log.info("Delay timeout for " + trigger + " event canceled");
 		
@@ -60,7 +58,7 @@ SystemAlarms.prototype.setupDelayTimeout = function(trigger, delay, data) {
 	// Delay will be calculated to be on a half minute so it won't happen 
 	// at the same time with alarm timeout due to bug in Mojo re-launch.
 
-	var key = this.appid + "." + trigger + ".delay";
+	var key = Mojo.Controller.appInfo.id + "." + trigger + ".delay";
 
 	var date = new Date();
 	
@@ -90,7 +88,7 @@ SystemAlarms.prototype.setupDelayTimeout = function(trigger, delay, data) {
  			'wakeup': true,
  			'key': key,
  			'uri': "palm://com.palm.applicationManager/launch",
- 			'params': {'id': this.appid, 'params': {
+ 			'params': {'id': Mojo.Controller.appInfo.id, 'params': {
  				'action': "trigger", 'event': trigger, 'data': data}},
 			'in': delayStr} });
 }

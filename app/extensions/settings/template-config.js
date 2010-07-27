@@ -17,6 +17,16 @@ TemplateConfig.prototype.label = function() {
 
 //
 
+TemplateConfig.prototype.activate = function() {
+	// This function is called when application configuration scene is activated.
+}
+
+TemplateConfig.prototype.deactivate = function() {
+	// This function is called when application configuration scene is activated.
+}
+
+//
+
 TemplateConfig.prototype.setup = function(controller) {
 	// This function should setup all the widgets in the extension-listitem file.
 

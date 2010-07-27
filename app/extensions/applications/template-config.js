@@ -18,8 +18,12 @@ TemplateConfig.prototype.appid = function() {
 
 //
 
-TemplateConfig.prototype.init = function() {
-	// This function is called when Mode Switcher configuration app is started.
+TemplateConfig.prototype.activate = function() {
+	// This function is called when application configuration scene is activated.
+}
+
+TemplateConfig.prototype.deactivate = function() {
+	// This function is called when application configuration scene is deactivated.
 }
 
 //

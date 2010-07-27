@@ -4,6 +4,15 @@ function RingerSetting(ServiceRequestWrapper) {
 
 //
 
+RingerSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+RingerSetting.prototype.shutdown = function() {
+}
+
+//
+
 RingerSetting.prototype.get = function(callback) {
 	var settings = {};
 	

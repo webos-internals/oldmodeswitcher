@@ -4,11 +4,31 @@ function TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNoti
 	this.alarms = SystemAlarmsWrapper;
 	
 	this.notifier = SystemNotifierWrapper;
+
+	this.callback = null;
+	this.initialized = false;
+
+	this.config = null;
+	this.enabled = false;
 }
 
 //
 
-TimeofdayTrigger.prototype.init = function(config) {
+TimeofdayTrigger.prototype.init = function(callback) {
+	this.callback = callback;
+
+	this.initialized = true;
+	this.callback(true);
+	this.callback = null;
+}
+
+TimeofdayTrigger.prototype.shutdown = function() {
+	this.initialized = false;
+}
+
+//
+
+TimeofdayTrigger.prototype.enable = function(config) {
 	// Re-schedule and setup all timers for timeofday triggers. 
 
 	this.config = config;
@@ -29,10 +49,8 @@ TimeofdayTrigger.prototype.init = function(config) {
 	}
 }
 
-TimeofdayTrigger.prototype.shutdown = function(config) {
+TimeofdayTrigger.prototype.disable = function() {
 	// Disable all timeofday trigger timers.
-
-	this.config = config;
 
 	// FIXME: keep track of timers and close them here and in reload?
 

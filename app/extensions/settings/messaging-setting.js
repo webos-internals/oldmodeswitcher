@@ -4,6 +4,15 @@ function MessagingSetting(ServiceRequestWrapper) {
 
 //
 
+MessagingSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+MessagingSetting.prototype.shutdown = function() {
+}
+
+//
+
 MessagingSetting.prototype.get = function(callback) {
 	var settings = {};
 	

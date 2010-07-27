@@ -13,6 +13,14 @@ CalendarConfig.prototype.label = function() {
 
 //
 
+CalendarConfig.prototype.activate = function() {
+}
+
+CalendarConfig.prototype.deactivate = function() {
+}
+
+//
+
 CalendarConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 

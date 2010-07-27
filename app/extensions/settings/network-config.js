@@ -13,6 +13,14 @@ NetworkConfig.prototype.label = function() {
 
 //
 
+NetworkConfig.prototype.activate = function() {
+}
+
+NetworkConfig.prototype.deactivate = function() {
+}
+
+//
+
 NetworkConfig.prototype.setup = function(controller) {
 	this.choicesNetworkTypeSelector = [
 		{'label': controller.defaultChoiseLabel, 'value': -1},

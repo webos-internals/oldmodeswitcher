@@ -4,6 +4,15 @@ function ScreenSetting(ServiceRequestWrapper) {
 
 //
 
+ScreenSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+ScreenSetting.prototype.shutdown = function() {
+}
+
+//
+
 ScreenSetting.prototype.get = function(callback) {
 	var settings = {};
 	

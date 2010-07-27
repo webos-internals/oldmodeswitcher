@@ -13,6 +13,14 @@ EmailConfig.prototype.label = function() {
 
 //
 
+EmailConfig.prototype.activate = function() {
+}
+
+EmailConfig.prototype.deactivate = function() {
+}
+
+//
+
 EmailConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 

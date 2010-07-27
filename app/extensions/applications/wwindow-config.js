@@ -12,7 +12,10 @@ WwindowConfig.prototype.appid = function() {
 
 //
 
-WwindowConfig.prototype.init = function() {
+WwindowConfig.prototype.activate = function() {
+}
+
+WwindowConfig.prototype.deactivate = function() {
 }
 
 //

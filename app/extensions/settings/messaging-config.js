@@ -13,6 +13,14 @@ MessagingConfig.prototype.label = function() {
 
 //
 
+MessagingConfig.prototype.activate = function() {
+}
+
+MessagingConfig.prototype.deactivate = function() {
+}
+
+//
+
 MessagingConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 	

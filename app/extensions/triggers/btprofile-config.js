@@ -5,10 +5,16 @@ BtprofileConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 BtprofileConfig.prototype.label = function() {
 	return "Bluetooth Profile Trigger";
+}
+
+//
+
+BtprofileConfig.prototype.activate = function() {
+}
+
+BtprofileConfig.prototype.deactivate = function() {
 }
 
 //

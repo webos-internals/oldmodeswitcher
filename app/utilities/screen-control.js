@@ -60,13 +60,13 @@ ScreenControl.prototype.subscribeChargerStatus = function() {
 		method: 'chargerStatusQuery' });
 }
 
-ScreenControl.prototype.handleChargerStatus = function(payload) {
-//	Mojo.Log.error("DEBUG: handle display charger " + payload.type + " " + this.chargerSet);
+ScreenControl.prototype.handleChargerStatus = function(response) {
+//	Mojo.Log.error("DEBUG: handle display charger " + response.type + " " + this.chargerSet);
 
-	if(payload.type) {
-//		Mojo.Log.error("DEBUG: handle display charger2 " + payload.connected + " " + this.powerSource['usb'] + " " + this.powerSource['inductive']);
+	if(response.type) {
+//		Mojo.Log.error("DEBUG: handle display charger2 " + response.connected + " " + this.powerSource['usb'] + " " + this.powerSource['inductive']);
 	
-		this.powerSource[payload.type] = payload.connected;
+		this.powerSource[response.type] = response.connected;
 		
 		// See if any power source is connected
 		
@@ -101,23 +101,23 @@ ScreenControl.prototype.subscribeDisplayStatus = function() {
 		onSuccess: this.handleDisplayStatus.bind(this) });
 }
 
-ScreenControl.prototype.handleDisplayStatus = function(payload) {
-//	Mojo.Log.error("DEBUG: handle display state " + payload.event + " " + this.chargerSet + " " + this.displayOff);
-
-	if(payload.event == "unblockedDisplay") {
+ScreenControl.prototype.handleDisplayStatus = function(response) {
+//	Mojo.Log.error("DEBUG: handle display state " + response.event + " " + this.chargerSet + " " + this.displayOff);
+	
+	if(response.event == "unblockedDisplay") {
 		this.displayBlock = false;
 
 		if((this.chargerSet) && (this.displayMode == "alwayson"))
 			this.setupDisplayBlock("on", 0);
 	}
-	else if((payload.event == "displayOn") && (this.displayOff))
+	else if((response.event == "displayOn") && (this.displayOff))
 	{
 		this.displayOff = false;
 
 		this.setupDisplayState("on", 0);
 	}
-	else if(((payload.event == "displayOff") || (payload.event == "displayInactive") || 
-				(payload.locked)) && (this.chargerSet) && (!this.displayOff))
+	else if(((response.event == "displayOff") || (response.event == "displayInactive") || 
+				(response.locked)) && (this.chargerSet) && (!this.displayOff))
 	{
 		if(this.displayMode == "turnoff") {
 			this.displayOff = true;
@@ -158,7 +158,7 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 			if(retry < 3) {
 				this.setupTouchPanelState = new Mojo.Service.Request('palm://com.palm.hidd/HidTouchpanel/', {
 					method: 'State', parameters:{'mode':'set', 'value':'off'},
-					onSuccess: function(payload) {
+					onSuccess: function(response) {
 						if(this.setupBacklightState)
 							this.setupBacklightState.cancel();
 

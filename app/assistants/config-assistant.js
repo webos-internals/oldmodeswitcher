@@ -22,10 +22,6 @@ function ConfigAssistant(action, modeidx) {
 	this.settings = this.appAssistant.settings;
 	
 	this.activated = this.config.modeSwitcher.activated;
-	
-	for(var i = 0; i < this.applications.length; i++) {
-		this.applications[i].config.init();
-	}
 }    
 
 ConfigAssistant.prototype.setup = function() {
@@ -311,17 +307,17 @@ ConfigAssistant.prototype.cleanup = function(event) {
 
 	if((this.activated == 0) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
-			method: 'launch', parameters: {"id": this.appAssistant.appid, "params": {
+			method: 'launch', parameters: {"id": Mojo.Controller.appInfo.id, "params": {
 				"action": "control", "event": "init"}} });
 	}
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
-			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
+			method: 'launch',	parameters: {"id": Mojo.Controller.appInfo.id, "params": {
 				"action": "control", "event": "reload"}} });
 	}
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 0)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
-			method: 'launch',	parameters: {"id": this.appAssistant.appid, "params": {
+			method: 'launch',	parameters: {"id": Mojo.Controller.appInfo.id, "params": {
 				"action": "control", "event": "shutdown"}} });
 	}
 }

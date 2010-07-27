@@ -13,6 +13,14 @@ SecurityConfig.prototype.label = function() {
 
 //
 
+SecurityConfig.prototype.activate = function() {
+}
+
+SecurityConfig.prototype.deactivate = function() {
+}
+
+//
+
 SecurityConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 

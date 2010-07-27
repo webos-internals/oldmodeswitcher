@@ -5,10 +5,16 @@ WirelessConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 WirelessConfig.prototype.label = function() {
 	return "Wi-Fi Network Trigger";
+}
+
+//
+
+WirelessConfig.prototype.activate = function() {
+}
+
+WirelessConfig.prototype.deactivate = function() {
 }
 
 //

@@ -1,29 +1,49 @@
 function BtprofileTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
-	
+
+	this.callback = null;
+	this.initialized = false;
+
+	this.config = null;
+	this.enabled = false;
+		
 	this.profile = "none";
 	this.connected = false;
 	this.profileState = 0;
-	
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
 }
 
 //
 
-BtprofileTrigger.prototype.init = function(config) {
-	this.log("init: config:",Object.toJSON(config));
+BtprofileTrigger.prototype.init = function(callback) {
+	this.callback = callback;
 
-	this.config = config;
+	this.initialized = false;
 	
 	this.checkRadioState();
 }
 
-BtprofileTrigger.prototype.shutdown = function(config) {
-	this.config = config;
+BtprofileTrigger.prototype.shutdown = function() {
+	this.initialized = false;
+
+	this.profile = "none";
+	this.connected = false;
+	this.profileState = 0;
 
 	this.subscribeRadioStatus("cancel");
 	
 	this.subscribeMonitorNotifications("cancel");
+}
+
+//
+
+BtprofileTrigger.prototype.enable = function(config) {
+	this.config = config;
+	
+	this.enabled = true;
+}
+
+BtprofileTrigger.prototype.disable = function() {
+	this.enabled = false;
 }
 
 //
@@ -87,14 +107,22 @@ BtprofileTrigger.prototype.execute = function(profile, launchCallback) {
 //
 
 BtprofileTrigger.prototype.checkRadioState = function() {
-	new Mojo.Service.Request("palm://com.palm.btmonitor/monitor/", {'method': "getradiostate", 
-		'parameters': {}, 'onComplete': this.handleRadioState.bind(this)});
+	new Mojo.Service.Request("palm://com.palm.btmonitor/monitor/", {
+		'method': "getradiostate", 'parameters': {}, 
+		'onSuccess': this.handleRadioState.bind(this),
+		'onFailure': this.handleTriggerError.bind(this)});
 }
 
 BtprofileTrigger.prototype.handleRadioState = function(response) {
 	this.log("handleInitRadioState:","response:", Object.toJSON(response));
 	
 	this.log("handleInitRadioState:","handleInitRadioState:", "Subscribing to radio state notifications.");
+	
+	if(!this.initialized) {
+		this.initialized = true;
+		this.callback(true);
+		this.callback = null;
+	}
 	
 	// Subscribe to bluetooth radio state notifications.
 
@@ -114,6 +142,11 @@ BtprofileTrigger.prototype.handleRadioState = function(response) {
 		this.log("handleInitRadioState:","handleInitRadioState:", "Radio is not on");
 
 	this.log("handleInitRadioState:","handleInitRadioState:", "done.");
+}
+
+BtprofileTrigger.prototype.handleTriggerError = function(response) {
+	this.callback(false);
+	this.callback = null;
 }
 
 //
@@ -175,7 +208,7 @@ BtprofileTrigger.prototype.handleMonitorNotifications = function(response) {
 			this.connected = false;
 		    
 			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
-			    'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+			    'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 			    	'event': "btprofile", 'data': this.profile}}});
 
 			return;
@@ -284,7 +317,7 @@ BtprofileTrigger.prototype.handleRadioStatus = function(response) {
 			this.log("Sending trigger notification...")
 			
 			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+				'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 					'event': "btprofile", 'data': this.profile}}});
 		}
 		

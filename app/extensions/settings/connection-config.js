@@ -13,6 +13,14 @@ ConnectionConfig.prototype.label = function() {
 
 //
 
+ConnectionConfig.prototype.activate = function() {
+}
+
+ConnectionConfig.prototype.deactivate = function() {
+}
+
+//
+
 ConnectionConfig.prototype.setup = function(controller) {
 	this.choicesPhoneSelector = [
 		{'label': controller.defaultChoiseLabel, value: -1},

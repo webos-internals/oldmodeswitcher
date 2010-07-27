@@ -4,6 +4,15 @@ function SoundSetting(ServiceRequestWrapper) {
 
 //
 
+SoundSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+SoundSetting.prototype.shutdown = function() {
+}
+
+//
+
 SoundSetting.prototype.get = function(callback) {
 	var settings = {};
 	

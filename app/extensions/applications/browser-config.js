@@ -12,7 +12,10 @@ BrowserConfig.prototype.appid = function() {
 
 //
 
-BrowserConfig.prototype.init = function() {
+BrowserConfig.prototype.activate = function() {
+}
+
+BrowserConfig.prototype.deactivate = function() {
 }
 
 //

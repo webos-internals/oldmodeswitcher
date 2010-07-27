@@ -13,6 +13,14 @@ AirplaneConfig.prototype.label = function() {
 
 //
 
+AirplaneConfig.prototype.activate = function() {
+}
+
+AirplaneConfig.prototype.deactivate = function() {
+}
+
+//
+
 AirplaneConfig.prototype.setup = function(controller) {
 	this.choicesAirplaneModeSelector = [
 		{'label': controller.defaultChoiseLabel, 'value': -1},

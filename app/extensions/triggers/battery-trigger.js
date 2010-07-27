@@ -1,24 +1,45 @@
 function BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
 	this.service = ServiceRequestWrapper;
 
-	this.batteryLevel = 0;
+	this.callback = null;
+	this.initialized = false;
+
+	this.config = null;
+	this.enabled = false;
 	
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
+	this.batteryLevel = 0;
 }
 
 //
 
-BatteryTrigger.prototype.init = function(config) {
-	this.config = config;
+BatteryTrigger.prototype.init = function(callback) {
+	this.callback = callback;
 
-	this.subscribeBatteryStatus();
+	this.initialized = false;
+
+	this.subscribeBatteryStatus(callback);
 }
 
-BatteryTrigger.prototype.shutdown = function(config) {
-	this.config = config;
+BatteryTrigger.prototype.shutdown = function() {
+	this.initialized = false;
+
+	this.batteryLevel = 0;
 
 	if(this.subscribtionBatteryStatus)
 		this.subscribtionBatteryStatus.cancel();
+}
+
+
+//
+
+BatteryTrigger.prototype.enable = function(config) {
+	this.config = config;
+	
+	this.enabled = true;
+}
+
+BatteryTrigger.prototype.disable = function() {
+	this.enabled = false;
 }
 
 //
@@ -68,7 +89,8 @@ BatteryTrigger.prototype.subscribeBatteryStatus = function() {
 	
 	this.subscribtionBatteryStatus = new Mojo.Service.Request("palm://com.palm.bus/signal/", {
 		'method': "addmatch", 'parameters': {'category':"/com/palm/power",'method':"batteryStatus"},
-		'onSuccess': this.handleBatteryStatus.bind(this)});
+		'onSuccess': this.handleBatteryStatus.bind(this),
+		'onFailure': this.handleTriggerError.bind(this)});
 
 	// Get the Initial Value for battery status (returned as signals)
 	
@@ -77,20 +99,32 @@ BatteryTrigger.prototype.subscribeBatteryStatus = function() {
 }
 
 BatteryTrigger.prototype.handleBatteryStatus = function(response) {
-	if (response.percent_ui != undefined) {
-		
+	if(!this.initialized) {
+		if (response.percent_ui != undefined)
+			this.batteryLevel = response.percent_ui;
+
+		this.initialized = true;
+		this.callback(true);
+		this.callback = null;
+	}
+	else if((this.enabled) && (response.percent_ui != undefined)) {
 		// Save the Battery Level
 
 		var oldLevel = this.batteryLevel;
-		
+	
 		this.batteryLevel = response.percent_ui;
-		
+
 		if((oldLevel != this.batteryLevel) && (((this.batteryLevel % 5) == 0) || 
 			((this.batteryLevel % 5) == 1) || ((this.batteryLevel % 5) == 4))) {
 			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': this.appid, 'params': {'action': "trigger", 
+				'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 					'event': "battery", 'data': this.batteryLevel}}});
 		}
 	}
+}
+
+BatteryTrigger.prototype.handleTriggerError = function(response) {
+	this.callback(false);
+	this.callback = null;
 }
 

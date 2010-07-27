@@ -7,12 +7,20 @@ TemplateConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 TemplateConfig.prototype.label = function() {
 	// This function should return the configuration UI label for this trigger.
 	
 	return "Template Trigger";
+}
+
+//
+
+TemplateConfig.prototype.activate = function() {
+	// This function is called when application configuration scene is activated.
+}
+
+TemplateConfig.prototype.deactivate = function() {
+	// This function is called when application configuration scene is activated.
 }
 
 //

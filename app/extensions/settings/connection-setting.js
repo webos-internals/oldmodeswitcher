@@ -4,6 +4,15 @@ function ConnectionSetting(ServiceRequestWrapper) {
 
 //
 
+ConnectionSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+ConnectionSetting.prototype.shutdown = function() {
+}
+
+//
+
 ConnectionSetting.prototype.get = function(callback) {
 	var settings = {};
 	
@@ -29,7 +38,7 @@ ConnectionSetting.prototype.apply = function(current, requested, callback) {
 	if((requested.connectionData != undefined) && (current.connectionData != requested.connectionData))
 		settings.connectionData = requested.connectionData;
 
-	if((requested.connectionWiFi != undefined) && (current.connectionWiFi != requested.connectionWiFi))
+//	if((requested.connectionWiFi != undefined) && (current.connectionWiFi != requested.connectionWiFi))
 		settings.connectionWiFi = requested.connectionWiFi;
 		
 	if((requested.connectionBT != undefined) && (current.connectionBT != requested.connectionBT))
@@ -150,7 +159,7 @@ ConnectionSetting.prototype.setSystemSettings = function(request, settings, call
 				var wifiState = "enabled";
 			else
 				var wifiState = "disabled";
-		
+
 			this.service.request("palm://com.palm.wifi/", {'method': "setstate", 
 				'parameters': {'state': wifiState}, 'onComplete': completeCallback});
 		}

@@ -13,6 +13,14 @@ SoundConfig.prototype.label = function() {
 
 //
 
+SoundConfig.prototype.activate = function() {
+}
+
+SoundConfig.prototype.deactivate = function() {
+}
+
+//
+
 SoundConfig.prototype.setup = function(controller) {
 	// Ringer, System and Media volume selectors
 	

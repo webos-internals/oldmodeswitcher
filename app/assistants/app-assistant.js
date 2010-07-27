@@ -7,8 +7,6 @@ function AppAssistant(appController) {
 
 	// Initialize global variables
 
-	this.appid = "com.palm.org.e-lnx.wee.apps.modeswitcher";
-
 	this.config = {}; 
 
 	this.initialized = false;
@@ -57,50 +55,6 @@ AppAssistant.prototype.setup = function() {
 	this.config.defaultMode = null; 
 	
 	this.config.modifierModes = new Array();
-	
-	// Load available extensions.
-
-	var types = ["setting", "application", "trigger"];
-
-	for(var i = 0; i < types.length; i++) {
-		if(types[i] == "setting") {
-			var extensions = ["airplane", "calendar", "connection", "email", 
-				"messaging", "network", "ringer", "screen", "security", "sound"];
-		}
-		else if(types[i] == "application") {
-			var extensions = ["default", "browser", "govnah", 
-				"modesw", "phone", "wwindow"];		
-		}
-		else if(types[i] == "trigger") {
-			var extensions = ["battery", "btprofile", "charger", 
-				"location", "timeofday", "wireless"];
-		}
-		
-		for(var j = 0; j < extensions.length; j++) {
-			var id = extensions[j];
-			var ext = id.charAt(0).toUpperCase() + id.slice(1);
-	
-			var config = eval("new " + ext + "Config(ServiceRequestWrapper);");
-				
-			if(types[i] == "setting")	
-				var setting = eval ("new " + ext + "Setting(ServiceRequestWrapper);");
-			else if(types[i] == "trigger")
-				var trigger = eval ("new " + ext + "Trigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);");
-			
-			if(config.version() == this.config.modeSwitcher.apiVersion) {
-				Mojo.Log.info("Loading " + types[i] + " extension: " + id);
-	
-				if(types[i] == "setting")
-					this.settings.push({"id": id, "config": config, "setting": setting});
-				else if(types[i] == "application")
-					this.applications.push({"id": id, "appid": config.appid(), "config": config});
-				else if(types[i] == "trigger")
-					this.triggers.push({"id": id, "config": config, "trigger": trigger});
-			}
-			else
-				Mojo.Log.error("Invalid extension version: " + id);
-		}
-	}
 }
 
 AppAssistant.prototype.cleanup = function() {
@@ -140,7 +94,7 @@ AppAssistant.prototype.handleLaunch = function(params) {
 
 AppAssistant.prototype.executeLaunch = function(params) {
 	ServiceRequestWrapper.request('palm://com.palm.power/com/palm/power', { 
-		method: 'activityStart', parameters: {'id': this.appid, 'duration_ms': 60000} });
+		method: 'activityStart', parameters: {'id': Mojo.Controller.appInfo.id, 'duration_ms': 60000} });
 	
 	var stageController = this.controller.getStageController("config");
 	var appController = Mojo.Controller.getAppController();
@@ -243,10 +197,11 @@ AppAssistant.prototype.executeLaunch = function(params) {
 			(params.event == "start") ||
 			(params.event == "close"))
 		{
+			var event = params.event;
 			var original = params.data.original;
 			var modifiers = params.data.modifiers;
 
-			this.processLauncher(original, modifiers);
+			this.processLauncher(event, original, modifiers);
 		}
 	}
 	
@@ -387,13 +342,16 @@ AppAssistant.prototype.executeLauncher = function(startModes, closeMode, modifie
 	}
 }
 
-AppAssistant.prototype.processLauncher = function(originalMode, modifierModes) {
+AppAssistant.prototype.processLauncher = function(event, originalMode, modifierModes) {
+	Mojo.Log.info("Processing launcher request: " + originalMode);
+
 	var original = this.config.defaultMode;
 	var modifiers = new Array();
 
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		if(this.config.modesConfig[i].name == originalMode) {
-			original = this.config.modesConfig[i];
+			if(event != "close")
+				original = this.config.modesConfig[i];
 		}
 		else if(modifierModes.indexOf(this.config.modesConfig[i].name) != -1) {
 			modifiers.push(this.config.modesConfig[i]);
@@ -411,13 +369,20 @@ AppAssistant.prototype.updateConfigData = function() {
 	Mojo.Log.error("DEBUG: Mode Switcher Updating Config");
 	
 	if((this.config.modeSwitcher.cfgVersion == undefined) || 
-		(this.config.modeSwitcher.cfgVersion !== "1.0"))
+		(this.config.modeSwitcher.cfgVersion !== "1.0") ||
+		(this.config.currentMode == null) || (this.config.defaultMode == null))
 	{
 		//if(this.config.modeSwitcher.cfgVersion === "1.0") {
 		//}
 		//else {
 
-		Mojo.Log.error("DEBUG: Mode Switcher Resetting Old Config");
+		if((this.config.currentMode == null) ||
+			(this.config.defaultMode == null))
+		{
+			Mojo.Log.error("DEBUG: Uninitialized Mode Switcher Config");
+		}
+		else
+			Mojo.Log.error("DEBUG: Mode Switcher Resetting Old Config");
 
 		this.config.modeSwitcher = {
 			'activated': 0, 
@@ -437,10 +402,87 @@ AppAssistant.prototype.updateConfigData = function() {
 
 		ConfigManagerWrapper.save(this.config);
 	}
+
+	this.initExtensionsExec("setting");
+}
+
+//
+
+AppAssistant.prototype.initExtensionsExec = function(type) {
 	
-	// If mode switcher is activated then execute startup.
+	// Load available extensions.
+
+	if(type == "setting")
+		extensions = ["airplane", "calendar", "connection", "email", 
+			"messaging", "network", "ringer", "screen", "security", "sound"];
+	else if(type == "application")
+		var extensions = ["default", "browser", "govnah", 
+			"modesw", "phone", "wwindow"];		
+	else if(type == "trigger")
+		var extensions = ["battery", "btprofile", "charger", 
+			"location", "timeofday", "wireless"];
+
+	this.initExtensionExec(type, extensions, 0);
+}
+
+AppAssistant.prototype.initExtensionsDone = function(type) {
+	if(type == "setting")
+		this.initExtensionsExec("application");
+	else if(type == "application")
+		this.initExtensionsExec("trigger");
+	else {
+		// If mode switcher is activated then execute startup.
 	
-	this.reloadModeSwitcher();
+		this.reloadModeSwitcher(true);
+	}
+}
+
+//
+
+AppAssistant.prototype.initExtensionExec = function(type, extensions, index) {
+	var id = extensions[index];
+	var ext = id.charAt(0).toUpperCase() + id.slice(1);
+	
+	var extConfig = eval("new " + ext + "Config(ServiceRequestWrapper);");
+				
+	if(type == "setting")	
+		var extClass = eval ("new " + ext + "Setting(ServiceRequestWrapper);");
+	else if(type == "trigger")
+		var extClass = eval ("new " + ext + "Trigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper);");
+			
+	if(extConfig.version() == this.config.modeSwitcher.apiVersion) {
+		var callback = this.initExtensionDone.bind(this, type, extensions, index, extConfig, extClass);
+	
+		if(type == "application")
+			callback(true);
+		else 
+			extClass.init(callback);
+	}
+	else
+		Mojo.Log.error("Invalid extension version: " + id);
+}
+
+AppAssistant.prototype.initExtensionDone = function(type, extensions, index, extConfig, extClass, state) {
+
+	var id = extensions[index];
+
+	if(state) {
+		Mojo.Log.info("Loading " + type + " extension: " + id);
+	
+		if(type == "setting")
+			this.settings.push({"id": id, "config": extConfig, "setting": extClass});
+		else if(type == "application")
+			this.applications.push({"id": id, "appid": extConfig.appid(), "config": extConfig});
+		else if(type == "trigger")
+			this.triggers.push({"id": id, "config": extConfig, "trigger": extClass});
+	}
+	else
+		Mojo.Log.error("Extension loading failed: " + id);
+
+	if(index >= (extensions.length - 1))
+		this.initExtensionsDone(type);
+	else
+		this.initExtensionExec(type, extensions, ++index);
 }
 
 //
@@ -458,7 +500,7 @@ AppAssistant.prototype.initModeSwitcher = function() {
 
 	clearTimeout(this.initTriggersTimer);
 	
-	this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 30000);
+	this.initTriggersTimer = setTimeout(this.enableModeTriggers.bind(this), 30000);
 
 	// Start the default mode when Mode Switcher is initialized.
 	
@@ -467,7 +509,7 @@ AppAssistant.prototype.initModeSwitcher = function() {
 	this.executeStartMode(this.config.defaultMode.name);
 }
 
-AppAssistant.prototype.reloadModeSwitcher = function() {
+AppAssistant.prototype.reloadModeSwitcher = function(startup) {
 	Mojo.Log.error("DEBUG: Reloading Mode Switcher");
 	
 	Mojo.Log.info("Reinitializing mode switcher");
@@ -484,10 +526,12 @@ AppAssistant.prototype.reloadModeSwitcher = function() {
 
 	// Shutdown enabled trigger extensions for mode switcher reload.
 
-	clearTimeout(this.shutdownTriggersTimer);
+	if(startup != true) {
+		clearTimeout(this.shutdownTriggersTimer);
 
-	this.shutdownTriggersTimer = setTimeout(this.shutdownModeTriggers.bind(this), 0);
-
+		this.shutdownTriggersTimer = setTimeout(this.disableModeTriggers.bind(this), 0);
+	}
+	
 	// Check that original mode still exists and triggers are valid.
 
 	var original = this.config.defaultMode;
@@ -531,9 +575,9 @@ AppAssistant.prototype.reloadModeSwitcher = function() {
 	clearTimeout(this.initTriggersTimer);
 	
 	if(this.initialized)
-		this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 0);
+		this.initTriggersTimer = setTimeout(this.enableModeTriggers.bind(this), 0);
 	else
-		this.initTriggersTimer = setTimeout(this.initModeTriggers.bind(this), 30000);
+		this.initTriggersTimer = setTimeout(this.enableModeTriggers.bind(this), 30000);
 }
 
 AppAssistant.prototype.shutdownModeSwitcher = function() {
@@ -549,7 +593,7 @@ AppAssistant.prototype.shutdownModeSwitcher = function() {
 
 	clearTimeout(this.shutdownTriggersTimer);
 	
-	this.shutdownTriggersTimer = setTimeout(this.shutdownModeTriggers.bind(this), 0);
+	this.shutdownTriggersTimer = setTimeout(this.disableModeTriggers.bind(this), 0);
 	
 	// Close the current mode (set system settings from default mode).
 
@@ -560,14 +604,14 @@ AppAssistant.prototype.shutdownModeSwitcher = function() {
 
 //
 
-AppAssistant.prototype.initModeTriggers = function() {
+AppAssistant.prototype.enableModeTriggers = function() {
 	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].trigger.init(this.config);
+		this.triggers[i].trigger.enable(this.config);
 }
 
-AppAssistant.prototype.shutdownModeTriggers = function() {
+AppAssistant.prototype.disableModeTriggers = function() {
 	for(var i = 0; i < this.triggers.length; i++)
-		this.triggers[i].trigger.shutdown(this.config);
+		this.triggers[i].trigger.disable();
 }
 
 //

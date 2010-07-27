@@ -13,6 +13,14 @@ ScreenConfig.prototype.label = function() {
 
 //
 
+ScreenConfig.prototype.activate = function() {
+}
+
+ScreenConfig.prototype.deactivate = function() {
+}
+
+//
+
 ScreenConfig.prototype.setup = function(controller) {
 	// Screen brightness slider, timeout and wallpaper selector
 	

@@ -12,7 +12,10 @@ PhoneConfig.prototype.appid = function() {
 
 //
 
-PhoneConfig.prototype.init = function() {
+PhoneConfig.prototype.activate = function() {
+}
+
+PhoneConfig.prototype.deactivate = function() {
 }
 
 //

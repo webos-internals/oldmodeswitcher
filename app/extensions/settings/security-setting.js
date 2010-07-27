@@ -4,6 +4,15 @@ function SecuritySetting(ServiceRequestWrapper) {
 
 //
 
+SecuritySetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+SecuritySetting.prototype.shutdown = function() {
+}
+
+//
+
 SecuritySetting.prototype.get = function(callback) {
 	var settings = {};
 	

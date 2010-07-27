@@ -16,11 +16,16 @@ ModeswConfig.prototype.appid = function() {
 
 //
 
-ModeswConfig.prototype.init = function() {
-	new Mojo.Service.Request('palm://com.palm.systemservice/', {
+ModeswConfig.prototype.activate = function() {
+	this.subscriptionMSPreferences = new Mojo.Service.Request('palm://com.palm.systemservice/', {
 		'method': 'getPreferences', 'parameters': {
 			'subscribe': true, 'keys': ["modesConfig"]},
 		onSuccess: this.handleModeData.bind(this)} );
+}
+
+ModeswConfig.prototype.deactivate = function() {
+	if(this.subscriptionMSPreferences)
+		this.subscriptionMSPreferences.cancel();
 }
 
 //

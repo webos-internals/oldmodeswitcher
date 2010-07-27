@@ -5,10 +5,16 @@ ChargerConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 ChargerConfig.prototype.label = function() {
 	return "Charger Event Trigger";
+}
+
+//
+
+ChargerConfig.prototype.activate = function() {
+}
+
+ChargerConfig.prototype.deactivate = function() {
 }
 
 //

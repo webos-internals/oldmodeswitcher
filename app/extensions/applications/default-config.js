@@ -12,7 +12,10 @@ DefaultConfig.prototype.appid = function() {
 
 //
 
-DefaultConfig.prototype.init = function() {
+DefaultConfig.prototype.activate = function() {
+}
+
+DefaultConfig.prototype.deactivate = function() {
 }
 
 //

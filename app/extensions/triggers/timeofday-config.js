@@ -5,10 +5,16 @@ TimeofdayConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 TimeofdayConfig.prototype.label = function() {
 	return "Time of Day Trigger";
+}
+
+//
+
+TimeofdayConfig.prototype.activate = function() {
+}
+
+TimeofdayConfig.prototype.deactivate = function() {
 }
 
 //

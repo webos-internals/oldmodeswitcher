@@ -4,6 +4,15 @@ function EmailSetting(ServiceRequestWrapper) {
 
 //
 
+EmailSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+EmailSetting.prototype.shutdown = function() {
+}
+
+//
+
 EmailSetting.prototype.get = function(callback) {
 	var settings = {};
 	

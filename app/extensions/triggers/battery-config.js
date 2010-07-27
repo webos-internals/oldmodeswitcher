@@ -5,10 +5,16 @@ BatteryConfig.prototype.version = function() {
 	return "1.0";
 }
 
-//
-
 BatteryConfig.prototype.label = function() {
 	return "Battery Level Trigger";
+}
+
+//
+
+BatteryConfig.prototype.activate = function() {
+}
+
+BatteryConfig.prototype.deactivate = function() {
 }
 
 //

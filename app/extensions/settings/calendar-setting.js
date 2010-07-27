@@ -4,6 +4,15 @@ function CalendarSetting(ServiceRequestWrapper) {
 
 //
 
+CalendarSetting.prototype.init = function(callback) {
+	callback(true);
+}
+
+CalendarSetting.prototype.shutdown = function() {
+}
+
+//
+
 CalendarSetting.prototype.get = function(callback) {
 	var settings = {};
 
