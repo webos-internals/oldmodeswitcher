@@ -234,7 +234,7 @@ LauncherAssistant.prototype.cleanup = function(event) {
 				'action': "launcher", 'event': "start", 'data': data}}});
 	}
 	else if(this.event == "close") {
-		var data = {'original': this.close.name, "modifiers": this.modifiers};
+		var data = {'original': this.config.defaultMode.name, "modifiers": this.modifiers};
 	
 		this.controller.serviceRequest("palm://com.palm.applicationManager", { 'method': "launch",
 			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {
