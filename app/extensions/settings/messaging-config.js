@@ -2,7 +2,7 @@ function MessagingConfig() {
 }
 
 MessagingConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 //
@@ -66,7 +66,8 @@ MessagingConfig.prototype.config = function() {
 		'messagingAlert': -1, 
 		'messagingRingtoneName': "", 
 		'messagingRingtonePath': "",
-		'messagingIMStatus': -1 };
+		'messagingIMStatus': -1,
+		'messagingRingtoneDisplay': "none" };
 	
 	return config;
 }
@@ -78,6 +79,9 @@ MessagingConfig.prototype.load = function(preferences) {
 	
 	if(preferences.messagingAlert != undefined)
 		config.messagingAlert = preferences.messagingAlert;
+
+	if(preferences.messagingAlert == 2)
+		config.messagingRingtoneDisplay = "block";
 
 	if(preferences.messagingRingtone != undefined) {
 		config.messagingRingtoneName = preferences.messagingRingtone.name;
@@ -96,12 +100,14 @@ MessagingConfig.prototype.save = function(config) {
 	if(config.messagingAlert != -1)
 		preferences.messagingAlert = config.messagingAlert;
 
-	if(config.messagingRingtoneName.length != 0) {
-		preferences.messagingRingtone = {
-			'name': config.messagingRingtoneName, 
-			'path': config.messagingRingtonePath };
+	if(config.messagingAlert == 2) {
+		if(config.messagingRingtoneName.length != 0) {
+			preferences.messagingRingtone = {
+				'name': config.messagingRingtoneName, 
+				'path': config.messagingRingtonePath };
+		}
 	}
-	
+		
 	if(config.messagingIMStatus != -1)
 		preferences.messagingIMStatus = config.messagingIMStatus;
 	
@@ -111,7 +117,19 @@ MessagingConfig.prototype.save = function(config) {
 //
 
 MessagingConfig.prototype.handleListChange = function(event) {
-	if(event.property == "messagingRingtoneName") {
+	if(event.property == "messagingAlert") {
+		event.model.messagingRingtoneDisplay = "none";
+		
+		if(event.value == 2)
+			event.model.messagingRingtoneDisplay = "block";
+
+		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
+
+		this.controller.get("SettingsList").mojo.invalidateItems(0);
+		
+		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
+	}
+	else if(event.property == "messagingRingtoneName") {
 		event.model.messagingRingtoneName = "";		
 		event.model.messagingRingtonePath = "";		
 		

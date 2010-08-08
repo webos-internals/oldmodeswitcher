@@ -1,4 +1,4 @@
-function TemplateTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function TemplateTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	// The service request wrapper needs to be used for making system requests.
 
 	this.service = ServiceRequestWrapper;
@@ -101,7 +101,7 @@ TemplateTrigger.prototype.execute = function(state, launchCallback) {
 TemplateTrigger.prototype.subscribeTemplateNotifications = function() {
 	// This function is a helper function that subscribes to wanted information.
 
-	this.subscriptionTemplateNotifications = new Mojo.Service.Request("url", {
+	this.subscriptionTemplateNotifications = this.service.request("url", {
 		'method': "method", 'parameters': {'subscribe': true},
 		'onSuccess': this.handleTemplateNotification.bind(this),
 		'onFailure': this.handleTriggerError.bind(this)});
@@ -118,7 +118,7 @@ TemplateTrigger.prototype.handleTemplateNotification = function(response) {
 	else if((this.enabled) && (this.response)) {
 		this.triggerState = response.state;
 	
-		new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
 			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 				'event': "template", 'data': this.triggerState}}});
 	}
@@ -127,7 +127,9 @@ TemplateTrigger.prototype.handleTemplateNotification = function(response) {
 TemplateTrigger.prototype.handleTemplateNotification = function(response) {
 	// This function helper function notifies app about failed initialization.
 	
-	this.callback(false);
-	this.callback = null;
+	if(this.callback) {
+		this.callback(false);
+		this.callback = null;
+	}
 }
 

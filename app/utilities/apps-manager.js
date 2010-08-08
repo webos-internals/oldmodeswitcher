@@ -1,239 +1,126 @@
 function AppsManager(serviceRequestWrapper) {
 	this.service = serviceRequestWrapper;
 	
-	this.appsList = new Array();
+	this.startedAppsList = new Array();
 	
 	this.timers = new Array();
 }
 
 //
 
-AppsManager.prototype.update = function(oldApps, newApps, start, close, callback) {
+AppsManager.prototype.update = function(startApps, closeApps, doneCallback) {
 	for(var i = 0; i < this.timers.length; i++)
 		clearTimeout(this.timers[i]);
 		
 	this.timers.clear();
 
-	this.fetchRunningApps(oldApps, newApps, start, close, callback, 0);
+	this.service.request('palm://com.palm.applicationManager/', {
+		'method': "running", 'parameters': {}, 'onComplete': 
+			function(startApps, closeApps, doneCallback, response) {
+				this.execute(startApps, closeApps, response.running, doneCallback);		
+			}.bind(this, startApps, closeApps, doneCallback)});	
 }
 
 //
 
-AppsManager.prototype.fetchRunningApps = function(oldApps, newApps, start, close, callback) {
-	this.service.request('palm://com.palm.applicationManager/', {
-		'method': "running", 'parameters': {},
-		'onComplete': this.handleRunningApps.bind(this, oldApps, newApps, start, close, callback)});	
-}
+AppsManager.prototype.execute = function(startApps, closeApps, runningApps, doneCallback) {
+	if(closeApps == "all")
+		closeApps = runningApps;
 
-AppsManager.prototype.handleRunningApps = function(oldApps, newApps, start, close, callback, response) {
-	var appsForLaunch = new Array();
-	
-	var oldStatusApps = this.appsList;
+	runningApps.reverse();
 
-	this.appsList = new Array();
+	Mojo.Log.error("Executing applications update: " + startApps.length + " " + closeApps.length);
 
-	if(((close == 1) && (oldApps.length > 0)) || 
-		((start == 2) || (close == 2)) && 
-		(response.running.length > 0))
-	{
-		Mojo.Log.info("Closing configured applications");
-			
-		for(var i = 0 ; i < response.running.length ; i++) {
-			var skip = false;
-			
-			// Always skip applications that would be started on newmode.
+	// Remove apps that would have been closed and started right after.
 
-			for(var j = 0; j < oldApps.length; j++) {
-				if((oldApps[j].launchMode != 1) && (oldApps[j].appid == response.running[i].id)) {
-					if(oldApps[j].closeParams.length == 0)
-						skip = true;
-						
-					break;
-				}
-			}
-							
-			for(var j = 0; j < newApps.length; j++) {
-				if((newApps[j].launchMode != 2) && (newApps[j].appid == response.running[i].id)) {
-					if(newApps[j].startParams.length == 0)
-						skip = true;
-						
-					break;
-				}
-			}
-		
-			if((close == 1) && (!skip)) {
-				// Skip applications that were not started by the oldmode.
-			
-				skip = true;
-			
-				for(var j = 0 ; j < oldApps.length; j++) {
-					if((oldApps[j].launchMode != 2) && (oldApps[j].appid == response.running[i].id)) {
-						skip = false;
-						
-						// Skip applications that were running when mode was started.
-				
-						for(var k = 0; k < oldStatusApps.length; k++) {
-							if(oldStatusApps[k] == response.running[i].id) {
-								skip = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-		
-			if((!skip) && (response.running[i].processid > 1010) && 
-				(response.running[i].id != "com.palm.systemui") && 
-				(response.running[i].id != this.appid))
-			{
-				Mojo.Log.info("Requesting application close: ");
-				Mojo.Log.info(response.running[i].id);
-			
-				this.service.request('palm://com.palm.applicationManager/', {
-					'method': "close", 'parameters': {'processId': response.running[i].processid}});
-			}
-		}
-
-		// If all apps closed then no need to save the list.	
-		
-		if(close == 1) {
-			if(response.running.length > 0) {
-				Mojo.Log.info("Storing list of running apps");
-		
-				for(var i = 0 ; i < response.running.length ; i++) {
-					// Only store apps that were not part of old mode.
-	
-					var skip = false;
-	
-					if(oldApps.length == 0)
-						this.appsList.push(response.running[i].id);
-					else {					
-						for(var j = 0 ; j < oldApps.length ; j++) {
-							if(response.running[i].id == oldApps[j].appid) {
-								skip = true;
-					
-								for(var k = 0; k < oldStatusApps.length; k++) {
-									if(oldStatusApps[k] == oldApps[j].appid) {
-										skip = false;
-									}
-								}
-							}
-						}
-			
-						if(!skip)
-							this.appsList.push(response.running[i].id);						
-					}
-				}
-			}
-		}	
-	}
-
-	if(oldApps.length > 0) {
-		for(var i = 0 ; i < oldApps.length ; i++) {
-			if(oldApps[i].launchMode == 1)
-				continue;
-		
-			var skip = false;
-
-			// Only start applications that were not running.
-
-			for(var j = 0 ; j < response.running.length ; j++) {
-				if((response.running[j].id == oldApps[i].appid) &&
-					(response.running[j].processid > 1010))
+	for(var i = 0; i < closeApps.length; i++) {
+		if(closeApps[i].processid == undefined) {
+			for(var j = 0; j < startApps.length; j++) {
+				if((closeApps[i].appid == startApps[j].appid) &&
+					(closeApps[i].params == startApps[j].params))
 				{
-					if(oldApps[i].closeParams.length == 0)
-						skip = true;
+					closeApps.splice(i--, 1);
+					startApps.splice(j--, 1);
 					
 					break;
 				}
 			}
-		
-			if(!skip) {
-				appsForLaunch.push({
-					"url": oldApps[i].url,
-					"method": oldApps[i].method,
-					"appid": oldApps[i].appid, 
-					"delay": oldApps[i].launchDelay,
-					"params": oldApps[i].closeParams });
-			}
 		}
 	}
+
+	// Close the app if it is not set to be started and is started by MS.
+
+	for(var i = 0; i < closeApps.length; i++) {
+		var appid = null;
+		var processid = 0;
 	
-	if(newApps.length > 0) {
-		for(var i = 0 ; i < newApps.length ; i++) {
-			if(newApps[i].launchMode == 2)
-				continue;
-		
-			var skip = false;
-
-			// Only start applications that were not running.
-
-			for(var j = 0 ; j < response.running.length ; j++) {
-				if((response.running[j].id == newApps[i].appid) &&
-					(response.running[j].processid > 1010))
+		if(closeApps[i].processid == undefined) {
+			for(var j = 0; j < this.startedAppsList.length; j++) {
+				if((this.startedAppsList[j].appid == closeApps[i].appid) &&
+					(this.startedAppsList[j].params == closeApps[i].params))
 				{
-					if(newApps[i].startParams.length == 0)
-						skip = true;
+					for(var k = 0; k < runningApps.length; k++) {
+						if(((this.startedAppsList[j].processid < 1010) &&
+							(runningApps[k].id == this.startedAppsList[j].appid)) ||
+							((runningApps[k].processid == this.startedAppsList[j].processid) &&
+							(runningApps[k].id == this.startedAppsList[j].appid)))
+						{
+							appid = runningApps[k].id;
+							processid = runningApps[k].processid;
 						
-					break;
+							break;
+						}
+					}
+					
+					this.startedAppsList.splice(j--, 1);
 				}
 			}
+		}
+		else {
+			appid = closeApps[i].id;
+			processid = closeApps[i].processid;
+		}
 		
-			if(!skip) {
-				appsForLaunch.push({
-					"url": newApps[i].url,
-					"method": newApps[i].method,
-					"appid": newApps[i].appid, 
-					"delay": newApps[i].launchDelay,
-					"params": newApps[i].startParams });
-			}
+		if((appid) && (processid)) {
+			this.close(appid, processid);
 		}
 	}
-	
-	if(appsForLaunch.length > 0)
-		Mojo.Log.info("Starting configured applications");
 
-	appsForLaunch.done = 0;
+	// Start requested apps and collect and save the processid information.
 
-	this.launchModeApplications(0, appsForLaunch, callback);
-}
+	for(var i = 0; i < startApps.length; i++) {
+		var launch = this.launch.bind(this, startApps[i].appid, startApps[i].params);
 
-AppsManager.prototype.launchModeApplications = function(index, apps, callback) {
-	if(index < apps.length) {
-		Mojo.Log.info("Requesting application launch: ");
-		Mojo.Log.info(apps[index].appid);
-
-		var launch = this.launchApplication.bind(this, index, apps, callback);
-
-		var timer = setTimeout(launch, apps[index].delay * 1000);
+		var timer = setTimeout(launch, startApps[i].delay * 1000);
 			
 		this.timers.push(timer);
-			
-		this.launchModeApplications(++index, apps, callback)
 	}
+	
+	if(doneCallback)
+		doneCallback();
 }
 
-AppsManager.prototype.launchApplication = function(index, apps, callback) {
-	try {eval("var params = " + apps[index].params);} catch(error) {var params = "";}
+//
 
-	if(apps[index].url.length > 0) {
-		var url = apps[index].url;
-		var method = apps[index].method;
-	}
-	else {
-		var url = "palm://com.palm.applicationManager/";
-		var method = "launch";
-	}
+AppsManager.prototype.launch = function(appid, params) {
+	try {eval("var parameters = " + params);} catch(error) {var parameters = "";}
 
-	Mojo.Log.error("DEBUG: App Launch: " + url + " " + method + " " + apps[index].appid + " " + Object.toJSON(params));
+	Mojo.Log.error("App launched: " + appid);
 
-	this.service.request(url, {
-		'method': method, 'parameters': {'id': apps[index].appid, 'params': params },
-		'onComplete': this.launchedApplication.bind(this, apps, callback)});
+	this.service.request("palm://com.palm.applicationManager/", {
+		'method': "launch", 'parameters': {'id': appid, 'params': parameters },
+		'onComplete': function(appid, params, response) {
+				this.startedAppsList.push({'appid': appid, 'params': params, 'processid': response.processId});
+			}.bind(this, appid, params)});
 }
 
-AppsManager.prototype.launchedApplication = function(apps, callback) {
-	if((++apps.done == apps.length) && (callback))
-		callback();
+AppsManager.prototype.close = function(appid, processid) {
+	if((processid > 1010) && (appid != "com.palm.systemui") && (appid != Mojo.Controller.appInfo.id))
+	{
+		Mojo.Log.error("Closing app: " + appid);
+	
+		this.service.request('palm://com.palm.applicationManager/', {
+			'method': "close", 'parameters': {'processId': processid}});
+	}
 }
 

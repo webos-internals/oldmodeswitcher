@@ -26,16 +26,17 @@ ServiceRequest.prototype.executeRequest = function(url, options, retry) {
 }
 
 ServiceRequest.prototype.completeHandler = function(url, options, retry, request, response) {
-	delete this.requests[request];
+	if((!options.parameters) || (!options.parameters.subscribe))
+		delete this.requests[request];
 
 	if((response.returnValue != undefined) && (response.returnValue == false)) {
 		if(retry < this.retries) {
-			Mojo.Log.warn("Retrying service request");
+			Mojo.Log.error("Retrying service request (count: " + retry + ")");
 			
 			this.executeRequest(url, options, ++retry);
 		}
 		else {
-			Mojo.Log.error("Dropping service request");
+			Mojo.Log.error("Dropping service request (count: " + retry + ")");
 			
 			options.onComplete && options.onComplete({'returnValue': false});
 		}

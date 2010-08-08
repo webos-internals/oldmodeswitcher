@@ -142,8 +142,9 @@ NetworkSetting.prototype.setSystemSettings = function(request, settings, callbac
 			else
 				var roammode = "any";
 			
-			this.service-request("palm://com.palm.telephony/", {'method': "roamModeSet", 
-				'parameters': {'mode': roammode,	'client': Mojo.appName}});
+			this.service.request("palm://com.palm.telephony/", {'method': "roamModeSet", 
+				'parameters': {'mode': roammode,	'client': Mojo.appName},
+				'onComplete': completeCallback});
 		}
 	}
 	else

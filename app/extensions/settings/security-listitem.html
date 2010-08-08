@@ -5,21 +5,12 @@
 			<div class="palm-group-title">Security</div>
 			
 			<div class="palm-list">	
-				<div class='palm-row first'>
+				<div class='palm-row #{securityLockRow}'>
 					<div class='palm-row-wrapper'>
 						<div name="SecurityLockSelector" x-mojo-element="ListSelector"></div>
 					</div>
 				</div>
-				<div class='palm-row last' style="display:#{securityDisplayNone};">
-					<div class='palm-row-wrapper'>
-						<div class='textfield-group' x-mojo-focus-highlight="true">
-							<div class="title">
-								<div name="SecurityNoneText" x-mojo-element="TextField"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class='palm-row last' style="display:#{securityDisplayPIN};">
+				<div class='palm-row last' style="display:#{securityPINDisplay};">
 					<div class='palm-row-wrapper'>
 						<div class='textfield-group' x-mojo-focus-highlight="true">
 							<div class="title">
@@ -28,7 +19,7 @@
 						</div>
 					</div>
 				</div>
-				<div class='palm-row last' style="display:#{securityDisplayPW};">
+				<div class='palm-row last' style="display:#{securityPWDisplay};">
 					<div class='palm-row-wrapper'>
 						<div class='textfield-group' x-mojo-focus-highlight="true">
 							<div class="title">

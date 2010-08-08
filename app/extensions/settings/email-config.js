@@ -2,7 +2,7 @@ function EmailConfig() {
 }
 
 EmailConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 //
@@ -73,7 +73,8 @@ EmailConfig.prototype.config = function() {
 		'emailAlert': -1, 
 		'emailRingtoneName': "", 
 		'emailRingtonePath': "",
-		'emailSync': -1 };
+		'emailSync': -1,
+		'emailRingtoneDisplay': "none" };
 	
 	return config;
 }
@@ -86,6 +87,9 @@ EmailConfig.prototype.load = function(preferences) {
 	if(preferences.emailAlert != undefined)
 		config.emailAlert = preferences.emailAlert;
 
+	if(preferences.emailAlert == 3)
+		config.emailRingtoneDisplay = "block";
+	
 	if(preferences.emailRingtone != undefined) {
 		config.emailRingtoneName = preferences.emailRingtone.name; 
 		config.emailRingtonePath = preferences.emailRingtone.path;
@@ -103,12 +107,14 @@ EmailConfig.prototype.save = function(config) {
 	if(config.emailAlert != -1)
 		preferences.emailAlert = config.emailAlert;
 	
-	if(config.emailRingtoneName.length != 0) {
-		preferences.emailRingtone = {
-			'name': config.emailRingtoneName, 
-			'path': config.emailRingtonePath };
+	if(config.emailAlert == 3) {
+		if(config.emailRingtoneName.length != 0) {
+			preferences.emailRingtone = {
+				'name': config.emailRingtoneName, 
+				'path': config.emailRingtonePath };
+		}
 	}
-
+	
 	if(config.emailSync != -1)
 		preferences.emailSync = config.emailSync;
 	
@@ -118,7 +124,19 @@ EmailConfig.prototype.save = function(config) {
 //
 
 EmailConfig.prototype.handleListChange = function(event) {
-	if(event.property == "emailRingtoneName") {
+	if(event.property == "emailAlert") {
+		event.model.emailRingtoneDisplay = "none";
+		
+		if(event.value == 3)
+			event.model.emailRingtoneDisplay = "block";
+				
+		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
+
+		this.controller.get("SettingsList").mojo.invalidateItems(0);
+		
+		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
+	}
+	else if(event.property == "emailRingtoneName") {
 		event.model.emailRingtoneName = "";		
 		event.model.emailRingtonePath = "";		
 		

@@ -1,8 +1,8 @@
 /*
- * Screen Control Class - allows controlling of screen behavior when on charger (default, turnoff, alwayson)
+ * Display Control Class - allows controlling of screen behavior when on charger (default, turnoff, alwayson)
  */
 
-function ScreenControl(serviceRequestWrapper) {
+function DisplayControl(serviceRequestWrapper) {
 	this.service = serviceRequestWrapper;
 
 	this.chargerSet = false;
@@ -14,13 +14,13 @@ function ScreenControl(serviceRequestWrapper) {
 	this.displayMode = "default";
 }
 
-ScreenControl.prototype.setup = function() {
+DisplayControl.prototype.setup = function() {
 	this.subscribeChargerStatus();
 		
 	this.subscribeDisplayStatus();
 }
 
-ScreenControl.prototype.cleanup = function() {
+DisplayControl.prototype.cleanup = function() {
 	if(this.subscribeChargerStatus)
 		this.subscribeChargerStatus.cancel();
 	
@@ -33,38 +33,41 @@ ScreenControl.prototype.cleanup = function() {
 
 //
 
-ScreenControl.prototype.setMode = function(mode) {
+DisplayControl.prototype.setMode = function(mode) {
 //	Mojo.Log.error("DEBUG: handle display setmode " + mode);
 
 	this.displayMode = mode;
 	
 	this.checkDisplayBlock();
+
+	if(this.subscribeLockStatus)
+		this.subscribeLockStatus.cancel();
 	
-	this.subscribeLockStatus = new Mojo.Service.Request('palm://com.palm.systemmanager/', {
+	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
 		method: 'getLockStatus', parameters: {'subscribe': true},
 		onSuccess: this.handleDisplayStatus.bind(this) });
 }
 
 //
 
-ScreenControl.prototype.subscribeChargerStatus = function() {
+DisplayControl.prototype.subscribeChargerStatus = function() {
 	// Subscribe to charger status notifications
 	
-	this.subscribeChargerStatus = new Mojo.Service.Request('palm://com.palm.bus/signal/', {
+	this.subscribeChargerStatus = this.service.request('palm://com.palm.bus/signal/', {
 		method: 'addmatch', parameters: {"category":"/com/palm/power","method":"chargerStatus"},
 		onSuccess: this.handleChargerStatus.bind(this)});
 		
 	// Get the initial value for charger status 
 	
-	this.requestChargerStatus = new Mojo.Service.Request('palm://com.palm.power/com/palm/power/', {
+	this.requestChargerStatus = this.service.request('palm://com.palm.power/com/palm/power/', {
 		method: 'chargerStatusQuery' });
 }
 
-ScreenControl.prototype.handleChargerStatus = function(response) {
+DisplayControl.prototype.handleChargerStatus = function(response) {
 //	Mojo.Log.error("DEBUG: handle display charger " + response.type + " " + this.chargerSet);
 
 	if(response.type) {
-//		Mojo.Log.error("DEBUG: handle display charger2 " + response.connected + " " + this.powerSource['usb'] + " " + this.powerSource['inductive']);
+		Mojo.Log.error("DEBUG: handle display charger2 " + response.connected + " " + this.powerSource['usb'] + " " + this.powerSource['inductive']);
 	
 		this.powerSource[response.type] = response.connected;
 		
@@ -91,18 +94,18 @@ ScreenControl.prototype.handleChargerStatus = function(response) {
 
 //
 
-ScreenControl.prototype.subscribeDisplayStatus = function() {
-	this.subscribeDisplayStatus = new Mojo.Service.Request('palm://com.palm.display/control/', {
+DisplayControl.prototype.subscribeDisplayStatus = function() {
+	this.subscribeDisplayStatus = this.service.request('palm://com.palm.display/control/', {
 		method: 'status', parameters: {'subscribe': true}, 
 		onSuccess: this.handleDisplayStatus.bind(this) });
 
-	this.subscribeLockStatus = new Mojo.Service.Request('palm://com.palm.systemmanager/', {
+	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
 		method: 'getLockStatus', parameters: {'subscribe': true},
 		onSuccess: this.handleDisplayStatus.bind(this) });
 }
 
-ScreenControl.prototype.handleDisplayStatus = function(response) {
-//	Mojo.Log.error("DEBUG: handle display state " + response.event + " " + this.chargerSet + " " + this.displayOff);
+DisplayControl.prototype.handleDisplayStatus = function(response) {
+	Mojo.Log.error("DEBUG: handle display state " + response.event + " " + this.chargerSet + " " + this.displayOff);
 	
 	if(response.event == "unblockedDisplay") {
 		this.displayBlock = false;
@@ -129,8 +132,8 @@ ScreenControl.prototype.handleDisplayStatus = function(response) {
 
 //
 
-ScreenControl.prototype.setupDisplayState = function(state, retry) {
-//	Mojo.Log.error("DEBUG: setup display state " + state + " " + retry + " " + this.displayOff);
+DisplayControl.prototype.setupDisplayState = function(state, retry) {
+	Mojo.Log.error("DEBUG: setup display state " + state + " " + retry + " " + this.displayOff);
 
 	if(state == "on") {
 		if(!this.displayOff) {
@@ -143,7 +146,7 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 			if(retry < 3) {
 				retry++;
 
-				this.setupTouchPanelState = new Mojo.Service.Request('palm://com.palm.hidd/HidTouchpanel/', {
+				this.setupTouchPanelState = this.service.request('palm://com.palm.hidd/HidTouchpanel/', {
 					method: 'State', parameters:{'mode':'set', 'value':'on'},
 					onFailure: this.setupDisplayState.bind(this, state, retry),
 					onComplete: function() {this.setupTouchPanelState = null;}.bind(this) });
@@ -156,13 +159,13 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 				this.setupTouchPanelState.cancel();
 
 			if(retry < 3) {
-				this.setupTouchPanelState = new Mojo.Service.Request('palm://com.palm.hidd/HidTouchpanel/', {
+				this.setupTouchPanelState = this.service.request('palm://com.palm.hidd/HidTouchpanel/', {
 					method: 'State', parameters:{'mode':'set', 'value':'off'},
 					onSuccess: function(response) {
 						if(this.setupBacklightState)
 							this.setupBacklightState.cancel();
 
-						this.setupBacklightState = new Mojo.Service.Request('palm://com.palm.power/backlight/', {
+						this.setupBacklightState = this.service.request('palm://com.palm.power/backlight/', {
 							method: 'set', parameters:{keypad: {brightness: 0}, display: {brightness: -1}},
 							onFailure: this.setupDisplayState.bind(this, state, ++retry),
 							onComplete: function() {this.setupBacklightState = null;}.bind(this) });	
@@ -176,7 +179,7 @@ ScreenControl.prototype.setupDisplayState = function(state, retry) {
 
 //
 
-ScreenControl.prototype.checkDisplayBlock = function() {
+DisplayControl.prototype.checkDisplayBlock = function() {
 //	Mojo.Log.error("DEBUG: check display block " + this.displayBlock + " " + this.chargerSet + " " + this.displayMode);
 
 	if((!this.displayBlock) && (this.chargerSet) && (this.displayMode == "alwayson"))
@@ -185,7 +188,7 @@ ScreenControl.prototype.checkDisplayBlock = function() {
 		this.setupDisplayBlock("off", 0);
 }
 
-ScreenControl.prototype.setupDisplayBlock = function(state, retry) {
+DisplayControl.prototype.setupDisplayBlock = function(state, retry) {
 //	Mojo.Log.error("DEBUG: setup display block " + state + " " + retry + " " + this.displayBlock);
 
 	if(state == "on") {
@@ -196,7 +199,7 @@ ScreenControl.prototype.setupDisplayBlock = function(state, retry) {
 				this.requestDisplayBlock.cancel();
 
 			if(retry < 3) {
-				this.requestDisplayBlock = new Mojo.Service.Request('palm://com.palm.display/control/', {
+				this.requestDisplayBlock = this.service.request('palm://com.palm.display/control/', {
 					method: "setProperty", parameters: {"requestBlock": true, "client": "modeswitcher"},
 					onFailure: this.setupDisplayBlock.bind(this, state, ++retry),
 					onComplete: function() {this.requestDisplayBlock = null;}.bind(this) });
@@ -211,7 +214,7 @@ ScreenControl.prototype.setupDisplayBlock = function(state, retry) {
 				this.requestDisplayBlock.cancel();
 
 			if(retry < 3) {
-				this.requestDisplayBlock = new Mojo.Service.Request('palm://com.palm.display/control/', {
+				this.requestDisplayBlock = this.service.request('palm://com.palm.display/control/', {
 					method: "setProperty", parameters: {"requestBlock": false, "client": "modeswitcher"},
 					onFailure: this.setupDisplayBlock.bind(this, state, ++retry),
 					onComplete: function() {this.requestDisplayBlock = null;}.bind(this) });

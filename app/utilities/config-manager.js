@@ -7,7 +7,7 @@ function ConfigManager(serviceRequestWrapper) {
 ConfigManager.prototype.load = function(params, callback) {	
 	// Load all requested system preferences.
 
-	Mojo.Log.info("Loading config from system preferences");
+	Mojo.Log.error("Loading config from system preferences");
 
 	var keys = new Array();
 
@@ -27,7 +27,7 @@ ConfigManager.prototype.load = function(params, callback) {
 ConfigManager.prototype.save = function(params, target) {
 	// Save all requested system preferences.
 	
-	Mojo.Log.info("Saving config to system preferences");
+	Mojo.Log.error("Saving config to system preferences");
 
 	var parameters = {};
 
@@ -38,7 +38,7 @@ ConfigManager.prototype.save = function(params, target) {
 			config = "none";
 
 		if((target == undefined) || (target == key) || (this.requestSave)) {
-			Mojo.Log.info("Adding config for saving: " + key);
+			Mojo.Log.error("Adding config for saving: " + key);
 
 			eval("parameters." + key + " = config");
 		}
@@ -49,8 +49,8 @@ ConfigManager.prototype.save = function(params, target) {
 
 	this.requestSave = this.service.request('palm://com.palm.systemservice/', {
 		'method': 'setPreferences', 'parameters': parameters,
-		onSuccess: function() {Mojo.Log.error("Config saved succesfully");}, 
-		onFailure: function() {Mojo.Log.error("Saving of config failed");},
+		onSuccess: function() {Mojo.Log.error("Saving of requested config succesful");}, 
+		onFailure: function() {Mojo.Log.error("Saving of requested config failed");},
 		onComplete: function() {this.requestSave = null;}.bind(this) });
 }
 
@@ -63,7 +63,7 @@ ConfigManager.prototype.handleConfigData = function(params, callback, payload) {
 		eval("var config = payload." + key);
 
 		if((config != undefined) && (config != "none")) {
-			Mojo.Log.info("Config loaded succesfully: " + key);
+			Mojo.Log.error("Config loaded succesfully: " + key);
 
 			eval("params." + key + " = config");
 		}

@@ -3,7 +3,7 @@ function DefaultConfig(ServiceRequestWrapper) {
 }
 
 DefaultConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 DefaultConfig.prototype.appid = function() {
@@ -22,8 +22,8 @@ DefaultConfig.prototype.deactivate = function() {
 
 DefaultConfig.prototype.setup = function(controller) {
 	this.choicesDefaultLaunchSelector = [
-		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2} ];  
+		{'label': "On Mode Start", value: "start"},
+		{'label': "On Mode Close", value: "close"} ];  
 
 	controller.setupWidget("DefaultLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
@@ -46,11 +46,9 @@ DefaultConfig.prototype.setup = function(controller) {
 DefaultConfig.prototype.config = function(launchPoint) {
 	var config = {
 		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0,
-		'startParams': "", 
-		'closeParams': "" };
+		'appid': launchPoint.id,
+		'launchMode': "start", 
+		'launchDelay': 0 };
 	
 	return config;
 }
@@ -61,24 +59,20 @@ DefaultConfig.prototype.load = function(preferences) {
 	var config = {
 		'name': preferences.name,
 		'appid': preferences.appid,
-		'launchMode': preferences.launchMode, 
-		'launchDelay': preferences.launchDelay, 
-		'startParams': preferences.startParams,
-		'closeParams': preferences.closeParams };
+		'launchMode': preferences.event, 
+		'launchDelay': preferences.delay };
 	
 	return config;
 }
 
 DefaultConfig.prototype.save = function(config) {
 	var preferences = {
-		'url': "",
-		'method': "",
+		'type': "app",
 		'name': config.name,
+		'event': config.launchMode,
+		'delay': config.launchDelay,		
 		'appid': config.appid, 
-		'launchMode': config.launchMode, 
-		'launchDelay': config.launchDelay,
-		'startParams': config.startParams,
-		'closeParams': config.closeParams };
+		'params': "" };
 	
 	return preferences;
 }

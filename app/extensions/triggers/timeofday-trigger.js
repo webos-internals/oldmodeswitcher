@@ -1,9 +1,6 @@
-function TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function TimeofdayTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.service = ServiceRequestWrapper;
-	
 	this.alarms = SystemAlarmsWrapper;
-	
-	this.notifier = SystemNotifierWrapper;
 
 	this.callback = null;
 	this.initialized = false;
@@ -89,6 +86,9 @@ TimeofdayTrigger.prototype.execute = function(timestamp, launchCallback) {
 
 	// Find the corresponding mode config(s) that matches the timestamp parameter.
 	// Check that the time trigger is enabled and if yes then re-schedule the timeofday.
+
+	if(!this.enabled)
+		return;
 
 	var startModes = new Array();
 	var closeModes = new Array();

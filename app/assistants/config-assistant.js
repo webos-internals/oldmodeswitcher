@@ -34,6 +34,7 @@ ConfigAssistant.prototype.setup = function() {
 	
 	this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true},
 		{visible: true, items: [ 
+			{label: "Report Problem", command: 'debug'},
 			{label: "Donate", command: 'donate'},
 			{label: "Help", command: 'help'}]});
 	
@@ -142,7 +143,7 @@ ConfigAssistant.prototype.setup = function() {
 
 			'miscOnStartup': 0, 'miscAppsMode': 1,						
 
-			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
+			'settings': {'notify': 2, 'charging': 1}, 'settingsList': [],
 			
 			'apps': {'start':0, 'close': 0}, 'appsList': []
 		};
@@ -275,7 +276,20 @@ ConfigAssistant.prototype.handleCommand = function(event) {
 		this.controller.stageController.deactivate();		
 	}
 	else if(event.type == Mojo.Event.command) {
-		if(event.command == "donate") {
+		if(event.command == "debug") {
+			this.controller.serviceRequest("palm://com.palm.applicationManager", {
+			  method: 'open', parameters: {id: "com.palm.app.email", params: {
+	          summary: "Mode Switcher Problems",
+	          text: "Give a detailed description of your problem. Your messages log and configuration is already attached for debugging purposes. If you don't want to include your messages log then please remove the attachment.<br><br>Configuration:<br><br>" + Object.toJSON(this.config),
+	          attachments: [{fullPath: "/var/log/messages"}],
+	          recipients: [{
+	              type:"email",
+	              role:1,
+	              value:"scorpio.iix@gmail.com",
+	              contactDisplay:"Mode Switcher Author"
+	          }]}}}); 
+		}
+		else if(event.command == "donate") {
 			window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7A4RPR9ZX3TYS&lc=FI&item_name=Mode%20Switcher%20Application&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted');
 		}
 		else if(event.command == "help") {
@@ -308,7 +322,7 @@ ConfigAssistant.prototype.cleanup = function(event) {
 	if((this.activated == 0) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
 			method: 'launch', parameters: {"id": Mojo.Controller.appInfo.id, "params": {
-				"action": "control", "event": "init"}} });
+				"action": "control", "event": "enable"}} });
 	}
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 1)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
@@ -318,7 +332,7 @@ ConfigAssistant.prototype.cleanup = function(event) {
 	else if((this.activated == 1) && (this.config.modeSwitcher.activated == 0)) {
 		this.controller.serviceRequest("palm://com.palm.applicationManager", {
 			method: 'launch',	parameters: {"id": Mojo.Controller.appInfo.id, "params": {
-				"action": "control", "event": "shutdown"}} });
+				"action": "control", "event": "disable"}} });
 	}
 }
 

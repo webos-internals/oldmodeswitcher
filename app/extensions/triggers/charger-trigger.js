@@ -1,4 +1,4 @@
-function ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.service = ServiceRequestWrapper;
 
 	this.callback = null;
@@ -103,12 +103,12 @@ ChargerTrigger.prototype.execute = function(connected, launchCallback) {
 //
 
 ChargerTrigger.prototype.subscribeChargerStatus = function() {
-	this.subscribtionChargerStatus = new Mojo.Service.Request("palm://com.palm.bus/signal/", { 
+	this.subscribtionChargerStatus = this.service.request("palm://com.palm.bus/signal/", { 
 		'method': "addmatch", 'parameters': {'category': "/com/palm/power", 'method': "chargerStatus"},
 		'onSuccess': this.handleChargerStatus.bind(this),
 		'onFailure': this.handleTriggerError.bind(this)});
 		
-	this.requestChargerStatus = new Mojo.Service.Request("palm://com.palm.power/com/palm/power/", {
+	this.requestChargerStatus = this.service.request("palm://com.palm.power/com/palm/power/", {
 		'method': "chargerStatusQuery"});
 }
 
@@ -148,8 +148,10 @@ ChargerTrigger.prototype.handleChargerStatus = function(response) {
 }
 
 ChargerTrigger.prototype.handleTriggerError = function(response) {
-	this.callback(false);
-	this.callback = null;
+	if(this.callback) {
+		this.callback(false);
+		this.callback = null;
+	}
 }
 
 //

@@ -3,7 +3,7 @@ function PhoneConfig(ServiceRequestWrapper) {
 }
 
 PhoneConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 PhoneConfig.prototype.appid = function() {
@@ -22,8 +22,8 @@ PhoneConfig.prototype.deactivate = function() {
 
 PhoneConfig.prototype.setup = function(controller) {
 	this.choicesPhoneLaunchSelector = [
-		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2} ];  
+		{'label': "On Mode Start", value: "start"},
+		{'label': "On Mode Close", value: "close"} ];  
 
 	controller.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
@@ -38,10 +38,8 @@ PhoneConfig.prototype.setup = function(controller) {
 
 PhoneConfig.prototype.config = function(launchPoint) {
 	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0, 
+		'name': launchPoint.title,
+		'launchMode': "start",
 		'launchNumber': "" };
 	
 	return config;
@@ -52,48 +50,32 @@ PhoneConfig.prototype.config = function(launchPoint) {
 PhoneConfig.prototype.load = function(preferences) {
 	var launchNumber = "";
 	
-	if(preferences.launchMode == 1) {
-		try {eval("var params = " + preferences.startParams);} catch(error) {var params = "";}
-	}
-	else {
-		try {eval("var params = " + preferences.closeParams);} catch(error) {var params = "";}
-	}
+	try {eval("var params = " + preferences.params);} catch(error) {var params = "";}
 
 	if(params.number != undefined)
 		launchNumber = params.number;
 		
 	var config = {
-		'name': preferences.name,
-		'appid': preferences.appid,
-		'launchMode': preferences.launchMode, 
-		'launchDelay': preferences.launchDelay, 
+		'name': preferences.name,		
+		'launchMode': preferences.event,
 		'launchNumber': launchNumber };
 	
 	return config;
 }
 
 PhoneConfig.prototype.save = function(config) {
-	var startParams = "";
-	var closeParams = "";
-	
-	if(config.launchNumber.length != 0) {
-		if(config.launchMode == 1) {
-			startParams = "{number: '" + config.launchNumber + "'}";
-		}
-		else {
-			closeParams = "{number: '" + config.launchNumber + "'}";
-		}
-	}
+	var params = "";
+
+	if(config.launchNumber.length != 0)
+		params = "{number: '" + config.launchNumber + "'}";
 
 	var preferences = {
-		'url': "",
-		'method': "",
-		'name': config.name,
-		'appid': config.appid, 
-		'launchMode': config.launchMode,
-		'launchDelay': config.launchDelay,  
-		'startParams': startParams,
-		'closeParams': closeParams };
+		'type': "app",
+		'name': config.name,		
+		'event': config.launchMode,
+		'delay': config.launchDelay,
+		'appid': this.appid(), 
+		'params': params };
 	
 	return preferences;
 }

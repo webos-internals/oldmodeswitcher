@@ -1,9 +1,6 @@
-function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.service = ServiceRequestWrapper;
-
 	this.alarms = SystemAlarmsWrapper;
-
-	this.notifier = SystemNotifierWrapper;
 
 	this.callback = null;
 	this.initialized = false;

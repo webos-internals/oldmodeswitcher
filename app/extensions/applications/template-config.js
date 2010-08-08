@@ -7,7 +7,7 @@ function TemplateConfig(ServiceRequestWrapper) {
 TemplateConfig.prototype.version = function() {
 	// This function should return the api version that this extension was made for.
 	
-	return "1.0";
+	return "1.1";
 }
 
 TemplateConfig.prototype.appid = function() {
@@ -32,8 +32,8 @@ TemplateConfig.prototype.setup = function(controller) {
 	// This function should setup all the widgets in the extension-listitem file.
 	
 	this.choicesTemplateLaunchSelector = [
-		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2} ];  
+		{'label': "On Mode Start", value: "start"},
+		{'label': "On Mode Close", value: "close"} ];  
 
 	controller.setupWidget("TemplateLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
@@ -50,12 +50,8 @@ TemplateConfig.prototype.config = function(launchPoint) {
 	// The simplest configuration is to use the preferences format.
 
 	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0, 
-		'startParams': "",
-		'closeParams': "" };
+		'name': launchPoint.title,
+		'launchMode': "start" };
 	
 	return config;
 }
@@ -73,11 +69,7 @@ TemplateConfig.prototype.load = function(preferences) {
 
 	var config = {
 		'name': preferences.name,
-		'appid': preferences.appid,
-		'launchMode': preferences.launchMode, 
-		'launchDelay': preferences.launchDelay, 
-		'startParams': preferences.startParams, 
-		'closeParams': preferences.closeParams };
+		'launchMode': preferences.event };
 	
 	return config;
 }
@@ -92,14 +84,12 @@ TemplateConfig.prototype.save = function(config) {
 	// The most simple saving would be just to copy the configuration:
 	
 	var preferences = {
-		'url': "",
-		'method': "",
+		'type': "app",
 		'name': config.name,
-		'appid': config.appid, 
-		'launchMode': config.launchMode, 
-		'launchDelay': config.launchDelay, 
-		'startParams': config.startParams,
-		'closeParams': config.closeParams };
+		'event': config.launchMode, 
+		'delay': 0, 
+		'appid': this.appid(), 
+		'params': "" };
 
 	return preferences;
 }

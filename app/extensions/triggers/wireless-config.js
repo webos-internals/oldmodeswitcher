@@ -2,7 +2,7 @@ function WirelessConfig() {
 }
 
 WirelessConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 WirelessConfig.prototype.label = function() {
@@ -32,8 +32,9 @@ WirelessConfig.prototype.setup = function(controller) {
 		'labelPlacement': "left", 'modelProperty': "wirelessState",
 		'choices': this.choicesWiFiStateSelector});
 
-	controller.setupWidget("WirelessSSIDText", {hintText: "WiFi Network Name (SSID)", 
-		multiline: false, enterSubmits: false, focus: true, modelProperty: "wirelessSSID"}); 
+	controller.setupWidget("WirelessSSIDText", {'hintText': "WiFi Network Name (SSID)", 
+		'multiline': false, 'enterSubmits': false, 'focus': true, 
+		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "wirelessSSID"}); 
 
 	this.choicesWiFiDelaySelector = [
 		{'label': "No Delay", 'value': 0},
@@ -44,7 +45,7 @@ WirelessConfig.prototype.setup = function(controller) {
 		'labelPlacement': "left", 'modelProperty': "wirelessDelay",
 		'choices': this.choicesWiFiDelaySelector});
 
-	// Listen for keyboard event for ssid text field
+	// Listen for state selector change event
 
 	Mojo.Event.listen(controller.get("TriggersList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
@@ -57,7 +58,7 @@ WirelessConfig.prototype.config = function() {
 		'wirelessState': 0,
 		'wirelessSSID': "",
 		'wirelessDelay': 0,
-		'wirelessDisplaySSID': "none" };
+		'wirelessSSIDDisplay': "none" };
 	
 	return config;
 }
@@ -74,7 +75,7 @@ WirelessConfig.prototype.load = function(preferences) {
 		'wirelessState': preferences.wirelessState,
 		'wirelessSSID': preferences.wirelessSSID,
 		'wirelessDelay': preferences.wirelessDelay,
-		'wirelessDisplaySSID': display };
+		'wirelessSSIDDisplay': display };
 	
 	return config;
 }
@@ -93,9 +94,9 @@ WirelessConfig.prototype.save = function(config) {
 WirelessConfig.prototype.handleListChange = function(event) {
 	if(event.property == "wirelessState") {
 		if(event.value >= 2)
-			event.model.wirelessDisplaySSID = "block";
+			event.model.wirelessSSIDDisplay = "block";
 		else
-			event.model.wirelessDisplaySSID = "none";
+			event.model.wirelessSSIDDisplay = "none";
 
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 

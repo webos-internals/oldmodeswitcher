@@ -1,4 +1,4 @@
-function BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.service = ServiceRequestWrapper;
 
 	this.callback = null;
@@ -17,7 +17,7 @@ BatteryTrigger.prototype.init = function(callback) {
 
 	this.initialized = false;
 
-	this.subscribeBatteryStatus(callback);
+	this.subscribeBatteryStatus();
 }
 
 BatteryTrigger.prototype.shutdown = function() {
@@ -87,14 +87,14 @@ BatteryTrigger.prototype.execute = function(level, launchCallback) {
 BatteryTrigger.prototype.subscribeBatteryStatus = function() {
 	// Subscribe to Battery Notifications
 	
-	this.subscribtionBatteryStatus = new Mojo.Service.Request("palm://com.palm.bus/signal/", {
+	this.subscribtionBatteryStatus = this.service.request("palm://com.palm.bus/signal/", {
 		'method': "addmatch", 'parameters': {'category':"/com/palm/power",'method':"batteryStatus"},
 		'onSuccess': this.handleBatteryStatus.bind(this),
 		'onFailure': this.handleTriggerError.bind(this)});
 
 	// Get the Initial Value for battery status (returned as signals)
 	
-	this.requestBatteryStatus = new Mojo.Service.Request("palm://com.palm.power/com/palm/power/", {
+	this.requestBatteryStatus = this.service.request("palm://com.palm.power/com/palm/power/", {
 		'method': "batteryStatusQuery"});
 }
 
@@ -116,7 +116,7 @@ BatteryTrigger.prototype.handleBatteryStatus = function(response) {
 
 		if((oldLevel != this.batteryLevel) && (((this.batteryLevel % 5) == 0) || 
 			((this.batteryLevel % 5) == 1) || ((this.batteryLevel % 5) == 4))) {
-			new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
 				'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 					'event': "battery", 'data': this.batteryLevel}}});
 		}
@@ -124,7 +124,9 @@ BatteryTrigger.prototype.handleBatteryStatus = function(response) {
 }
 
 BatteryTrigger.prototype.handleTriggerError = function(response) {
-	this.callback(false);
-	this.callback = null;
+	if(this.callback) {
+		this.callback(false);
+		this.callback = null;
+	}
 }
 

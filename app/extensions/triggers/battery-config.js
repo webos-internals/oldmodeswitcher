@@ -2,7 +2,7 @@ function BatteryConfig() {
 }
 
 BatteryConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 BatteryConfig.prototype.label = function() {
@@ -57,6 +57,16 @@ BatteryConfig.prototype.setup = function(controller) {
 
 //
 
+BatteryConfig.prototype.config = function() {
+	var config = {
+		'batteryHigh': 100,
+		'batteryLow': 0 };
+	
+	return config;
+}
+
+//
+
 BatteryConfig.prototype.load = function(preferences) {
 	var config = {
 		'batteryHigh': preferences.batteryHigh,
@@ -71,15 +81,5 @@ BatteryConfig.prototype.save = function(config) {
 		'batteryLow': config.batteryLow };
 	
 	return preferences;
-}
-
-//
-
-BatteryConfig.prototype.config = function() {
-	var config = {
-		'batteryHigh': 100,
-		'batteryLow': 0 };
-	
-	return config;
 }
 

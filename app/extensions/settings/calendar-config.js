@@ -2,7 +2,7 @@ function CalendarConfig() {
 }
 
 CalendarConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 //
@@ -56,7 +56,9 @@ CalendarConfig.prototype.config = function() {
 	var config = {
 		'calendarAlarm': -1,
 		'calendarRingtoneName': "", 
-		'calendarRingtonePath': "" };
+		'calendarRingtonePath': "",
+		'calendarAlarmRow': "single",
+		'calendarRingtoneDisplay': "none" };
 	
 	return config;
 }
@@ -68,7 +70,12 @@ CalendarConfig.prototype.load = function(preferences) {
 	
 	if(preferences.calendarAlarm != undefined)
 		config.calendarAlarm = preferences.calendarAlarm;
-	
+
+	if(preferences.calendarAlarm == 2) {
+		config.calendarAlarmRow = "first";		
+		config.calendarRingtoneDisplay = "block";
+	}
+			
 	if(preferences.calendarRingtone != undefined) {
 		config.calendarRingtoneName = preferences.calendarRingtone.name;
 		config.calendarRingtonePath = preferences.calendarRingtone.path;
@@ -83,19 +90,36 @@ CalendarConfig.prototype.save = function(config) {
 	if(config.calendarAlarm != -1)
 		preferences.calendarAlarm = config.calendarAlarm;
 	
-	if(config.calendarRingtoneName.length != 0) {
-		preferences.calendarRingtone = {
-			'name': config.calendarRingtoneName,
-			'path': config.calendarRingtonePath };
+	if(config.calendarAlarm == 3) {	
+		if(config.calendarRingtoneName.length != 0) {
+			preferences.calendarRingtone = {
+				'name': config.calendarRingtoneName,
+				'path': config.calendarRingtonePath };
+		}
 	}
-	
+		
 	return preferences;
 }
 
 //
 
 CalendarConfig.prototype.handleListChange = function(event) {
-	if(event.property == "calendarRingtoneName") {
+	if(event.property == "calendarAlarm") {
+		event.model.calendarAlarmRow = "single";		
+		event.model.calendarRingtoneDisplay = "none";
+		
+		if(event.value == 2) {
+			event.model.calendarAlarmRow = "first";		
+			event.model.calendarRingtoneDisplay = "block";
+		}
+						
+		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
+
+		this.controller.get("SettingsList").mojo.invalidateItems(0);
+		
+		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
+	}
+	else if(event.property == "calendarRingtoneName") {
 		event.model.calendarRingtoneName = "";		
 		event.model.calendarRingtonePath = "";		
 		

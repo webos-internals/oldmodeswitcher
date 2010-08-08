@@ -20,6 +20,8 @@ function EditmodeAssistant(type, modeidx) {
 
 	this.triggers = this.appAssistant.triggers;
 
+	this.unloaded = {'settings': [], 'apps': [], 'triggers': []};
+
 	this.retrieving = false;
 
 	this.type = type;
@@ -472,7 +474,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 					
 			'miscOnStartup': 0, 'miscAppsMode': 1,
 
-			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
+			'settings': {'notify': 2, 'charging': 1}, 'settingsList': [],
 		
 			'apps': {'start':0, 'close': 0}, 'appsList': []
 		};
@@ -504,19 +506,18 @@ EditmodeAssistant.prototype.getModeData = function() {
 	}
 
 	if(this.type != "default") {
-		for(var i = 0; i < this.triggers.length; i++) {
+		for(var i = 0; i < this.triggers.length; i++) {
 			var id = this.triggers[i].id;
 			var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
-	
-			var trigger = {};
-		
+
+			var trigger = {'list': "<div name='" + element + "' x-mojo-element='List'></div>"};
+
 			trigger[id] = [];
-			trigger['list'] = "<div name='" + element + "' x-mojo-element='List'></div>";
 
 			mode.triggersList.push(trigger);
 		}
 	}
-
+	
 	if(this.type != "default") {
 		if(this.modeidx == undefined)
 			return mode;
@@ -525,28 +526,6 @@ EditmodeAssistant.prototype.getModeData = function() {
 	}
 	else
 		var config = this.config.defaultMode;
-
-	for(var i = 0; i < config.appsList.length; i++) {
-		for(var j = 0; j < this.applications.length; j++) {
-			if(this.applications[j].id == "default")
-				cfgIndex = j;
-			else if(this.applications[j].appid == config.appsList[i].appid) {
-				cfgIndex = j;
-				
-				break;
-			}
-		}
-
-		var id = this.applications[cfgIndex].id;
-		var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
-
-		var setting = {};
-		
-		setting[id] = []; 
-		setting['list'] = "<div name='" + element + "' x-mojo-element='List'></div>";
-		
-		mode.appsList.push(setting);
-	}
 
 	// Actual loading of the configuration.
 
@@ -564,65 +543,65 @@ EditmodeAssistant.prototype.getModeData = function() {
 				
 	mode.settings.notify = config.settings.notify;
 	mode.settings.charging = config.settings.charging;
-						
-	for(var i = 0; i < this.settings.length; i++) {
-		for(var j = 0; j < config.settingsList.length; j++) {
-			if(this.settings[i].id == config.settingsList[j].extension) {
-				var source = config.settingsList[j];
-				eval('var target = mode.settingsList[i].' + this.settings[i].id);
-				
-				var data = this.settings[i].config.load(source);
-				
-				data.extension = this.settings[i].id;
-				
-				target.push(data);
-				
-				break;
-			}
+
+	for(var i = 0; i < config.settingsList.length; i++) {
+		var cfgIndex = this.appAssistant.find("id", config.settingsList[i].extension, this.settings);
+
+		if(cfgIndex != -1) {
+			eval('var target = mode.settingsList[cfgIndex].' + this.settings[cfgIndex].id);
+			
+			var data = this.settings[cfgIndex].config.load(config.settingsList[i]);
+			
+			data.extension = this.settings[cfgIndex].id;
+			
+			target.push(data);
 		}
+		else
+			this.unloaded.settings.push(config.settingsList[i]);
 	}
 
 	mode.apps.start = config.apps.start;
 	mode.apps.close = config.apps.close;
 
 	for(var i = 0; i < config.appsList.length; i++) {
-		for(var j = 0; j < this.applications.length; j++) {
-			if(this.applications[j].id == "default")
-				cfgIndex = j;
-			else if(this.applications[j].appid == config.appsList[i].appid) {
-				cfgIndex = j;
-			
-				break;
-			}
-		}
+		var cfgIndex = this.appAssistant.find("id", config.appsList[i].extension, this.applications);
 		
-		var source = config.appsList[i];
-		eval("var target = mode.appsList[i]['" + this.applications[cfgIndex].id + "']");
+		if(cfgIndex != -1) {
+			var id = config.appsList[i].extension;
+			var element = id.charAt(0).toUpperCase() + id.slice(1) + "List";
 
-		var data = this.applications[cfgIndex].config.load(source);
+			var setting = {'list': "<div name='" + element + "' x-mojo-element='List'></div>"};
+
+			var data = this.applications[cfgIndex].config.load(config.appsList[i]);
 	
-		data.extension = this.applications[cfgIndex].id;
-	
-		target.push(data);
+			data.extension = this.applications[cfgIndex].id;
+
+			setting[id] = [data]; 
+		
+			mode.appsList.push(setting);
+		}
+		else
+			this.unloaded.apps.push(config.appsList[i]);
 	}
-	
+
 	if(this.type != "default") {
 		mode.triggers.block = config.triggers.block;
 		mode.triggers.required = config.triggers.required;
 	
-		for(var i = 0; i < this.triggers.length; i++) {
-			for(var j = 0; j < config.triggersList.length; j++) {
-				if(this.triggers[i].id == config.triggersList[j].extension) {
-					var source = config.triggersList[j];
-					eval('var target = mode.triggersList[i].' + this.triggers[i].id);
-			
-					var data = this.triggers[i].config.load(source);
+		for(var i = 0; i < config.triggersList.length; i++) {
+			var cfgIndex = this.appAssistant.find("id", config.triggersList[i].extension, this.triggers);
+		
+			if(cfgIndex != -1) {
+				eval('var target = mode.triggersList[cfgIndex].' + this.triggers[cfgIndex].id);
+	
+				var data = this.triggers[cfgIndex].config.load(config.triggersList[i]);
+		
+				data.extension = this.triggers[cfgIndex].id;
 				
-					data.extension = this.triggers[i].id;
-				
-					target.push(data);
-				}
+				target.push(data);
 			}
+			else
+				this.unloaded.triggers.push(config.triggersList[i]);
 		}
 	}
 	
@@ -655,7 +634,7 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		
 			'miscOnStartup': 0, 'miscAppsMode': 1,
 		
-			'settings': {'notify': 2, 'charging': 3}, 'settingsList': [],
+			'settings': {'notify': 2, 'charging': 1}, 'settingsList': [],
 		
 			'apps': {'start':0, 'close': 0}, 'appsList': []
 		};
@@ -699,20 +678,23 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		eval('var source = this.mode.settingsList[i].' + this.settings[i].id + '[0]');
 	
 		if(source != undefined) {
-			var target = mode.settingsList;
-			
 			var data = this.settings[i].config.save(source);
 			
 			data.extension = this.settings[i].id;
 			
-			target.push(data);
+			mode.settingsList.push(data);
 		}
 	}
+
+	for(var i = 0; i < this.unloaded.settings.length; i++)
+		mode.settingsList.push(this.unloaded.settings[i]);
 
 	mode.apps.start = this.modelAppsStartSelector.value;
 	mode.apps.close = this.modelAppsCloseSelector.value;								
 
 	for(var i = 0; i < this.mode.appsList.length; i++) {
+		var cfgIndex = -1;
+
 		for(var j = 0; j < this.applications.length; j++) {
 			if(eval("this.mode.appsList[i]['" + this.applications[j].id + "']") != undefined) {
 				cfgIndex = j;
@@ -720,19 +702,22 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 				break;
 			}
 		}
-	
-		eval("var source = this.mode.appsList[i]['" + this.applications[cfgIndex].id + "'][0]");
+			
+		if(cfgIndex != -1) {
+			eval("var source = this.mode.appsList[i]['" + this.applications[cfgIndex].id + "'][0]");
 
-		if(source != undefined) {
-			var target = mode.appsList;
+			if(source != undefined) {
+				var data = this.applications[cfgIndex].config.save(source);
 		
-			var data = this.applications[cfgIndex].config.save(source);
-		
-			target.extension = this.applications[cfgIndex].id;
-		
-			target.push(data);
+				data.extension = this.applications[cfgIndex].id;
+
+				mode.appsList.push(data);
+			}
 		}
 	}
+
+	for(var i = 0; i < this.unloaded.apps.length; i++)
+		mode.appsList.push(this.unloaded.apps[i]);
 		
 	if(this.type != "default") {
 		mode.triggers.block = this.modelBlockSelector.value;
@@ -745,16 +730,17 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 				eval('var source = this.mode.triggersList[i].' + this.triggers[i].id + '[j]');
 		
 				if(source != undefined) {
-					var target = mode.triggersList;
-
 					var data = this.triggers[i].config.save(source);
 			
 					data.extension = this.triggers[i].id;
 			
-					target.push(data);
+					mode.triggersList.push(data);
 				}
 			}
 		}
+
+		for(var i = 0; i < this.unloaded.triggers.length; i++)
+			mode.triggersList.push(this.unloaded.triggers[i]);
 
 		if(this.modeidx == undefined)
 		{
@@ -1018,6 +1004,8 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 					if(eval("this.mode.settingsList[i]." + this.settings[i].id + ".length") == 0)
 						settingItems.push({'label': this.settings[i].config.label(), 'command': i});
 				}
+
+				settingItems.sort(this.sortAlphabeticallyFunction);
 	
 				this.controller.popupSubmenu({
 					'onChoose': this.handleSettingsChoose.bind(this), 'items': settingItems});
@@ -1046,6 +1034,8 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			for(var i = 0; i < this.triggers.length; i++)
 				triggerItems.push({'label': this.triggers[i].config.label(), 'command': i});
 	
+			triggerItems.sort(this.sortAlphabeticallyFunction);
+	
 			this.controller.popupSubmenu({
 				'onChoose':  this.handleTriggersChoose.bind(this), 'items': triggerItems});
 		}	
@@ -1053,7 +1043,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			this.controller.serviceRequest('palm://com.palm.applicationManager/', {
 				'method': "addLaunchPoint", 'parameters': {'id': Mojo.Controller.appInfo.id,
 					'icon': "images/default_icon.png", 'title': this.mode.name,
-					'params': {'action': "execute", 'event': "toggle", 'name': this.mode.name}}});
+					'params': {'launchPoint': true, 'action': "execute", 'event': "toggle", 'name': this.mode.name}}});
 		}
 		else if(event.command == 'retrieve') {
 			for(var i = 0; i < this.settings.length; i++)
@@ -1186,7 +1176,7 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 			if(eval("event.model.items[event.index]['" + this.applications[i].id + "']") != undefined) {
 				this.mode.appsList.splice(event.index,1);
 		
-				this.setModeData(true);
+				this.setModeData(false);
 		
 				break;
 			}
@@ -1255,7 +1245,11 @@ EditmodeAssistant.prototype.sortAlphabeticallyFunction = function(a,b){
 		var c = a.type.toLowerCase();
 		var d = b.type.toLowerCase();
 	}
-	else {
+	else if(a.label != undefined) {
+		var c = a.label.toLowerCase();
+		var d = b.label.toLowerCase();
+	}
+	else if(a.title != undefined) {
 		var c = a.title.toLowerCase();
 		var d = b.title.toLowerCase();
 	}

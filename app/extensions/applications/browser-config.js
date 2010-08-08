@@ -3,7 +3,7 @@ function BrowserConfig(ServiceRequestWrapper) {
 }
 
 BrowserConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 BrowserConfig.prototype.appid = function() {
@@ -24,8 +24,8 @@ BrowserConfig.prototype.setup = function(controller) {
 	// Mode selector
 
 	this.choicesBrowserLaunchSelector = [
-		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2}];  
+		{'label': "On Mode Start", value: "start"},
+		{'label': "On Mode Close", value: "close"}];  
 
 	controller.setupWidget("BrowserLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
@@ -52,12 +52,16 @@ BrowserConfig.prototype.setup = function(controller) {
 //
 
 BrowserConfig.prototype.config = function(launchPoint) {
+	var url = "";
+
+	if((launchPoint.params) && (launchPoint.params.url))
+		url = launchPoint.params.url;
+
 	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
+		'name': launchPoint.title,
+		'launchMode': "start", 
 		'launchDelay': 0, 
-		'launchURL': "" };
+		'launchURL': url };
 	
 	return config;
 }
@@ -67,19 +71,13 @@ BrowserConfig.prototype.config = function(launchPoint) {
 BrowserConfig.prototype.load = function(preferences) {
 	var launchURL = "";
 	
-	if(preferences.launchMode == 1) {
-		try {eval("var params = " + preferences.startParams);} catch(error) {var params = "";}
-	}
-	else {
-		try {eval("var params = " + preferences.closeParams);} catch(error) {var params = "";}
-	}
+	try {eval("var params = " + preferences.params);} catch(error) {var params = "";}
 
 	if(params.target != undefined)
 		launchURL = params.target;
 		
 	var config = {
 		'name': preferences.name,
-		'appid': preferences.appid,
 		'launchMode': preferences.launchMode, 
 		'launchDelay': preferences.launchDelay, 
 		'launchURL': launchURL };
@@ -88,27 +86,18 @@ BrowserConfig.prototype.load = function(preferences) {
 }
 
 BrowserConfig.prototype.save = function(config) {
-	var startParams = "";
-	var closeParams = "";
+	var params = "";
 	
-	if(config.launchURL.length != 0) {
-		if(config.launchMode == 1) {
-			startParams = "{target: '" + config.launchURL + "'}";
-		}
-		else {
-			closeParams = "{target: '" + config.launchURL + "'}";
-		}
-	}
+	if(config.launchURL.length != 0)
+		params = "{target: '" + config.launchURL + "'}";
 
 	var preferences = {
-		'url': "",
-		'method': "",
+		'type': "app",
 		'name': config.name,
-		'appid': config.appid, 
-		'launchMode': config.launchMode, 
-		'launchDelay': config.launchDelay, 
-		'startParams': startParams,
-		'closeParams': closeParams };
+		'event': config.launchMode,
+		'delay': config.launchDelay, 
+		'appid': this.appid(), 
+		'params': params };
 	
 	return preferences;
 }

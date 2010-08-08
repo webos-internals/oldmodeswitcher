@@ -1,12 +1,9 @@
 function GovnahConfig(ServiceRequestWrapper) {
 	this.service = ServiceRequestWrapper;
-
-	this.choicesGovnahStartSelector = [{'label': "No profiles", 'value': "none"}];
-	this.choicesGovnahCloseSelector = [{'label': "No profiles", 'value': "none"}];
 }
 
 GovnahConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 GovnahConfig.prototype.appid = function() {
@@ -21,14 +18,11 @@ GovnahConfig.prototype.activate = function() {
 }
 
 GovnahConfig.prototype.data = function(data) {
-	this.choicesGovnahStartSelector.clear();
-	this.choicesGovnahCloseSelector.clear();
-	
 	if(data.profiles.length > 0) {
 		this.choicesGovnahStartSelector.clear();
 		this.choicesGovnahCloseSelector.clear();
 	}
-		
+
 	for(var i = 0; i < data.profiles.length; i++) {
 		this.choicesGovnahStartSelector.push({'label': data.profiles[i].name, value: data.profiles[i].id});  
 
@@ -44,11 +38,15 @@ GovnahConfig.prototype.deactivate = function() {
 GovnahConfig.prototype.setup = function(controller) {
 	// Start profile selector
 
+	this.choicesGovnahStartSelector = [{'label': "No profiles", 'value': 0}];
+
 	controller.setupWidget("GovnahStartSelector", {'label': "On Start", 
 		'labelPlacement': "left", 'modelProperty': "startProfile",
 		'choices': this.choicesGovnahStartSelector});
 		
 	// Close profile selector
+
+	this.choicesGovnahCloseSelector = [{'label': "No profiles", 'value': 0}];
 
 	controller.setupWidget("GovnahCloseSelector", {'label': "On Close", 
 		'labelPlacement': "left", 'modelProperty': "closeProfile",
@@ -59,10 +57,7 @@ GovnahConfig.prototype.setup = function(controller) {
 
 GovnahConfig.prototype.config = function(launchPoint) {
 	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 0, 
-		'launchDelay': 0, 
+		'name': launchPoint.title,
 		'startProfile': 0, 
 		'closeProfile': 0 };
 	
@@ -75,9 +70,9 @@ GovnahConfig.prototype.load = function(preferences) {
 	var startProfile = 0;
 	var closeProfile = 0;
 		
-	try {eval("var startParams = " + preferences.startParams);} catch(error) {var startParams = "";}
+	try {eval("var startParams = " + preferences.params.start);} catch(error) {var startParams = "";}
 
-	try {eval("var closeParams = " + preferences.closeParams);} catch(error) {var closeParams = "";}
+	try {eval("var closeParams = " + preferences.params.close);} catch(error) {var closeParams = "";}
 
 	if(startParams.profileid != undefined)
 		startProfile = startParams.profileid;
@@ -87,9 +82,6 @@ GovnahConfig.prototype.load = function(preferences) {
 
 	var config = {
 		'name': preferences.name,
-		'appid': preferences.appid,
-		'launchMode': preferences.launchMode, 
-		'launchDelay': preferences.launchDelay, 
 		'startProfile': startProfile,
 		'closeProfile': closeProfile };
 	
@@ -97,21 +89,18 @@ GovnahConfig.prototype.load = function(preferences) {
 }
 
 GovnahConfig.prototype.save = function(config) {
-	var startParams = "";
-	var closeParams = "";
+	var params = {};
 	
-	startParams = "{profileid: '" + config.startProfile + "'}";
-	closeParams = "{profileid: '" + config.closeProfile + "'}";
+	params.start = "{profileid: '" + config.startProfile + "'}";
+	params.close = "{profileid: '" + config.closeProfile + "'}";
 
 	var preferences = {
+		'type': "srv",
+		'name': config.name,
+		'event': "both",
 		'url': "palm://org.webosinternals.govnah/",
 		'method': "setProfile",
-		'name': config.name,
-		'appid': config.appid, 
-		'launchMode': config.launchMode, 
-		'launchDelay': config.launchDelay, 		
-		'startParams': startParams,
-		'closeParams': closeParams };
+		'params': params };
 	
 	return preferences;
 }

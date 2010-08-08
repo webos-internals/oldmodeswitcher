@@ -105,16 +105,28 @@
 	},
 
 	{
+		"source": "app\/extensions/triggers\/application-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/application-trigger.js"
+	},
+	{
 		"source": "app\/extensions/triggers\/battery-config.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/battery-trigger.js"
 	},
 	{
-		"source": "app\/extensions/triggers\/btprofile-config.js"
+		"source": "app\/extensions/triggers\/bluetooth-config.js"
 	},
 	{
-		"source": "app\/extensions/triggers\/btprofile-trigger.js"
+		"source": "app\/extensions/triggers\/bluetooth-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/calevent-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/calevent-trigger.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/charger-config.js"
@@ -123,10 +135,22 @@
 		"source": "app\/extensions/triggers\/charger-trigger.js"
 	},
 	{
+		"source": "app\/extensions/triggers\/headset-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/headset-trigger.js"
+	},
+	{
 		"source": "app\/extensions/triggers\/location-config.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/location-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/silentsw-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/silentsw-trigger.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/timeofday-config.js"
@@ -148,15 +172,15 @@
 		"source": "app\/utilities\/config-manager.js"
 	},
 	{
-		"source": "app\/utilities\/screen-control.js"
+		"source": "app\/utilities\/display-control.js"
+	},
+	{
+		"source": "app\/utilities\/notify-control.js"
 	},
 	{
 		"source": "app\/utilities\/service-request.js"
 	},
 	{
 		"source": "app\/utilities\/system-alarms.js"
-	},
-	{
-		"source": "app\/utilities\/system-notifier.js"
 	},
 ]

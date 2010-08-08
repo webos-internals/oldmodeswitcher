@@ -3,7 +3,7 @@ function WwindowConfig(ServiceRequestWrapper) {
 }
 
 WwindowConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 WwindowConfig.prototype.appid = function() {
@@ -22,8 +22,8 @@ WwindowConfig.prototype.deactivate = function() {
 
 WwindowConfig.prototype.setup = function(controller) {
 	this.choicesWwindowLaunchSelector = [
-		{'label': "On Mode Start", value: 1},
-		{'label': "On Mode Close", value: 2} ];  
+		{'label': "On Mode Start", value: "start"},
+		{'label': "On Mode Close", value: "close"} ];  
 
 	controller.setupWidget("WwindowLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
@@ -51,11 +51,10 @@ WwindowConfig.prototype.setup = function(controller) {
 
 WwindowConfig.prototype.config = function(launchPoint) {
 	var config = {
-		'name': launchPoint.title, 
-		'appid': launchPoint.id, 
-		'launchMode': 1, 
-		'launchDelay': 0,
-		'launchAction': 1 };
+		'name': launchPoint.title,
+		'launchMode': "start",
+		'launchAction': 0,
+		'launchDelay': 0 };
 	
 	return config;
 }
@@ -65,48 +64,33 @@ WwindowConfig.prototype.config = function(launchPoint) {
 WwindowConfig.prototype.load = function(preferences) {
 	var launchAction = 0;
 	
-	if(preferences.launchMode == 1) {
-		try {eval("var params = " + preferences.startParams);} catch(error) {var params = "";}
-	}
-	else {
-		try {eval("var params = " + preferences.closeParams);} catch(error) {var params = "";}
-	}
+	try {eval("var params = " + preferences.params);} catch(error) {var params = "";}
 
 	if(params.action != undefined)
 		launchAction = 1;
 		
 	var config = {
 		'name': preferences.name,
-		'appid': preferences.appid,
-		'launchMode': preferences.launchMode,
-		'launchDelay': preferences.launchDelay,  
+		'launchMode': preferences.event,
+		'launchDelay': preferences.delay,
 		'launchAction': launchAction };
 	
 	return config;
 }
 
 WwindowConfig.prototype.save = function(config) {
-	var startParams = "";
-	var closeParams = "";
+	var params = "";
 	
-	if(config.launchAction == 1) {
-		if(config.launchMode == 1) {
-			startParams = "{action: 'getWeather'}";
-		}
-		else {
-			closeParams = "{action: 'getWeather'}";
-		}
-	}
+	if(config.launchAction == 1)
+		params = "{action: 'getWeather'}";
 
 	var preferences = {
-		'url': "",
-		'method': "",
+		'type': "app",
 		'name': config.name,
-		'appid': config.appid, 
-		'launchMode': config.launchMode,
-		'launchDelay': config.launchDelay,  
-		'startParams': startParams,
-		'closeParams': closeParams };
+		'event': config.launchMode,
+		'delay': config.launchDelay,
+		'appid': this.appid(),
+		'params': params };
 	
 	return preferences;
 }

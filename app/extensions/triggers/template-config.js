@@ -4,7 +4,7 @@ function TemplateConfig() {
 TemplateConfig.prototype.version = function() {
 	// This function should return the api version that this extension was made for.
 
-	return "1.0";
+	return "1.1";
 }
 
 TemplateConfig.prototype.label = function() {

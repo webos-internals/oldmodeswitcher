@@ -2,7 +2,7 @@ function ConnectionConfig() {
 }
 
 ConnectionConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 //

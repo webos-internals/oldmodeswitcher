@@ -2,7 +2,7 @@ function LocationConfig() {
 }
 
 LocationConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 LocationConfig.prototype.label = function() {
@@ -37,6 +37,19 @@ LocationConfig.prototype.setup = function(controller) {
 
 //
 
+LocationConfig.prototype.config = function() {
+	var config = {
+		'locationRadius': 200,
+		'locationLatitude': "(locating)",
+		'locationLongitude': "(locating)" };
+
+	this.fetchCurrentLocation(config, 0);
+		
+	return config;
+}
+
+//
+
 LocationConfig.prototype.load = function(preferences) {
 	var config = {
 		'locationRadius': preferences.locationRadius,
@@ -53,19 +66,6 @@ LocationConfig.prototype.save = function(config) {
 		'locationLongitude': config.locationLongitude };
 	
 	return preferences;
-}
-
-//
-
-LocationConfig.prototype.config = function() {
-	var config = {
-		'locationRadius': 200,
-		'locationLatitude': "(locating)",
-		'locationLongitude': "(locating)" };
-
-	this.fetchCurrentLocation(config, 0);
-		
-	return config;
 }
 
 //

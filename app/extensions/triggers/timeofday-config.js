@@ -2,7 +2,7 @@ function TimeofdayConfig() {
 }
 
 TimeofdayConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 TimeofdayConfig.prototype.label = function() {
@@ -54,6 +54,38 @@ TimeofdayConfig.prototype.setup = function(controller) {
 
 //
 
+TimeofdayConfig.prototype.config = function() {
+	var startTime = new Date();
+	var closeTime = new Date();
+
+	startTime.setHours(0);
+	startTime.setMinutes(0);
+	startTime.setSeconds(0);
+	startTime.setMilliseconds(0);
+
+	closeTime.setHours(0);
+	closeTime.setMinutes(0);
+	closeTime.setSeconds(0);
+	closeTime.setMilliseconds(0);
+
+	var config = {
+		'timeofdayDays': 0,
+		'timeofdayCustom': "none",
+		'timeofdayDay0': false,
+		'timeofdayDay1': false,
+		'timeofdayDay2': false,
+		'timeofdayDay3': false,
+		'timeofdayDay4': false,
+		'timeofdayDay5': false,
+		'timeofdayDay6': false,
+		'timeofdayStart': startTime,
+		'timeofdayClose': closeTime };
+	
+	return config;
+}
+
+//
+
 TimeofdayConfig.prototype.load = function(preferences) {
 	var startDate = new Date(preferences.timeofdayStart * 1000);
 	var closeDate = new Date(preferences.timeofdayClose * 1000);
@@ -96,38 +128,6 @@ TimeofdayConfig.prototype.save = function(config) {
 		'timeofdayClose': config.timeofdayClose.getTime() / 1000 };
 	
 	return preferences;
-}
-
-//
-
-TimeofdayConfig.prototype.config = function() {
-	var startTime = new Date();
-	var closeTime = new Date();
-
-	startTime.setHours(0);
-	startTime.setMinutes(0);
-	startTime.setSeconds(0);
-	startTime.setMilliseconds(0);
-
-	closeTime.setHours(0);
-	closeTime.setMinutes(0);
-	closeTime.setSeconds(0);
-	closeTime.setMilliseconds(0);
-
-	var config = {
-		'timeofdayDays': 0,
-		'timeofdayCustom': "none",
-		'timeofdayDay0': false,
-		'timeofdayDay1': false,
-		'timeofdayDay2': false,
-		'timeofdayDay3': false,
-		'timeofdayDay4': false,
-		'timeofdayDay5': false,
-		'timeofdayDay6': false,
-		'timeofdayStart': startTime,
-		'timeofdayClose': closeTime };
-	
-	return config;
 }
 
 //

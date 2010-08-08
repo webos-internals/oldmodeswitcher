@@ -2,7 +2,7 @@ function SecurityConfig() {
 }
 
 SecurityConfig.prototype.version = function() {
-	return "1.0";
+	return "1.1";
 }
 
 //
@@ -34,18 +34,14 @@ SecurityConfig.prototype.setup = function(controller) {
 		'labelPlacement': "left", 'modelProperty': "securityLock",
 		'choices': this.choicesSecurityLockSelector});
 
-	this.controller.setupWidget("SecurityNoneText", {'hintText': "", 
-		'multiline': false, 'enterSubmits': false, 'focus': false, 
-		'modelProperty': "securitySecretNone"});
-
 	this.controller.setupWidget("SecurityPINText", {'hintText': "Enter PIN...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
-		'modelProperty': "securitySecretPIN", 
+		'modifierState': Mojo.Widget.numLock, 'modelProperty': "securitySecretPIN", 
 		'charsAllow': this.checkPINCharacter.bind(this)});
 
 	this.controller.setupWidget("SecurityPWText", {'hintText': "Enter Password...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
-		'modelProperty': "securitySecretPW"});
+		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "securitySecretPW"});
 
 	// Listen for keyboard event for secret text field
 
@@ -58,12 +54,11 @@ SecurityConfig.prototype.setup = function(controller) {
 SecurityConfig.prototype.config = function() {
 	var config = {
 		'securityLock': -1, 
-		'securitySecretNone': "",
 		'securitySecretPIN': "",
 		'securitySecretPW': "",
-		'securityDisplayNone': "block",
-		'securityDisplayPIN': "none",
-		'securityDisplayPW': "none" };
+		'securityPINDisplay': "none",
+		'securityPWDisplay': "none",
+		'securityLockRow': "single" };
 	
 	return config;
 }
@@ -79,24 +74,23 @@ SecurityConfig.prototype.load = function(preferences) {
 	if(preferences.securitySecret != undefined)
 		config.securitySecret = preferences.securitySecret;
 	
-	config.displayNone = "none";
-	config.displayPIN = "none";
-	config.displayPW = "none";
+	config.securityLockRow = "single";
+	config.securityPINDisplay = "none";
+	config.securityPWDisplay = "none";
 
-	config.secretNone = "";	
-	config.secretPIN = "";
-	config.secretPW = "";
+	config.securitySecretPIN = "";
+	config.securitySecretPW = "";
 		
 	if(config.securityLock == 1) {
-		config.displayPIN = "block";
-		config.secretPIN = config.securitySecret;
+		config.securityLockRow = "first";
+		config.securityPINDisplay = "block";
+		config.securitySecretPIN = config.securitySecret;
 	}
 	else if(config.securityLock == 2) {
-		config.displayPW = "block";
-		config.secretPW = config.securitySecret;
+		config.securityLockRow = "first";
+		config.securityPWDisplay = "block";
+		config.securitySecretPW = config.securitySecret;
 	}
-	else
-		config.displayNone = "block";
 	
 	return config;
 }
@@ -106,6 +100,7 @@ SecurityConfig.prototype.save = function(config) {
 
 	if(config.securityLock == 0) {
 		preferences.securityLock = 0;
+		preferences.securitySecret = "";
 	}
 	else if(config.securityLock == 1) {
 		preferences.securityLock = 1;
@@ -132,17 +127,20 @@ SecurityConfig.prototype.checkPINCharacter = function(event) {
 
 SecurityConfig.prototype.handleListChange = function(event) {
 	if(event.property == "securityLock") {
-		event.model.securityDisplayNone = "none";
-		event.model.securityDisplayPIN = "none";
-		event.model.securityDisplayPW = "none";
-		
-		if(event.value == 1)
-			event.model.securityDisplayPIN = "block";
-		else if(event.value == 2)
-			event.model.securityDisplayPW = "block";
-		else
-			event.model.securityDisplayNone = "block";
+		event.model.securityLockRow = "single";
 
+		event.model.securityPINDisplay = "none";
+		event.model.securityPWDisplay = "none";
+		
+		if(event.value == 1) {
+			event.model.securityLockRow = "first";
+			event.model.securityPINDisplay = "block";
+		}
+		else if(event.value == 2) {
+			event.model.securityLockRow = "first";
+			event.model.securityPWDisplay = "block";
+		}
+		
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 
 		this.controller.get("SettingsList").mojo.invalidateItems(0);

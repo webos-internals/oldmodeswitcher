@@ -1,4 +1,4 @@
-function WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper, SystemNotifierWrapper) {
+function WirelessTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.service = ServiceRequestWrapper;
 
 	this.callback = null;
@@ -91,7 +91,7 @@ WirelessTrigger.prototype.execute = function(ssid, launchCallback) {
 //
 
 WirelessTrigger.prototype.subscribeWirelessStatus = function() {
-	this.subscribtionWirelessStatus = new Mojo.Service.Request("palm://com.palm.wifi/", {
+	this.subscribtionWirelessStatus = this.service.request("palm://com.palm.wifi/", {
 		'method': "getstatus", 'parameters': {'subscribe': true},
 		'onSuccess': this.handleWirelessStatus.bind(this),
 		'onFailure': this.handleTriggerError.bind(this)});
@@ -119,8 +119,10 @@ WirelessTrigger.prototype.handleWirelessStatus = function(response) {
 }
 
 WirelessTrigger.prototype.handleTriggerError = function(response) {
-	this.callback(false);
-	this.callback = null;
+	if(this.callback) {
+		this.callback(false);
+		this.callback = null;
+	}
 }
 
 //
@@ -156,14 +158,14 @@ WirelessTrigger.prototype.handleWirelessTrigger = function(ssid) {
 	if((ssid != "none") && (ssid != "unknown")) {
 		this.ssid = ssid;
 			
-		new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
 			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 				'event': "wireless", 'data': this.ssid}} });
 	}
 	else {
 		this.ssid = "none";
 		
-		new Mojo.Service.Request("palm://com.palm.applicationManager", {'method': "launch", 
+		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
 			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
 				'event': "wireless", 'data': "none"}} });
 	}

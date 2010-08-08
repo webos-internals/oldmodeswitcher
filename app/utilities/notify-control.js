@@ -1,4 +1,4 @@
-function SystemNotifier(serviceRequestWrapper) {
+function NotifyControl(serviceRequestWrapper) {
 	this.service = serviceRequestWrapper;
 
 	this.forceNotify = false;
@@ -8,7 +8,15 @@ function SystemNotifier(serviceRequestWrapper) {
 
 //
 
-SystemNotifier.prototype.override = function(state) {	
+NotifyControl.prototype.setup = function() {	
+}
+
+NotifyControl.prototype.cleanup = function() {	
+}
+
+//
+
+NotifyControl.prototype.override = function(state) {	
 	this.forceNotify = true;
 	
 	this.stateOverride = state;
@@ -16,7 +24,7 @@ SystemNotifier.prototype.override = function(state) {
 
 //
 
-SystemNotifier.prototype.notify = function(phase, oldCurrentMode, newCurrentMode) {	
+NotifyControl.prototype.notify = function(phase, oldCurrentMode, newCurrentMode) {	
 	var appCtl = Mojo.Controller.getAppController();
 	
 	if(this.stateOverride == "startup") {
