@@ -26,7 +26,7 @@ ServiceRequest.prototype.executeRequest = function(url, options, retry) {
 }
 
 ServiceRequest.prototype.completeHandler = function(url, options, retry, request, response) {
-	if((!options.parameters) || (!options.parameters.subscribe))
+	if(((!options.parameters) || (!options.parameters.subscribe)) && (options.method != "addmatch"))
 		delete this.requests[request];
 
 	if((response.returnValue != undefined) && (response.returnValue == false)) {

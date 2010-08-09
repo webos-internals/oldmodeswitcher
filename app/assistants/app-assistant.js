@@ -1167,7 +1167,7 @@ AppAssistant.prototype.applicationsUpdateExec = function(oldActiveModes, newActi
 
 	for(var i = 0; i < closeServices.length; i++) {
 		Mojo.Log.error("Executing service closing: " + closeServices[i].name);
-	
+
 		var params = closeServices[i].params.close;
 
 		try {eval("var parameters = " + params);} catch(error) {var parameters = "";}
@@ -1178,7 +1178,7 @@ AppAssistant.prototype.applicationsUpdateExec = function(oldActiveModes, newActi
 
 	for(var i = 0; i < startServices.length; i++) {
 		Mojo.Log.error("Executing service starting: " + startServices[i].name);
-		
+
 		var params = startServices[i].params.start;
 
 		try {eval("var parameters = " + params);} catch(error) {var parameters = "";}

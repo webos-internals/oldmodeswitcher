@@ -30,6 +30,8 @@ TimeofdayTrigger.prototype.enable = function(config) {
 
 	this.config = config;
 
+	this.enabled = true;
+
 	// Re-schedule and setup all timers for timeofday trigger. 
 
 	// FIXME: should cancel timer that was set earlier (if changed in config)
@@ -48,6 +50,8 @@ TimeofdayTrigger.prototype.enable = function(config) {
 
 TimeofdayTrigger.prototype.disable = function() {
 	// Disable all timeofday trigger timers.
+
+	this.enabled = false;
 
 	// FIXME: keep track of timers and close them here and in reload?
 
@@ -77,7 +81,7 @@ TimeofdayTrigger.prototype.check = function(config) {
 //
 
 TimeofdayTrigger.prototype.execute = function(timestamp, launchCallback) {
-	Mojo.Log.info("Timeout trigger received: " + timestamp);
+	Mojo.Log.info("Timeofday trigger received: " + timestamp);
 
 	// Process timeofday event for generating the launcherModes list for the launcher.
 
