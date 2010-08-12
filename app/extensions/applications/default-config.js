@@ -1,5 +1,4 @@
-function DefaultConfig(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function DefaultConfig() {
 }
 
 DefaultConfig.prototype.version = function() {

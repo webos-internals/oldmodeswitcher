@@ -1,7 +1,4 @@
-function TemplateConfig(ServiceRequestWrapper) {
-	// The service request wrapper needs to be used for making system requests.
-
-	this.service = ServiceRequestWrapper;
+function TemplateConfig() {
 }
 
 TemplateConfig.prototype.version = function() {

@@ -18,6 +18,9 @@ ServiceRequest.prototype.executeRequest = function(url, options, retry) {
 
 	var requestId = this.requestId++;
 
+	if(retry < this.retries)
+		requestOpt.onFailure = null;
+
 	requestOpt.onComplete = this.completeHandler.bind(this, url, options, retry, requestId);
 	
 	this.requests[requestId] = new Mojo.Service.Request(url, requestOpt);

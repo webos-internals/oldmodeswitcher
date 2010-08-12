@@ -18,6 +18,15 @@ CaleventTrigger.prototype.init = function(callback) {
 
 	this.initialized = false;
 
+	var date = new Date();
+	date.setDate(date.getDate() + 1);
+	date.setHours(0);
+	date.setMinutes(0);
+	date.setSeconds(0);
+	date.setMilliseconds(0);
+
+	this.alarms.setupAlarmTimeout("calevent", date, "refresh");
+
 	this.subscribeCalendarEvents(false);
 }
 
@@ -54,17 +63,28 @@ CaleventTrigger.prototype.disable = function() {
 
 CaleventTrigger.prototype.check = function(config) {
 	var date = new Date();	
+	
+	date.setMilliseconds(0);
 
-	var regexp = new RegExp("/*" + config.caleventMatch + "*");
+	if(config.caleventMatch.length > 0)
+		var regexp = new RegExp("/*" + config.caleventMatch + "*", "i");
 
 	for(var i = 0; i < this.events.length; i++) {
-		if((this.events[i].subject.match(regexp) != null) || 
-			(this.events[i].note.match(regexp) != null))
+		if((config.caleventCalendar == 0) || 
+			("id" + config.caleventCalendar == this.events[i].calendarId))
 		{
 			if((this.events[i].start <= date.getTime()) && 
-				(this.events[i].end >= date.getTime()))
+				(this.events[i].end > date.getTime()))
 			{
-				return true;
+				if(((config.caleventMode == 0) && ((config.caleventMatch.length == 0) || 
+					(this.events[i].subject.match(regexp) != null) || 
+					(this.events[i].note.match(regexp) != null))) ||
+					((config.caleventMode == 1) && ((config.caleventMatch.length == 0) || 
+					((this.events[i].subject.match(regexp) == null) && 
+					(this.events[i].note.match(regexp) == null)))))
+				{
+					return true;
+				}
 			}
 		}
 	}
@@ -81,6 +101,15 @@ CaleventTrigger.prototype.execute = function(event, launchCallback) {
 		return;
 	
 	if(event == "refresh") {
+		var date = new Date();
+		date.setDate(date.getDate() + 1);
+		date.setHours(0);
+		date.setMinutes(0);
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+	
+		this.alarms.setupAlarmTimeout("calevent", date, "refresh");
+
 		if(this.subscribtionCalendarEvents)
 			this.subscribtionCalendarEvents.cancel();
 	
@@ -95,23 +124,32 @@ CaleventTrigger.prototype.execute = function(event, launchCallback) {
 				if(this.config.modesConfig[i].triggersList[j].extension == "calevent") {
 					var text = this.config.modesConfig[i].triggersList[j].caleventMatch;
 				
-					var regexp = new RegExp("/*" + text + "*");
+					if(text.length > 0)
+						var regexp = new RegExp("/*" + text + "*", "i");
 
 					for(var k = 0; k < this.events.length; k++) {
-						if((this.events[k].subject.match(regexp) != null) || 
-							(this.events[k].note.match(regexp) != null))
+						if((this.config.modesConfig[i].triggersList[j].caleventCalendar == 0) ||
+							("id" + this.config.modesConfig[i].triggersList[j].caleventCalendar == this.events[k].calendarId))
 						{
-							var sdate = new Date(this.events[k].start);
-							var edate = new Date(this.events[k].end);
+							if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
+								((text.length == 0) || (this.events[k].subject.match(regexp) != null) || 
+								(this.events[k].note.match(regexp) != null))) ||
+								((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
+								((text.length == 0) || ((this.events[k].subject.match(regexp) == null) && 
+								(this.events[k].note.match(regexp) == null)))))
+							{
+								var sdate = new Date(this.events[k].start);
+								var edate = new Date(this.events[k].end);
 
-							sdate.setMilliseconds(0);
-							edate.setMilliseconds(0);
+								sdate.setMilliseconds(0);
+								edate.setMilliseconds(0);
 						
-							if((sdate.getTime() / 1000) == event)
-								startModes.push(this.config.modesConfig[i]);
+								if((sdate.getTime() / 1000) == event)
+									startModes.push(this.config.modesConfig[i]);
 							
-							if((edate.getTime() / 1000) == event)
-								closeModes.push(this.config.modesConfig[i]);
+								if((edate.getTime() / 1000) == event)
+									closeModes.push(this.config.modesConfig[i]);
+							}
 						}
 					}			
 				}
@@ -135,15 +173,6 @@ CaleventTrigger.prototype.subscribeCalendarEvents = function(subscribe) {
 }
 
 CaleventTrigger.prototype.handleCalendarEvents = function(response) {
-	var date = new Date();
-	date.setDate(date.getDate() + 1);
-	date.setHours(0);
-	date.setMinutes(0);
-	date.setSeconds(0);
-	date.setMilliseconds(0);
-	
-	this.alarms.setupAlarmTimeout("calevent", date, "refresh");
-				 				
 	if(response.days != undefined) {
 		response.days.each(function(day) {
 			this.events = day.allDayEvents.concat(day.events);
@@ -154,25 +183,35 @@ CaleventTrigger.prototype.handleCalendarEvents = function(response) {
 				for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 					if(this.config.modesConfig[i].triggersList[j].extension == "calevent") {
 						var text = this.config.modesConfig[i].triggersList[j].caleventMatch;
-						var regexp = new RegExp("/*" + text + "*");
+
+						if(text.length > 0)
+							var regexp = new RegExp("/*" + text + "*", "i");
 
 						for(var k = 0; k < this.events.length; k++) {
-							if((this.events[k].subject.match(regexp) != null) || 
-								(this.events[k].note.match(regexp) != null))
+							if((this.config.modesConfig[i].triggersList[j].caleventCalendar == 0) ||
+								("id" + this.config.modesConfig[i].triggersList[j].caleventCalendar == this.events[k].calendarId))
 							{
-								var date = new Date();
+								if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
+									((text.length == 0) || (this.events[k].subject.match(regexp) != null) || 
+									(this.events[k].note.match(regexp) != null))) ||
+									((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
+									((text.length == 0) || ((this.events[k].subject.match(regexp) == null) && 
+									(this.events[k].note.match(regexp) == null)))))
+								{
+									var date = new Date();
 
-								var sdate = new Date(this.events[k].start);
-								var edate = new Date(this.events[k].end);
+									var sdate = new Date(this.events[k].start);
+									var edate = new Date(this.events[k].end);
 
-								sdate.setMilliseconds(0);
-								edate.setMilliseconds(0);
+									sdate.setMilliseconds(0);
+									edate.setMilliseconds(0);
 																
-								if(sdate.getTime() >= date.getTime())
-					 				this.alarms.setupAlarmTimeout("calevent", sdate, sdate.getTime() / 1000);
+									if(sdate.getTime() >= date.getTime())
+						 				this.alarms.setupAlarmTimeout("calevent", sdate, sdate.getTime() / 1000);
 
-								if(edate.getTime() >= date.getTime())
-					 				this.alarms.setupAlarmTimeout("calevent", edate, edate.getTime() / 1000);
+									if(edate.getTime() >= date.getTime())
+						 				this.alarms.setupAlarmTimeout("calevent", edate, edate.getTime() / 1000);
+								}
 							}
 						}
 					}

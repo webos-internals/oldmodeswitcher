@@ -398,7 +398,23 @@ EditmodeAssistant.prototype.setup = function() {
 
 	// Trigger selector
 
-	if(this.type != "default") {
+	if(this.type == "default") {
+		this.modelRequiredSelector = {'disabled': true};
+
+		this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
+			'labelPlacement': "left", 'choices': []}, this.modelRequiredSelector);	
+
+		this.modelBlockSelector = {'disabled': true};
+
+		this.controller.setupWidget("BlockSelector",	{'label': "Block", 
+			'labelPlacement': "left", 'choices': []}, this.modelBlockSelector);	
+
+		this.modelTriggersList = {'items': []};
+	
+		this.controller.setupWidget("TriggersList", {},
+			this.modelTriggersList);
+	}
+	else if(this.type != "default") {
 		this.modelRequiredSelector = {'value': this.mode.triggers.required, 'disabled': false};
 
 		this.choicesTriggerSelector = [
@@ -1021,7 +1037,11 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 					this.launchPoints.sort(this.sortAlphabeticallyFunction);
 				
 					this.launchPoints.each(function(item, index){
-						appItems.push({'label': item.title, 'command': index});
+						if(((item.id != "com.palm.org.e-lnx.wee.apps.modeswitcher") || (!item.params)) &&
+							((item.id != "com.palm.app.contacts") || (!item.params)))
+						{
+							appItems.push({'label': item.title, 'command': index});
+						}
 					}.bind(this));
 
 					this.controller.popupSubmenu({
@@ -1205,7 +1225,9 @@ EditmodeAssistant.prototype.checkModeName = function() {
 
 	if((this.modelNameText.value == "Current Mode") || 
 		(this.modelNameText.value == "Default Mode") || 
-		(this.modelNameText.value == "Previous Mode"))
+		(this.modelNameText.value == "Previous Mode") ||
+		(this.modelNameText.value == "All Normal Modes") ||
+		(this.modelNameText.value == "All Modifier Modes"))
 	{
 		this.modelNameText.value = 'Reserved Mode Name';
 	}
@@ -1272,8 +1294,10 @@ EditmodeAssistant.prototype.activate = function(event) {
 		this.applications[i].config.activate();
 	}
 
-	for(var i = 0; i < this.triggers.length; i++) {
-		this.triggers[i].config.activate();
+	if(this.type != "default") {
+		for(var i = 0; i < this.triggers.length; i++) {
+			this.triggers[i].config.activate();
+		}
 	}
 }
 	
@@ -1292,8 +1316,10 @@ EditmodeAssistant.prototype.deactivate = function(event) {
 		this.applications[i].config.deactivate();
 	}
 
-	for(var i = 0; i < this.triggers.length; i++) {
-		this.triggers[i].config.deactivate();
+	if(this.type != "default") {
+		for(var i = 0; i < this.triggers.length; i++) {
+			this.triggers[i].config.deactivate();
+		}
 	}
 }
 

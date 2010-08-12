@@ -43,6 +43,8 @@ MessagingConfig.prototype.setup = function(controller) {
 		'labelPlacement': "left", 'modelProperty': "messagingRingtoneName",
 		'choices': this.choicesMsgRingtoneSelector});
 
+/*		{'label': "Set Per Account", 'value': -2},*/
+
 	this.choicesIMStatusSelector = [
 		{'label': controller.defaultChoiseLabel, 'value': -1},
 		{'label': "Available", 'value': 0},
@@ -67,6 +69,7 @@ MessagingConfig.prototype.config = function() {
 		'messagingRingtoneName': "", 
 		'messagingRingtonePath': "",
 		'messagingIMStatus': -1,
+		'messagingIMStatusCfg': [],
 		'messagingRingtoneDisplay': "none" };
 	
 	return config;
@@ -88,9 +91,14 @@ MessagingConfig.prototype.load = function(preferences) {
 		config.messagingRingtonePath = preferences.messagingRingtone.path;
 	}
 	
-	if(preferences.messagingIMStatus != undefined)
+	if(preferences.messagingIMStatusCfg != undefined) {
+		config.messagingIMStatus = "Per Account";
+
+		config.messagingIMStatusCfg = preferences.messagingIMStatusCfg;	
+	}
+	else if(preferences.messagingIMStatus != undefined)
 		config.messagingIMStatus = preferences.messagingIMStatus;
-	
+		
 	return config;
 }
 
@@ -107,8 +115,10 @@ MessagingConfig.prototype.save = function(config) {
 				'path': config.messagingRingtonePath };
 		}
 	}
-		
-	if(config.messagingIMStatus != -1)
+
+	if(config.messagingIMStatus == "Per Account")
+		preferences.messagingIMStatusCfg = config.messagingIMStatusCfg;
+	else if(config.messagingIMStatus != -1)
 		preferences.messagingIMStatus = config.messagingIMStatus;
 	
 	return preferences;
@@ -138,7 +148,24 @@ MessagingConfig.prototype.handleListChange = function(event) {
 		if(event.value == "select") {
 			this.executeRingtoneSelect(event.model);
 		}
-	}	
+	}
+	else if(event.property == "messagingIMStatus") {
+		if(event.value == -2) {
+			var callback = this.handlePerAccount.bind(this, event.model);
+
+			if(event.model.messagingIMStatusCfg.length > 0)
+				event.model.messagingIMStatus = "Per Account";		
+			else
+				event.model.messagingIMStatus = -1;
+
+			this.controller.modelChanged(event.model, this);
+
+			this.controller.stageController.pushScene("scene", "imStatus", 
+				this.controller.defaultChoiseLabel, event.model.messagingIMStatusCfg, callback);
+		}
+		else if(event.model.messagingIMStatusCfg)
+			event.model.messagingIMStatusCfg.clear();
+	}
 }
 
 //
@@ -153,5 +180,25 @@ MessagingConfig.prototype.executeRingtoneSelect = function(config) {
 				this.controller.modelChanged(config, this);
 			}.bind(this, config)},
 		this.controller.stageController);
+}
+
+//
+
+MessagingConfig.prototype.handlePerAccount = function(model, config, returnValue) {
+	if((returnValue) && (config.length > 0)) {
+		model.messagingIMStatus = "Per Account";
+		
+		model.messagingIMStatusCfg.clear();
+		
+		for(var i = 0; i < config.length; i++) {
+			if(config[i].messagingIMStatus != -1)
+				model.messagingIMStatusCfg.push(config[i]);
+		}
+		
+		if(model.messagingIMStatusCfg.length == 0)
+			model.messagingIMStatus = -1;
+	}
+	
+	this.controller.modelChanged(model, this);
 }
 

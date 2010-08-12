@@ -1,5 +1,4 @@
-function PhoneConfig(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function PhoneConfig() {
 }
 
 PhoneConfig.prototype.version = function() {

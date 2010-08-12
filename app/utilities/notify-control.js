@@ -3,7 +3,7 @@ function NotifyControl(serviceRequestWrapper) {
 
 	this.forceNotify = false;
 
-	this.stateOverride = "";
+	this.notifyMode = "";
 }
 
 //
@@ -16,49 +16,45 @@ NotifyControl.prototype.cleanup = function() {
 
 //
 
-NotifyControl.prototype.override = function(state) {	
-	this.forceNotify = true;
-	
-	this.stateOverride = state;
+NotifyControl.prototype.mode = function(mode) {	
+	if((mode == "") || (this.notifyMode == ""))
+		this.notifyMode = mode;
 }
 
 //
 
-NotifyControl.prototype.notify = function(phase, oldCurrentMode, newCurrentMode) {	
+NotifyControl.prototype.notify = function(phase, oldMode, newMode) {	
 	var appCtl = Mojo.Controller.getAppController();
 	
-	if(this.stateOverride == "startup") {
+	if(this.notifyMode == "startup") {
 		if(phase == "init")
-			appCtl.showBanner("Starting mode: " + newCurrentMode.name, {action: 'none'});
+			appCtl.showBanner("Starting mode: " + newMode, {action: 'none'});
 		else if(phase == "done")
-			appCtl.showBanner("Done starting: " + newCurrentMode.name, {action: 'none'});
+			appCtl.showBanner("Done starting: " + newMode, {action: 'none'});
 	}
-	else if(this.stateOverride == "shutdown")	{
+	else if(this.notifyMode == "shutdown")	{
 		if(phase == "init")
-			appCtl.showBanner("Closing mode: " + oldCurrentMode.name, {action: 'none'});
+			appCtl.showBanner("Closing mode: " + oldMode, {action: 'none'});
 		else
-			appCtl.showBanner("Done closing: " + oldCurrentMode.name, {action: 'none'});
+			appCtl.showBanner("Done closing: " + oldMode, {action: 'none'});
 	}
-	else {
-		if((newCurrentMode.settings.notify == 2) || (this.forceNotify)) {
-			if(oldCurrentMode.name == newCurrentMode.name) {
-				if(phase == "init")
-					appCtl.showBanner("Updating mode: " + newCurrentMode.name, {action: 'none'});
-				else if(phase == "done")
-					appCtl.showBanner("Done updating: " + newCurrentMode.name, {action: 'none'});
-			}
-			else {
-				if(phase == "init")
-					appCtl.showBanner("Switching mode to: " + newCurrentMode.name, {action: 'none'});
-				else if(phase == "done")
-					appCtl.showBanner("Done switching to: " + newCurrentMode.name, {action: 'none'});
-			}
+	else if(this.notifyMode != "") {
+		if(oldMode == newMode) {
+			if(phase == "init")
+				appCtl.showBanner("Updating mode: " + newMode, {action: 'none'});
+			else if(phase == "done")
+				appCtl.showBanner("Done updating: " + newMode, {action: 'none'});
+		}
+		else {
+			if(phase == "init")
+				appCtl.showBanner("Switching mode to: " + newMode, {action: 'none'});
+			else if(phase == "done")
+				appCtl.showBanner("Done switching to: " + newMode, {action: 'none'});
 		}
 	}
 
 	if(phase == "done") {
-		this.forceNotify = false;
-		this.stateOverride = "";
+		this.notifyMode = "";
 	}
 }
 

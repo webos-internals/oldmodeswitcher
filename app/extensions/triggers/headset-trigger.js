@@ -7,7 +7,7 @@ function HeadsetTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.config = null;
 	this.enabled = false;
 	
-	this.connected = false;
+	this.connected = "none";
 }
 
 //
@@ -23,7 +23,7 @@ HeadsetTrigger.prototype.init = function(callback) {
 HeadsetTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.connected = false;
+	this.connected = "none";
 
 	if(this.subscribtionHeadsetStatus)
 		this.subscribtionHeadsetStatus.cancel();
@@ -45,8 +45,16 @@ HeadsetTrigger.prototype.disable = function() {
 //
 
 HeadsetTrigger.prototype.check = function(config) {
-	if(((config.headsetState == 0) && (this.connected)) ||
-		((config.headsetState == 1) && (!this.connected)))
+	if((config.headsetState == 0) && (((config.headsetScenario == 0) && (this.connected != "none")) ||
+		((config.headsetScenario == 1) && (this.connected == "media_headset")) ||
+		((config.headsetScenario == 2) && (this.connected == "media_headset_mic"))))
+	{
+		return true;
+	}
+	
+	if((config.headsetState == 1) && (((config.headsetScenario == 0) && (this.connected == "none")) ||
+		((config.headsetScenario == 1) && (this.connected != "media_headset")) ||
+		((config.headsetScenario == 2) && (this.connected != "media_headset_mic"))))
 	{
 		return true;
 	}
@@ -94,10 +102,13 @@ HeadsetTrigger.prototype.subscribeHeadsetStatus = function() {
 HeadsetTrigger.prototype.handleHeadsetStatus = function(response) {
 	var old = this.connected;
 
-	if((response.scenario) && (response.scenario == "media_headset"))
-		this.connected = true;
+	if((response.scenario) && ((response.scenario == "media_headset") ||
+		(response.scenario == "media_headset_mic")))
+	{
+		this.connected = response.scenario;
+	}
 	else
-		this.connected = false;		
+		this.connected = "none";		
 
 	if(!this.initialized) {
 		this.initialized = true;

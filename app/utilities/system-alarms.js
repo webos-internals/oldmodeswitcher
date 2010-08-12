@@ -16,7 +16,7 @@ SystemAlarms.prototype.clearAlarmTimeout = function(trigger, time) {
 
 	var key = Mojo.Controller.appInfo.id + "." + trigger + "." + timestamp;
 
-	Mojo.Log.error("Normal timeout for " + trigger + " event canceled");
+	Mojo.Log.error("Alarm for " + trigger + " event canceled");
 		
 	this.service.request("palm://com.palm.power/timeout", {
 		'method': "clear", 'parameters': {'key': key} });
@@ -31,7 +31,7 @@ SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
 
 	var alarmStr = this.convertDateToUtfStr(time);
 	
-	Mojo.Log.error("Normal timeout set for " + trigger + " to: " + alarmStr);
+	Mojo.Log.error("Alarm for " + trigger + ": " + alarmStr);
 	
 	this.service.request('palm://com.palm.power/timeout', {
  		'method': "set", 'parameters': {
@@ -48,7 +48,7 @@ SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
 SystemAlarms.prototype.clearDelayTimeout = function(trigger) {
 	var key = Mojo.Controller.appInfo.id + "." + trigger + ".delay";
 
-	Mojo.Log.error("Delay timeout for " + trigger + " event canceled");
+	Mojo.Log.error("Delay for " + trigger + " event canceled");
 		
 	this.service.request("palm://com.palm.power/timeout", {
 		'method': "clear", 'parameters': {"key": key} });
@@ -81,7 +81,7 @@ SystemAlarms.prototype.setupDelayTimeout = function(trigger, delay, data) {
 	
 	// Setup the actual delay timeout with the above delay.
 
-	Mojo.Log.error("Delay timeout for " + trigger + " event set to: " + delayStr);
+	Mojo.Log.error("Delay for " + trigger + ": " + delayStr);
 	
 	this.service.request('palm://com.palm.power/timeout', {
  		'method': "set", 'parameters': {

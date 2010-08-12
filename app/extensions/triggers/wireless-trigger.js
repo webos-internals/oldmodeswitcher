@@ -52,11 +52,17 @@ WirelessTrigger.prototype.check = function(config) {
 	if((this.ssid == "none") && (config.wirelessState == 1))
 		return true;
 
-	if((this.ssid == config.wirelessSSID) && (config.wirelessState == 2))
+	if((this.ssid == config.wirelessSSID.toLowerCase()) && 
+		(config.wirelessState == 2))
+	{
 		return true;
-
-	if((this.ssid != config.wirelessSSID) && (config.wirelessState == 3))
+	}
+	
+	if((this.ssid != config.wirelessSSID.toLowerCase()) && 
+		(config.wirelessState == 3))
+	{
 		return true;
+	}
 	
 	return false;
 }
@@ -99,21 +105,27 @@ WirelessTrigger.prototype.subscribeWirelessStatus = function() {
 
 WirelessTrigger.prototype.handleWirelessStatus = function(response) {
 	if(!this.initialized) {
-		if((response.networkInfo) && (response.networkInfo.ssid))
-			this.ssid = response.networkInfo.ssid;
+		if((response) && (response.networkInfo) && (response.networkInfo.ssid))
+			this.ssid = response.networkInfo.ssid.toLowerCase();
 	
 		this.initialized = true;
 		this.callback(true);
 		this.callback = null;
 	}
-	else if((this.enabled) && (response)) {
-		if (response.status == "connectionStateChanged") {
-			if(response.networkInfo.connectState == "ipConfigured") {
-				this.handleWirelessEvent(response.networkInfo.ssid);
+	else if(response) {
+		if(this.enabled) {
+			if (response.status == "connectionStateChanged") {
+				if(response.networkInfo.connectState == "ipConfigured") {
+					this.handleWirelessEvent(response.networkInfo.ssid.toLowerCase());
+				}
+				else if(this.ssid != "none") {
+					this.handleWirelessEvent("none");
+				}
 			}
-			else if(this.ssid != "none") {
-				this.handleWirelessEvent("none");
-			}
+		}
+		else {
+			if((response.networkInfo) && (response.networkInfo.ssid))
+				this.ssid = response.networkInfo.ssid.toLowerCase();
 		}
 	}
 }
@@ -135,13 +147,14 @@ WirelessTrigger.prototype.handleWirelessEvent = function(ssid) {
 
 	if((ssid == "none") && (this.ssid != "none")) {
 		for(var i = 0; i < this.config.modesConfig.length; i++) {
-			if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+			if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
+				(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
+			{
 				for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 					if(this.config.modesConfig[i].triggersList[j].extension == "wireless") {
-						if(this.config.modesConfig[i].triggersList[j].wirelessSSID == this.ssid) {
-							timeout = this.config.modesConfig[i].triggersList[j].wirelessDelay * 1000;
-				
-							break;
+						if(this.config.modesConfig[i].triggersList[j].wirelessSSID.toLowerCase() == this.ssid) {
+							if(timeout < this.config.modesConfig[i].triggersList[j].wirelessDelay * 1000)
+								timeout = this.config.modesConfig[i].triggersList[j].wirelessDelay * 1000;
 						}
 					}		
 				}

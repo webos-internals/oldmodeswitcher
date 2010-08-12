@@ -184,13 +184,14 @@ ChargerTrigger.prototype.handleChargerEvent = function(connected) {
 		charger = 3;
 
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		if(this.config.modesConfig[i].name == this.config.currentMode.name) {
+		if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
+			(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
+		{
 			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 				if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
 					if(this.config.modesConfig[i].triggersList[j].chargerCharger == charger) {
-						timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
-				
-						break;
+						if(timeout < this.config.modesConfig[i].triggersList[j].chargerDelay * 1000)
+							timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
 					}
 				}		
 			}

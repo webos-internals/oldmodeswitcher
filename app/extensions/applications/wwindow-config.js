@@ -1,5 +1,4 @@
-function WwindowConfig(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function WwindowConfig() {
 }
 
 WwindowConfig.prototype.version = function() {

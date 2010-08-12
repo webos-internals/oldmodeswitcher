@@ -1,6 +1,4 @@
-function ModeswConfig(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
-
+function ModeswConfig() {
 	this.modesList = [];
 
 	this.choicesModeswModeSelector = [];
@@ -17,10 +15,11 @@ ModeswConfig.prototype.appid = function() {
 //
 
 ModeswConfig.prototype.activate = function() {
-	this.subscriptionMSPreferences = this.service.request('palm://com.palm.systemservice/', {
-		'method': 'getPreferences', 'parameters': {
-			'subscribe': true, 'keys': ["modesConfig"]},
-		onSuccess: this.handleModeData.bind(this)} );
+	this.subscriptionMSPreferences = this.controller.serviceRequest(
+		'palm://com.palm.systemservice/', {
+			'method': 'getPreferences', 'parameters': {
+				'subscribe': true, 'keys': ["modesConfig"]},
+			'onSuccess': this.handleModeData.bind(this)} );
 }
 
 ModeswConfig.prototype.deactivate = function() {
@@ -43,9 +42,9 @@ ModeswConfig.prototype.setup = function(controller) {
 		'choices': this.choicesModeswLaunchSelector});
 	
 	this.choicesModeswActionSelector = [
-		{'label': "Start Mode", value: "start"},
-		{'label': "Close Mode", value: "close"},
-		{'label': "Trigger Mode", value: "trigger"}];  
+		{'label': "Start Mode(s)", value: "start"},
+		{'label': "Close Mode(s)", value: "close"},
+		{'label': "Trigger Mode(s)", value: "trigger"}];  
 
 	controller.setupWidget("ModeswActionSelector", {'label': "Action", 
 		'labelPlacement': "left", 'modelProperty': "modeAction",
@@ -88,13 +87,24 @@ ModeswConfig.prototype.load = function(preferences) {
 	this.choicesModeswModeSelector.clear();
 
 	for(var i = 0; i < this.modesList.length; i++) {
-		if((preferences.action == "start") || (preferences.action == "manual")) {
-			if((this.modesList[i].type != "current") && (this.modesList[i].type != "default"))
+		if(preferences.action == "start") {
+			if((this.modesList[i].type != "current") && (this.modesList[i].type != "default") &&
+				(this.modesList[i].type != "alln") && (this.modesList[i].type != "allm")) 
+			{
 				this.choicesModeswModeSelector.push(this.modesList[i]);
+			}
 		}
 		else if(preferences.action == "close") {
-			if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier"))
+			if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier") ||
+				(this.modesList[i].type == "allm"))
+			{
 				this.choicesModeswModeSelector.push(this.modesList[i]);
+			}
+		}
+		else if(preferences.action == "trigger") {
+			if((this.modesList[i].type != "current") && (this.modesList[i].type != "default")) {
+				this.choicesModeswModeSelector.push(this.modesList[i]);
+			}
 		}
 	}
 
@@ -132,7 +142,9 @@ ModeswConfig.prototype.save = function(config) {
 ModeswConfig.prototype.handleModeData = function(data) {
 	if(data.modesConfig != undefined) {
 		this.modesList.clear();
-	
+
+		this.modesList.push({'label': "All Normal Modes", 'value': "All Normal Modes", 'type': "alln"});  	
+		this.modesList.push({'label': "All Modifier Modes", 'value': "All Modifier Modes", 'type': "allm"});  	
 		this.modesList.push({'label': "Current Mode", 'value': "Current Mode", 'type': "current"});  
 		this.modesList.push({'label': "Previous Mode", 'value': "Previous Mode", 'type': "previous"});  
 	
@@ -152,15 +164,26 @@ ModeswConfig.prototype.handleListChange = function(event) {
 		this.choicesModeswModeSelector.clear();
 
 		for(var i = 0; i < this.modesList.length; i++) {
-			if((event.value == "start") || (event.value == "trigger")) {
-				if((this.modesList[i].type != "current") && (this.modesList[i].type != "default")) {
+			if(event.value == "start") {
+				if((this.modesList[i].type != "current") && (this.modesList[i].type != "default") &&
+					(this.modesList[i].type != "alln")) 
+				{
 					if(this.controller.get("NameText").mojo.getValue() != this.modesList[i].value)
 						this.choicesModeswModeSelector.push(this.modesList[i]);
 				}
 			}
 			else if(event.value == "close") {
-				if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier"))
+				if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier") ||
+					(this.modesList[i].type == "allm"))
+				{
 					this.choicesModeswModeSelector.push(this.modesList[i]);
+				}
+			}
+			else if(event.value == "trigger") {
+				if((this.modesList[i].type != "current") && (this.modesList[i].type != "default")) {
+					if(this.controller.get("NameText").mojo.getValue() != this.modesList[i].value)
+						this.choicesModeswModeSelector.push(this.modesList[i]);
+				}
 			}
 		}		
 

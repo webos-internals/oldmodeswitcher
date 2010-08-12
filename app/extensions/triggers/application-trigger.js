@@ -7,9 +7,9 @@ function ApplicationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
 	this.config = null;
 	this.enabled = false;
 	
-	this.current = null;
+	this.current = "unknown";
 	
-	this.previous = null;
+	this.previous = "unknown";
 	
 	this.closeTimer = null;
 }
@@ -27,8 +27,8 @@ ApplicationTrigger.prototype.init = function(callback) {
 ApplicationTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.current = null;
-	this.previous = null;
+	this.current = "unknown";
+	this.previous = "unknown";
 	
 	if(this.subscribtionForegroundApp)
 		this.subscribtionForegroundApp.cancel();
@@ -53,7 +53,7 @@ ApplicationTrigger.prototype.check = function(config) {
 	if((config.applicationState == 0) && (config.applicationId == this.current))
 		return true;
 		
-	if((config.applicationState == 1) && ((config.applicationId == this.current) || (!this.current)))
+	if((config.applicationState == 1) && (config.applicationId != this.current))
 		return true;
 
 	return false;
@@ -97,13 +97,13 @@ ApplicationTrigger.prototype.subscribeForegroundApp = function() {
 }
 
 ApplicationTrigger.prototype.handleForegroundApp = function(response) {
-	if(this.current)
+	if(this.current != "unknown")
 		this.previous = this.current;
 
 	if(response.id != undefined)
 		this.current = response.id;
 	else
-		this.current = null;
+		this.current = "unknown";
 
 	if(!this.initialized) {
 		this.initialized = true;
@@ -118,7 +118,9 @@ ApplicationTrigger.prototype.handleForegroundApp = function(response) {
 			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 				if(this.config.modesConfig[i].triggersList[j].extension == "application") {
 					if(this.config.modesConfig[i].triggersList[j].applicationId == this.previous) {
-						if(this.config.currentMode.name == this.config.modesConfig[i].name) {
+						if((this.config.currentMode.name == this.config.modesConfig[i].name) ||
+							(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
+						{
 							delay = this.config.modesConfig[i].triggersList[j].applicationDelay;
 						}
 					}
@@ -133,9 +135,9 @@ ApplicationTrigger.prototype.handleForegroundApp = function(response) {
 		if(this.closeTimeout)
 			clearTimeout(this.closeTimeout);
 	
-		if((found) && (this.current))
+		if((found) && (this.current != "unknown"))
 			this.notifyTriggerUpdate();
-		else if(delay)
+		else if((delay) && (this.current == "unknown"))
 			this.closeTimeout = setTimeout(this.notifyTriggerUpdate.bind(this), delay * 1000);
 	}
 }

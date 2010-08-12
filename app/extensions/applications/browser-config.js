@@ -1,5 +1,4 @@
-function BrowserConfig(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function BrowserConfig() {
 }
 
 BrowserConfig.prototype.version = function() {
