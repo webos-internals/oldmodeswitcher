@@ -34,9 +34,9 @@ ConfigAssistant.prototype.setup = function() {
 	
 	this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true},
 		{visible: true, items: [ 
-			{label: "Report Problem", command: 'debug'},
-			{label: "Donate", command: 'donate'},
-			{label: "Help", command: 'help'}]});
+			{label: $L("Report Problem"), command: 'debug'},
+			{label: $L("Donate"), command: 'donate'},
+			{label: $L("Help"), command: 'help'}]});
 	
 	// Activated toggle button
 
@@ -52,33 +52,33 @@ ConfigAssistant.prototype.setup = function() {
 	// Auto start & close timer selectors
 	
 	this.choicesStartSelector = [
-		{label: "5 Seconds", value: 5},
-		{label: "10 Seconds", value: 10},
-		{label: "15 Seconds", value: 15},
-		{label: "20 Seconds", value: 20},
-		{label: "25 Seconds", value: 25},
-		{label: "30 Seconds", value: 30}];
+		{label: "5 " + $L("Seconds"), value: 5},
+		{label: "10 " + $L("Seconds"), value: 10},
+		{label: "15 " + $L("Seconds"), value: 15},
+		{label: "20 " + $L("Seconds"), value: 20},
+		{label: "25 " + $L("Seconds"), value: 25},
+		{label: "30 " + $L("Seconds"), value: 30}];
 
 	this.modelStartSelector = {value: this.config.modeSwitcher.timerStart, disabled: false};
 	   
 	this.controller.setupWidget("StartSelector", {
-		label: "Start Timer",
+		label: $L("Start Timer"),
 		labelPlacement: "left", 							
 		choices: this.choicesStartSelector},
 		this.modelStartSelector);
 
 	this.choicesCloseSelector = [
-		{label: "5 Seconds", value: 5},
-		{label: "10 Seconds", value: 10},
-		{label: "15 Seconds", value: 15},
-		{label: "20 Seconds", value: 20},
-		{label: "25 Seconds", value: 25},
-		{label: "30 Seconds", value: 30}];
+		{label: "5 " + $L("Seconds"), value: 5},
+		{label: "10 " + $L("Seconds"), value: 10},
+		{label: "15 " + $L("Seconds"), value: 15},
+		{label: "20 " + $L("Seconds"), value: 20},
+		{label: "25 " + $L("Seconds"), value: 25},
+		{label: "30 " + $L("Seconds"), value: 30}];
 		
 	this.modelCloseSelector = {value: this.config.modeSwitcher.timerClose, disabled: false};
 	   
 	this.controller.setupWidget("CloseSelector", {
-		label: "Close Timer",
+		label: $L("Close Timer"),
 		labelPlacement: "left", 							
 		choices: this.choicesCloseSelector},
 		this.modelCloseSelector);
@@ -116,7 +116,7 @@ ConfigAssistant.prototype.setup = function() {
 	this.modelAddModeButton = {buttonClass: '', disabled: false};
 
 	this.controller.setupWidget('AddModeButton', 
-		{label: "Add Custom Mode"}, this.modelAddModeButton);
+		{label: $L("Add Custom Mode")}, this.modelAddModeButton);
 	
 	Mojo.Event.listen(this.controller.get('AddModeButton'), Mojo.Event.tap, 
 		this.handleAddModeButtonPress.bind(this));
@@ -126,7 +126,7 @@ ConfigAssistant.prototype.setup = function() {
 	this.modelDefModeButton = {buttonClass: '', disabled: false};
 
 	this.controller.setupWidget('DefModeButton', 
-		{label: "Edit Default Mode"}, this.modelDefModeButton);
+		{label: $L("Edit Default Mode")}, this.modelDefModeButton);
 	
 	Mojo.Event.listen(this.controller.get('DefModeButton'), Mojo.Event.tap, 
 		this.handleDefModeButtonPress.bind(this));
@@ -152,17 +152,15 @@ ConfigAssistant.prototype.setup = function() {
 		this.controller.modelChanged(this.modelDefModeButton, this);		
 
 		this.controller.showAlertDialog({
-			title: "Initial setup of Mode Switcher!",
-			message: "<div align='justify'><i>Mode Switcher</i> needs to retrieve your current system settings for " +
-						"<i>Default Mode</i>. This operation should only take few seconds to finish. You can modify " + 
-						"the <i>Default Mode</i> afterwards by clicking the '<i>Edit Default Mode</i>' button.</div>",
-			choices:[{label:'Continue', value:"ok", type:'default'}],
+			title: $L("Initial setup of Mode Switcher!"),
+			message: "<div align='justify'>" + $L("<i>Mode Switcher</i> needs to retrieve your current system settings for <i>Default Mode</i>. This operation should only take few seconds to finish. You can modify the <i>Default Mode</i> afterwards by clicking the <i>Edit Default Mode</i> button.") + "</div>",
+			choices:[{label:$L("Continue"), value:"ok", type:'default'}],
 			preventCancel: true,
 			allowHTMLMessage: true,
 			onChoose: function(appControl, appAssistant, value) {
 				Mojo.Log.info("Retrieving default settings from system");
 			
-				appControl.showBanner("Retrieving current system settings", {});
+				appControl.showBanner($L("Retrieving current system settings"), {});
 
 				this.retrieveDefaultSettings(0);
 			}.bind(this, this.appControl, this.appAssistant)}); 
@@ -186,7 +184,7 @@ ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
 	}
 
 	if(index < this.settings.length) {
-		Mojo.Log.info("Retrieving " + this.settings[index].id + " settings");
+		Mojo.Log.info($L("Retrieving") + " " + this.settings[index].id + " " + $L("settings"));
 
 		var callback = this.retrieveDefaultSettings.bind(this, index + 1);
 
@@ -195,7 +193,7 @@ ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
 	else {
 		Mojo.Log.info("Retrieving of default settings done");
 
-		this.appControl.showBanner("Retrieving system settings finished", {});
+		this.appControl.showBanner($L("Retrieving system settings finished"), {});
 
 		this.modelDefModeButton.disabled = false;
 

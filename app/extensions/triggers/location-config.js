@@ -71,11 +71,13 @@ LocationConfig.prototype.save = function(config) {
 //
 
 LocationConfig.prototype.fetchCurrentLocation = function(config, retry) {
-	if(retry < 10) {
+	Mojo.Log.error("Fetching current location: " + retry);
+
+	if(retry < 20) {
 		this.controller.serviceRequest("palm://com.palm.location/", {
 			'method': "getCurrentPosition", 'parameters': {'Accuracy': 1},
-			'onSuccess': this.handleCurrentLocation.bind(this, config, 0),
-			'onFailure': this.handleCurrentLocation.bind(this, config, ++retry)});
+			'onSuccess': this.handleCurrentLocation.bind(this, config, retry),
+			'onFailure': this.fetchCurrentLocation.bind(this, config, ++retry)});
 	}
 	else {
 		config.locationLatitude = "(failed)";
@@ -86,13 +88,16 @@ LocationConfig.prototype.fetchCurrentLocation = function(config, retry) {
 }
 
 LocationConfig.prototype.handleCurrentLocation = function(config, retry, response) {
-	if(retry == 0) {
+	if((response.horizAccuracy == -1) || (response.horizAccuracy > 100)) {	
+		Mojo.Log.error("Insufficient location accuracy: " + response.horizAccuracy);
+
+		this.fetchCurrentLocation(config, ++retry);
+	}
+	else {
 		config.locationLatitude = Math.round(response.latitude*1000000)/1000000;
 		config.locationLongitude = Math.round(response.longitude*1000000)/1000000;
-				
+			
 		this.controller.get("TriggersList").mojo.invalidateItems(0);
 	}
-	else
-		this.fetchCurrentLocation(config, retry);
 }
 

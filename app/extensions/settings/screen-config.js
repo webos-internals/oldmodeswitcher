@@ -166,8 +166,8 @@ ScreenConfig.prototype.handleListChange = function(event) {
 ScreenConfig.prototype.executeWallpaperSelect = function(config) {
 	Mojo.FilePicker.pickFile({'defaultKind': "image", 'kinds': ["image"], 'actionType': "open", 
 		'actionName': "Select wallpaper", 'crop': {'width': 318, 'height': 479}, 'onSelect': 
-			function(config, payload) {
-				if((!payload) || (!payload.fullPath)) {
+			function(config, response) {
+				if((!response) || (!response.fullPath)) {
 					config.screenWallpaperName = "";
 					config.screenWallpaperPath = "";
 
@@ -176,26 +176,26 @@ ScreenConfig.prototype.executeWallpaperSelect = function(config) {
 					return;
 				}
 	
-				var params = {'target': encodeURIComponent(payload.fullPath)};
+				var params = {'target': encodeURIComponent(response.fullPath)};
 	
-				if(payload.cropInfo.window) {
-					if(payload.cropInfo.window.scale)
-						params['scale'] = payload.cropInfo.window.scale;
+				if(response.cropInfo.window) {
+					if(response.cropInfo.window.scale)
+						params['scale'] = response.cropInfo.window.scale;
 		
-					if(payload.cropInfo.window.focusX)
-						params['focusX'] = payload.cropInfo.window.focusX;
+					if(response.cropInfo.window.focusX)
+						params['focusX'] = response.cropInfo.window.focusX;
 		
-					if(payload.cropInfo.window.focusY)
-						params['focusY'] = payload.cropInfo.window.focusY;
+					if(response.cropInfo.window.focusY)
+						params['focusY'] = response.cropInfo.window.focusY;
 				}			
 		
 				this.controller.serviceRequest("palm://com.palm.systemservice/wallpaper/", {
 					'method': "importWallpaper", 
 					'parameters': params,
-					'onSuccess': function(config, payload) {
-						if(payload.wallpaper) {
-							config.screenWallpaperName = payload.wallpaper.wallpaperName;
-							config.screenWallpaperPath = payload.wallpaper.wallpaperFile;
+					'onSuccess': function(config, response) {
+						if(response.wallpaper) {
+							config.screenWallpaperName = response.wallpaper.wallpaperName;
+							config.screenWallpaperPath = response.wallpaper.wallpaperFile;
 						}
 						else {
 							config.screenWallpaperName = "";
@@ -204,7 +204,7 @@ ScreenConfig.prototype.executeWallpaperSelect = function(config) {
 						
 						this.controller.modelChanged(config, this);
 					}.bind(this, config),
-					'onFailure': function(payload) {
+					'onFailure': function(response) {
 						config.screenWallpaperName = "";
 						config.screenWallpaperPath = "";
 

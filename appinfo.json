@@ -5,7 +5,7 @@
 	"main": "index.html",
 	"icon": "icon.png",
 	"miniicon": "icon_mini.png",
-	"version": "0.9.39",
+	"version": "0.9.40",
 	"vendor": "e-lnx.org",
 	"removable": "true",
 	"noWindow": "true"

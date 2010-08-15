@@ -183,6 +183,8 @@ ChargerTrigger.prototype.handleChargerEvent = function(connected) {
 	else if((this.charger == "pc") || (connected == "pc"))
 		charger = 3;
 
+	Mojo.Log.error("Charger event debug: " + this.charger + " " + connected);
+
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
 			(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
@@ -190,6 +192,8 @@ ChargerTrigger.prototype.handleChargerEvent = function(connected) {
 			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 				if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
 					if(this.config.modesConfig[i].triggersList[j].chargerCharger == charger) {
+						Mojo.Log.error("Charger event delay: " + this.config.modesConfig[i].triggersList[j].chargerDelay + " " + timeout);
+					
 						if(timeout < this.config.modesConfig[i].triggersList[j].chargerDelay * 1000)
 							timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
 					}

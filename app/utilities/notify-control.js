@@ -28,28 +28,28 @@ NotifyControl.prototype.notify = function(phase, oldMode, newMode) {
 	
 	if(this.notifyMode == "startup") {
 		if(phase == "init")
-			appCtl.showBanner("Starting mode: " + newMode, {action: 'none'});
+			appCtl.showBanner($L("Starting mode") + ": " + newMode, {action: 'none'});
 		else if(phase == "done")
-			appCtl.showBanner("Done starting: " + newMode, {action: 'none'});
+			appCtl.showBanner($L("Done starting") + ": " + newMode, {action: 'none'});
 	}
 	else if(this.notifyMode == "shutdown")	{
 		if(phase == "init")
-			appCtl.showBanner("Closing mode: " + oldMode, {action: 'none'});
+			appCtl.showBanner($L("Closing mode") + ": " + oldMode, {action: 'none'});
 		else
-			appCtl.showBanner("Done closing: " + oldMode, {action: 'none'});
+			appCtl.showBanner($L("Done closing") + ": " + oldMode, {action: 'none'});
 	}
 	else if(this.notifyMode != "") {
 		if(oldMode == newMode) {
 			if(phase == "init")
-				appCtl.showBanner("Updating mode: " + newMode, {action: 'none'});
+				appCtl.showBanner($L("Updating mode") + ": " + newMode, {action: 'none'});
 			else if(phase == "done")
-				appCtl.showBanner("Done updating: " + newMode, {action: 'none'});
+				appCtl.showBanner($L("Done updating") + ": " + newMode, {action: 'none'});
 		}
 		else {
 			if(phase == "init")
-				appCtl.showBanner("Switching mode to: " + newMode, {action: 'none'});
+				appCtl.showBanner($L("Switching mode to") + ": " + newMode, {action: 'none'});
 			else if(phase == "done")
-				appCtl.showBanner("Done switching to: " + newMode, {action: 'none'});
+				appCtl.showBanner($L("Done switching to") + ": " + newMode, {action: 'none'});
 		}
 	}
 

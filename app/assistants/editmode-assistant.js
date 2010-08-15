@@ -44,12 +44,12 @@ EditmodeAssistant.prototype.setup = function() {
 	if(this.type == "default") {
 		this.controller.setupWidget(Mojo.Menu.appMenu, 
 			{'omitDefaultItems': true}, {'visible': true, 'items': [ 
-			{'label': "Get System Settings", 'command': "retrieve"}]} );
+			{'label': $L("Get System Settings"), 'command': "retrieve"}]} );
 	}
 	else {
 		this.controller.setupWidget(Mojo.Menu.appMenu, 
 			{'omitDefaultItems': true}, {'visible': true, 'items': [ 
-			{'label': "Add to Launcher", 'command': "launchpoint"}]} );
+			{'label': $L("Add to Launcher"), 'command': "launchpoint"}]} );
 	}
 	
 //
@@ -63,9 +63,9 @@ EditmodeAssistant.prototype.setup = function() {
 	this.configurationView.style.display = 'block';
 		
 	if(this.type == "default")
-		this.itemsViewMenu = [{'label': "Default Mode Settings", 'command': "configuration", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("Default Mode Settings"), 'command': "configuration", 'width': 320}];
 	else
-		this.itemsViewMenu = [{'label': "Mode Configuration", 'command': "configuration", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("Mode Configuration"), 'command': "configuration", 'width': 320}];
 
 	this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 
@@ -87,9 +87,9 @@ EditmodeAssistant.prototype.setup = function() {
 
 		this.itemsCommandMenu = [
 			{'width': 35},
-			{'label': "Settings", 'command': "settings", 'width': 110},
+			{'label': $L("Settings"), 'command': "settings", 'width': 110},
 			{'width': 30},
-			{'label': "Apps", 'command': "applications", 'width': 110},
+			{'label': $L("Apps"), 'command': "applications", 'width': 110},
 			{'width': 35} ];
 	}
 	else {
@@ -97,9 +97,9 @@ EditmodeAssistant.prototype.setup = function() {
 	
 		this.itemsCommandMenu = [
 			{'width': 5},
-			{'label': "Settings", 'command': "settings", 'width': 100},
-			{'label': "Apps", 'command': "applications", 'width': 80},
-			{'label': "Triggers", 'command': "triggers", 'width': 100},
+			{'label': $L("Settings"), 'command': "settings", 'width': 100},
+			{'label': $L("Apps"), 'command': "applications", 'width': 80},
+			{'label': $L("Triggers"), 'command': "triggers", 'width': 100},
 			{'width': 5} ];
 	}
 
@@ -114,11 +114,11 @@ EditmodeAssistant.prototype.setup = function() {
 	// Mode name text field
 	
 	if(this.type == "default")
-		this.modelNameText = {'value': this.mode.name, 'disabled': true};
+		this.modelNameText = {'value': $L(this.mode.name), 'disabled': true};
 	else
 		this.modelNameText = {'value': this.mode.name, 'disabled': false};
 		   
-	this.controller.setupWidget("NameText", { 'hintText': "Unique Mode Name", 
+	this.controller.setupWidget("NameText", { 'hintText': $L("Unique Mode Name"), 
 		'multiline': false, 'enterSubmits': false, 'focus': true},
 		this.modelNameText);
 
@@ -134,16 +134,16 @@ EditmodeAssistant.prototype.setup = function() {
 		
 	if(this.mode.type == "default") {
 		this.choicesTypeSelector = [
-			{'label': "Default", 'value': "default"}
+			{'label': $L("Default"), 'value': "default"}
 			/*{'label': "System", 'value': "system"}*/];  
 	}
 	else {
 		this.choicesTypeSelector = [
-			{'label': "Normal", 'value': "normal"},
-			{'label': "Modifier", 'value': "modifier"}];  
+			{'label': $L("Normal"), 'value': "normal"},
+			{'label': $L("Modifier"), 'value': "modifier"}];  
 	}
 
-	this.controller.setupWidget("ModeTypeSelector", {'label': "Mode Type", 
+	this.controller.setupWidget("ModeTypeSelector", {'label': $L("Mode Type"), 
 		'labelPlacement': "left", 'choices': this.choicesTypeSelector}, 
 		this.modelTypeSelector);
 
@@ -156,18 +156,18 @@ EditmodeAssistant.prototype.setup = function() {
 
 	if(this.mode.type == "normal") {
 		this.choicesStartSelector = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "By Selection", 'value': 1},
-			{'label': "After Timer", 'value': 2},
-			{'label': "Immediate", 'value': 3}];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("By Selection"), 'value': 1},
+			{'label': $L("After Timer"), 'value': 2},
+			{'label': $L("Immediate"), 'value': 3}];  
 	}
 	else {
 		this.choicesStartSelector = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "Immediate", 'value': 3}];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("Immediate"), 'value': 3}];  
 	}
 				
-	this.controller.setupWidget("StartSelector",	{'label': "Auto Start",
+	this.controller.setupWidget("StartSelector",	{'label': $L("Auto Start"),
 		'labelPlacement': "left", 'choices': this.choicesStartSelector},
 		this.modelStartSelector);
 	
@@ -178,10 +178,10 @@ EditmodeAssistant.prototype.setup = function() {
 
 	if(this.mode.type == "normal") {
 		this.choicesCloseSelector = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "By Selection", 'value': 1},
-			{'label': "After Timer", 'value': 2},
-			{'label': "Immediate", 'value': 3}];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("By Selection"), 'value': 1},
+			{'label': $L("After Timer"), 'value': 2},
+			{'label': $L("Immediate"), 'value': 3}];  
 	}
 	else {
 		this.choicesCloseSelector = [
@@ -189,7 +189,7 @@ EditmodeAssistant.prototype.setup = function() {
 			{'label': "Immediate", 'value': 3}];  
 	}
 
-	this.controller.setupWidget("CloseSelector",	{'label': "Auto Close", 
+	this.controller.setupWidget("CloseSelector",	{'label': $L("Auto Close"), 
 		'labelPlacement': "left", 'choices': this.choicesCloseSelector},
 		this.modelCloseSelector);
 	
@@ -201,10 +201,10 @@ EditmodeAssistant.prototype.setup = function() {
 	this.modelStartupSelector = {'value': this.mode.miscOnStartup, 'disabled': false};
 
 	this.choicesStartupSelector = [
-		{'label': "Active Mode", 'value': 0},
-		{'label': "Default Mode", 'value': 1}];  
+		{'label': $L("Active Mode"), 'value': 0},
+		{'label': $L("Default Mode"), 'value': 1}];  
 	
-	this.controller.setupWidget("StartupSelector", {'label': "On Startup", 
+	this.controller.setupWidget("StartupSelector", {'label': $L("On Startup"), 
 		'labelPlacement': "left", 'choices': this.choicesStartupSelector}, 
 		this.modelStartupSelector);
 
@@ -216,10 +216,10 @@ EditmodeAssistant.prototype.setup = function() {
 	this.modelAppsSelector = {'value': this.mode.miscAppsMode, 'disabled': false};
 
 	this.choicesAppsSelector = [
-		{'label': "Everytime", 'value': 0},
-		{'label': "On Startup", 'value': 1} ];  
+		{'label': $L("Everytime"), 'value': 0},
+		{'label': $L("On Startup"), 'value': 1} ];  
 
-	this.controller.setupWidget("AppsSelector", {'label': "Applications", 
+	this.controller.setupWidget("AppsSelector", {'label': $L("Applications"), 
 		'labelPlacement': "left", 'choices': this.choicesAppsSelector},
 		this.modelAppsSelector);	
 
@@ -236,22 +236,22 @@ EditmodeAssistant.prototype.setup = function() {
 
 	if(this.mode.type == "normal") {
 		this.choicesNotifySelector = [
-			{'label': "Default", 'value': 0},
-			{'label': "Disabled", 'value': 1},
-			{'label': "Use Banner", 'value': 2}/*,
+			{'label': $L("Default"), 'value': 0},
+			{'label': $L("Disabled"), 'value': 1},
+			{'label': $L("Use Banner"), 'value': 2}/*,
 			{'label': "System Alert", 'value': 3},
 			{'label': "Short Vibrate", 'value': 4}*/];  
 	}
 	else {
 		this.choicesNotifySelector = [
-			{'label': "Do Not Set", 'value': 0},
-			{'label': "Disabled", 'value': 1},
-			{'label': "Use Banner", 'value': 2}/*,
+			{'label': $L("Do Not Set"), 'value': 0},
+			{'label': $L("Disabled"), 'value': 1},
+			{'label': $L("Use Banner"), 'value': 2}/*,
 			{'label': "System Alert", 'value': 3},
 			{'label': "Short Vibrate", 'value': 4}*/];  
 	}
 		
-	this.controller.setupWidget("NotifySelector", {'label': "Notify", 
+	this.controller.setupWidget("NotifySelector", {'label': $L("Notify"), 
 		'labelPlacement': "left", 'choices': this.choicesNotifySelector}, 
 		this.modelNotifySelector);
 
@@ -264,20 +264,20 @@ EditmodeAssistant.prototype.setup = function() {
 
 	if(this.mode.type == "normal") {
 		this.choicesChargingSelector = [
-			{'label': "Default", 'value': 0},
-			{'label': "Lock Screen", 'value': 1},
-			{'label': "Always On", 'value': 2},
-			{'label': "Turn Off", 'value': 3}];  
+			{'label': $L("Default"), 'value': 0},
+			{'label': $L("Lock Screen"), 'value': 1},
+			{'label': $L("Always On"), 'value': 2},
+			{'label': $L("Turn Off"), 'value': 3}];  
 	}
 	else {
 		this.choicesChargingSelector = [
-			{'label': "Do Not Set", 'value': 0},
-			{'label': "Lock Screen", 'value': 1},
-			{'label': "Always On", 'value': 2},
-			{'label': "Turn Off", 'value': 3}];  
+			{'label': $L("Do Not Set"), 'value': 0},
+			{'label': $L("Lock Screen"), 'value': 1},
+			{'label': $L("Always On"), 'value': 2},
+			{'label': $L("Turn Off"), 'value': 3}];  
 	}
 		
-	this.controller.setupWidget("ChargingSelector",	{'label': "On Charger", 
+	this.controller.setupWidget("ChargingSelector",	{'label': $L("On Charger"), 
 		'labelPlacement': "left", 'choices': this.choicesChargingSelector}, 
 		this.modelChargingSelector);
 
@@ -314,9 +314,9 @@ EditmodeAssistant.prototype.setup = function() {
 //
 
 	if(this.mode.type == "normal")
-		this.controller.defaultChoiseLabel = "Default";
+		this.controller.defaultChoiseLabel = $L("Default");
 	else
-		this.controller.defaultChoiseLabel = "Do Not Set";
+		this.controller.defaultChoiseLabel = $L("Do Not Set");
 
 	for(var i = 0; i < this.settings.length; i++)
 		this.settings[i].config.setup(this.controller);
@@ -328,12 +328,12 @@ EditmodeAssistant.prototype.setup = function() {
 	// Application start selector
 	
 	this.choicesAppsStartSelector = [
-		{'label': "Do Nothing", 'value': 0},
-		{'label': "Close All Apps", 'value': 2}];  
+		{'label': $L("Do Nothing"), 'value': 0},
+		{'label': $L("Close All Apps"), 'value': 2}];  
 		
 	this.modelAppsStartSelector = {'value': this.mode.apps.start, 'disabled': false};
 		
-	this.controller.setupWidget("AppsStartSelector", {'label': "On Start", 
+	this.controller.setupWidget("AppsStartSelector", {'label': $L("On Start"), 
 		'labelPlacement': "left", 'choices': this.choicesAppsStartSelector},
 		this.modelAppsStartSelector);
 
@@ -343,13 +343,13 @@ EditmodeAssistant.prototype.setup = function() {
 	// Application close selector
 
 	this.choicesAppsCloseSelector = [
-		{'label': "Do Nothing", 'value': 0},
-		{'label': "Close Started", 'value': 1},
-		{'label': "Close All Apps", 'value': 2}];  
+		{'label': $L("Do Nothing"), 'value': 0},
+		{'label': $L("Close Started"), 'value': 1},
+		{'label': $L("Close All Apps"), 'value': 2}];  
 		
 	this.modelAppsCloseSelector = {'value': this.mode.apps.close, 'disabled': false};
 		
-	this.controller.setupWidget("AppsCloseSelector", {'label': "On Close", 
+	this.controller.setupWidget("AppsCloseSelector", {'label': $L("On Close"), 
 		'labelPlacement': "left", 'choices': this.choicesAppsCloseSelector},
 		this.modelAppsCloseSelector);
 
@@ -401,12 +401,12 @@ EditmodeAssistant.prototype.setup = function() {
 	if(this.type == "default") {
 		this.modelRequiredSelector = {'disabled': true};
 
-		this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
+		this.controller.setupWidget("RequiredSelector",	{'label': $L("Required"), 
 			'labelPlacement': "left", 'choices': []}, this.modelRequiredSelector);	
 
 		this.modelBlockSelector = {'disabled': true};
 
-		this.controller.setupWidget("BlockSelector",	{'label': "Block", 
+		this.controller.setupWidget("BlockSelector",	{'label': $L("Block"), 
 			'labelPlacement': "left", 'choices': []}, this.modelBlockSelector);	
 
 		this.modelTriggersList = {'items': []};
@@ -418,10 +418,10 @@ EditmodeAssistant.prototype.setup = function() {
 		this.modelRequiredSelector = {'value': this.mode.triggers.required, 'disabled': false};
 
 		this.choicesTriggerSelector = [
-			{'label': "All Unique", 'value': 0},
-			{'label': "One Trigger", 'value': 1}];  
+			{'label': $L("All Unique"), 'value': 0},
+			{'label': $L("One Trigger"), 'value': 1}];  
 
-		this.controller.setupWidget("RequiredSelector",	{'label': "Required", 
+		this.controller.setupWidget("RequiredSelector",	{'label': $L("Required"), 
 			'labelPlacement': "left", 'choices': this.choicesTriggerSelector},
 			this.modelRequiredSelector);	
 	
@@ -433,12 +433,12 @@ EditmodeAssistant.prototype.setup = function() {
 		this.modelBlockSelector = {'value': this.mode.triggers.block, 'disabled': false};
 
 		this.choicesBlockSelector = [
-			{'label': "No Blocking", 'value': 0},
-			{'label': "Other Modes", 'value': 1},
-			{'label': "Normal Modes", 'value': 2},
-			{'label': "Modifier Modes", 'value': 3}];  
+			{'label': $L("No Blocking"), 'value': 0},
+			{'label': $L("Other Modes"), 'value': 1},
+			{'label': $L("Normal Modes"), 'value': 2},
+			{'label': $L("Modifier Modes"), 'value': 3}];  
 
-		this.controller.setupWidget("BlockSelector",	{ 'label': "Block Mode", 
+		this.controller.setupWidget("BlockSelector",	{ 'label': $L("Block Mode"), 
 			'labelPlacement': 'left', 'choices': this.choicesBlockSelector},
 			this.modelBlockSelector);	
 	
@@ -786,21 +786,21 @@ EditmodeAssistant.prototype.setModeType = function(event) {
 		this.modelCloseSelector.value = 1;
 		
 		this.modelStartSelector.choices = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "By Selection", 'value': 1},
-			{'label': "After Timer", 'value': 2},
-			{'label': "Immediate", 'value': 3} ];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("By Selection"), 'value': 1},
+			{'label': $L("After Timer"), 'value': 2},
+			{'label': $L("Immediate"), 'value': 3} ];  
 
 		this.modelCloseSelector.choices = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "By Selection", 'value': 1},
-			{'label': "After Timer", 'value': 2},
-			{'label': "Immediate", 'value': 3} ];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("By Selection"), 'value': 1},
+			{'label': $L("After Timer"), 'value': 2},
+			{'label': $L("Immediate"), 'value': 3} ];  
 
-		this.choicesNotifySelector[0].label = "Default";
-		this.choicesChargingSelector[0].label = "Default";
+		this.choicesNotifySelector[0].label = $L("Default");
+		this.choicesChargingSelector[0].label = $L("Default");
 
-		this.controller.defaultChoiseLabel = "Default";
+		this.controller.defaultChoiseLabel = $L("Default");
 
 		for(var i = 0; i < this.settings.length; i++)
 			this.settings[i].config.setup(this.controller);
@@ -812,17 +812,17 @@ EditmodeAssistant.prototype.setModeType = function(event) {
 		this.modelCloseSelector.value = 3;
 
 		this.modelStartSelector.choices = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "Immediate", 'value': 3} ];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("Immediate"), 'value': 3} ];  
 
 		this.modelCloseSelector.choices = [
-			{'label': "Only Manually", 'value': 0},
-			{'label': "Immediate", 'value': 3} ];  
+			{'label': $L("Only Manually"), 'value': 0},
+			{'label': $L("Immediate"), 'value': 3} ];  
 
-		this.choicesNotifySelector[0].label = "Do Not Set";
-		this.choicesChargingSelector[0].label = "Do Not Set";
+		this.choicesNotifySelector[0].label = $L("Do Not Set");
+		this.choicesChargingSelector[0].label = $L("Do Not Set");
 
-		this.controller.defaultChoiseLabel = "Do Not Set";
+		this.controller.defaultChoiseLabel = $L("Do Not Set");
 
 		for(var i = 0; i < this.settings.length; i++)
 			this.settings[i].config.setup(this.controller);
@@ -878,7 +878,7 @@ EditmodeAssistant.prototype.retrieveCurrentSettings = function(index, target, se
 	else {
 		Mojo.Log.info("Retrieving system settings finished");
 
-		this.appControl.showBanner("Retrieving system settings finished", {});
+		this.appControl.showBanner($L("Retrieving system settings finished"), {});
 
 		this.retrieving = false;
 	}
@@ -891,7 +891,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 		event.stop();
 
 		if(this.retrieving) {
-			this.appControl.showBanner("Retrieving process still in progress", {});
+			this.appControl.showBanner($L("Retrieving process still in progress"), {});
 									 
 			return;
 		}
@@ -914,16 +914,16 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 
 			if(this.type == "default") {			
 				this.modelCommandMenu.items.push({'width': 35});
-				this.modelCommandMenu.items.push({'label': "Settings", 'command': "settings", 'width': 110});
+				this.modelCommandMenu.items.push({'label': $L("Settings"), 'command': "settings", 'width': 110});
 				this.modelCommandMenu.items.push({'width': 30});
-				this.modelCommandMenu.items.push({'label': "Apps", 'command': "applications", 'width': 110});
+				this.modelCommandMenu.items.push({'label': $L("Apps"), 'command': "applications", 'width': 110});
 				this.modelCommandMenu.items.push({'width': 35});
 			}
 			else {
 				this.modelCommandMenu.items.push({'width': 5});
-				this.modelCommandMenu.items.push({'label': "Settings", 'command': "settings", 'width': 100});
-				this.modelCommandMenu.items.push({'label': "Apps", 'command': "applications", 'width': 80});
-				this.modelCommandMenu.items.push({'label': 'Triggers', 'command': "triggers", 'width': 100});
+				this.modelCommandMenu.items.push({'label': $L("Settings"), 'command': "settings", 'width': 100});
+				this.modelCommandMenu.items.push({'label': $L("Apps"), 'command': "applications", 'width': 80});
+				this.modelCommandMenu.items.push({'label': $L("Triggers"), 'command': "triggers", 'width': 100});
 				this.modelCommandMenu.items.push({'width': 5});				
 			}
 
@@ -954,7 +954,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			
 			this.modelCommandMenu.items.clear();
 			this.modelCommandMenu.items.push({});
-			this.modelCommandMenu.items.push({'label': "Add System Setting", 'command': "settings-add"});
+			this.modelCommandMenu.items.push({'label': $L("Add System Setting"), 'command': "settings-add"});
 			this.modelCommandMenu.items.push({});
 
 			this.controller.modelChanged(this.modelCommandMenu, this);
@@ -977,7 +977,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			
 			this.modelCommandMenu.items.clear();
 			this.modelCommandMenu.items.push({});
-			this.modelCommandMenu.items.push({'label': "Add Application", 'command': "applications-add"});
+			this.modelCommandMenu.items.push({'label': $L("Add Application"), 'command': "applications-add"});
 			this.modelCommandMenu.items.push({});
 
 			this.controller.modelChanged(this.modelCommandMenu, this);
@@ -996,7 +996,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 
 			this.modelCommandMenu.items.clear();
 			this.modelCommandMenu.items.push({});
-			this.modelCommandMenu.items.push({'label': "Add Activation Trigger", 'command': "triggers-add"});
+			this.modelCommandMenu.items.push({'label': $L("Add Activation Trigger"), 'command': "triggers-add"});
 			this.modelCommandMenu.items.push({});
 
 			this.controller.modelChanged(this.modelCommandMenu, this);
@@ -1013,8 +1013,8 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 		else if(event.command == "settings-add") {
 				var settingItems = [];
 				
-				settingItems.push({'label': "Append All Settings", 'command': "everything"});
-				settingItems.push({'label': "Remove All Settings", 'command': "nosettings"});
+				settingItems.push({'label': $L("Append All Settings"), 'command': "everything"});
+				settingItems.push({'label': $L("Remove All Settings"), 'command': "nosettings"});
 							
 				for(var i = 0; i < this.settings.length; i++) {
 					if(eval("this.mode.settingsList[i]." + this.settings[i].id + ".length") == 0)
@@ -1087,7 +1087,7 @@ EditmodeAssistant.prototype.handleSettingsChoose = function(target) {
 		else {
 			Mojo.Log.info("Retrieving current system settings");
 
-			this.appControl.showBanner("Retrieving current system settings", {});
+			this.appControl.showBanner($L("Retrieving current system settings"), {});
 
 			this.retrieving = true;
 
@@ -1226,10 +1226,11 @@ EditmodeAssistant.prototype.checkModeName = function() {
 	if((this.modelNameText.value == "Current Mode") || 
 		(this.modelNameText.value == "Default Mode") || 
 		(this.modelNameText.value == "Previous Mode") ||
+		(this.modelNameText.value == "All Modes") ||
 		(this.modelNameText.value == "All Normal Modes") ||
 		(this.modelNameText.value == "All Modifier Modes"))
 	{
-		this.modelNameText.value = 'Reserved Mode Name';
+		this.modelNameText.value = $L("Reserved Mode Name");
 	}
 
 	for(var i = 0; i < 100; i++) {

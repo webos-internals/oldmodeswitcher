@@ -103,8 +103,8 @@ EmailSetting.prototype.setSystemSettings = function(request, settings, callback,
 	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback, data, index);
 	
 	if(request == 0) {
-		if((settings.emailAlarm == undefined) && (settings.emailSync == undefined) &&
-			(settings.emailRingtone == undefined) && (settings.emailAlarmCfg == undefined) && 
+		if((settings.emailAlert == undefined) && (settings.emailSync == undefined) &&
+			(settings.emailRingtone == undefined) && (settings.emailAlertCfg == undefined) && 
 			(settings.emailSyncCfg == undefined) && (settings.emailRingtoneCfg == undefined))
 		{
 			this.setSystemSettings(++request, settings, callback);
@@ -116,7 +116,7 @@ EmailSetting.prototype.setSystemSettings = function(request, settings, callback,
 	}
 	else if((request == 1) && (data != undefined) && (index < data.length)) {
 		var params = {'account': data[index].id};
-	
+
 		if(settings.emailAlert != undefined)
 			params.playSound = settings.emailAlert;
 			

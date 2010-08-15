@@ -102,14 +102,16 @@ HeadsetTrigger.prototype.subscribeHeadsetStatus = function() {
 HeadsetTrigger.prototype.handleHeadsetStatus = function(response) {
 	var old = this.connected;
 
-	if((response.scenario) && ((response.scenario == "media_headset") ||
+	if((response.scenario) && (response.action) && 
+		((response.scenario == "media_headset") ||
 		(response.scenario == "media_headset_mic")))
 	{
-		this.connected = response.scenario;
+		if(response.action == "enabled")
+			this.connected = response.scenario;
+		else if(response.action == "disabled")
+			this.connected = "none";		
 	}
-	else
-		this.connected = "none";		
-
+	
 	if(!this.initialized) {
 		this.initialized = true;
 		this.callback(true);

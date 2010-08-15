@@ -78,9 +78,11 @@ CaleventTrigger.prototype.check = function(config) {
 			{
 				if(((config.caleventMode == 0) && ((config.caleventMatch.length == 0) || 
 					(this.events[i].subject.match(regexp) != null) || 
+					(this.events[i].location.match(regexp) != null) || 
 					(this.events[i].note.match(regexp) != null))) ||
 					((config.caleventMode == 1) && ((config.caleventMatch.length == 0) || 
 					((this.events[i].subject.match(regexp) == null) && 
+					(this.events[i].location.match(regexp) == null) && 
 					(this.events[i].note.match(regexp) == null)))))
 				{
 					return true;
@@ -133,9 +135,11 @@ CaleventTrigger.prototype.execute = function(event, launchCallback) {
 						{
 							if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
 								((text.length == 0) || (this.events[k].subject.match(regexp) != null) || 
+								(this.events[k].location.match(regexp) != null) ||
 								(this.events[k].note.match(regexp) != null))) ||
 								((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
 								((text.length == 0) || ((this.events[k].subject.match(regexp) == null) && 
+								(this.events[k].note.match(regexp) == null) &&
 								(this.events[k].note.match(regexp) == null)))))
 							{
 								var sdate = new Date(this.events[k].start);
@@ -193,9 +197,11 @@ CaleventTrigger.prototype.handleCalendarEvents = function(response) {
 							{
 								if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
 									((text.length == 0) || (this.events[k].subject.match(regexp) != null) || 
+									(this.events[k].location.match(regexp) != null) ||
 									(this.events[k].note.match(regexp) != null))) ||
 									((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
 									((text.length == 0) || ((this.events[k].subject.match(regexp) == null) && 
+									(this.events[k].location.match(regexp) == null) &&
 									(this.events[k].note.match(regexp) == null)))))
 								{
 									var date = new Date();
