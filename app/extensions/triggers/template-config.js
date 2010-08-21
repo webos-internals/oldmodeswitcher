@@ -25,7 +25,7 @@ TemplateConfig.prototype.deactivate = function() {
 
 //
 
-TemplateConfig.prototype.setup = function(controller) {
+TemplateConfig.prototype.setup = function(sceneController) {
 	// This function should setup all the widgets in the extension-listitem file.
 
 	this.choicesTemplateOptionSelector = [
@@ -33,7 +33,7 @@ TemplateConfig.prototype.setup = function(controller) {
 		{'label': "Disabled", 'value': 0}
 	];  
 
-	controller.setupWidget("TemplateOptionSelector", {
+	sceneController.setupWidget("TemplateOptionSelector", {
 		'label': "Template Option",	'labelPlacement': "left",
 		'modelProperty': "templateOption", 
 		'choices': this.choicesTemplateOptionSelector} );
@@ -46,35 +46,35 @@ TemplateConfig.prototype.config = function() {
 
 	// Configuration returned here is the configuration for the UI part.
 	
-	var config = {
+	var triggerConfig = {
 		'templateOption': 0 };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-TemplateConfig.prototype.load = function(preferences) {
+TemplateConfig.prototype.load = function(triggerPreferences) {
 	// This function will do the parsing of the preferences stored by the main 
 	// application into the wanted format for the UI part of the configuration.
 	
 	// The data in application preferences is set by the extension itself.
 
-	var config = {
-		'templateOption': preferences.templateOption };
+	var triggerConfig = {
+		'templateOption': triggerPreferences.templateOption };
 	
-	return config;
+	return triggerConfig;
 }
 
-TemplateConfig.prototype.save = function(config) {
+TemplateConfig.prototype.save = function(triggerConfig) {
 	// This function will do the parsing of the configuration used in the UI 
 	// part into the preferences format stored by the main application.
 	
 	// The data in the main application preferences should be kept to minimum.
 
-	var preferences = {
-		'templateOption': config.templateOption };
+	var triggerPreferences = {
+		'templateOption': triggerConfig.templateOption };
 	
-	return preferences;
+	return triggerPreferences;
 }
 

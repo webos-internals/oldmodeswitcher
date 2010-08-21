@@ -19,20 +19,20 @@ ApplicationConfig.prototype.deactivate = function() {
 
 //
 
-ApplicationConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+ApplicationConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesStateSelector = [
 		{'label': "On Foreground", 'value': 0},
 		{'label': "On Background", 'value': 1} ];  
 
-	controller.setupWidget("ApplicationStateSelector", {'label': "State", 
+	this.controller.setupWidget("ApplicationStateSelector", {'label': "State", 
 		'labelPlacement': "left", 'modelProperty': "applicationState",
 		'choices': this.choicesStateSelector});
 	
 	this.choicesApplicationSelector = [];  
 
-	controller.setupWidget("ApplicationIdSelector", {'label': "Application", 
+	this.controller.setupWidget("ApplicationIdSelector", {'label': "Application", 
 		'labelPlacement': "left", 'modelProperty': "applicationId",
 		'choices': this.choicesApplicationSelector});
 
@@ -41,7 +41,7 @@ ApplicationConfig.prototype.setup = function(controller) {
 		{'label': "30 Seconds", 'value': 30},
 		{'label': "60 Seconds", 'value': 60} ];  
 
-	controller.setupWidget("ApplicationDelaySelector", {'label': "Delay", 
+	this.controller.setupWidget("ApplicationDelaySelector", {'label': "Delay", 
 		'labelPlacement': "left", 'modelProperty': "applicationDelay",
 		'choices': this.choicesDelaySelector});
 		
@@ -51,32 +51,32 @@ ApplicationConfig.prototype.setup = function(controller) {
 //
 
 ApplicationConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'applicationState': 0,
 		'applicationId': this.choicesApplicationSelector[0].value,
 		'applicationDelay': 15 };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-ApplicationConfig.prototype.load = function(preferences) {
-	var config = {
-		'applicationState': preferences.applicationState,
-		'applicationId': preferences.applicationId,
-		'applicationDelay': preferences.applicationDelay };
+ApplicationConfig.prototype.load = function(triggerPreferences) {
+	var triggerConfig = {
+		'applicationState': triggerPreferences.applicationState,
+		'applicationId': triggerPreferences.applicationId,
+		'applicationDelay': triggerPreferences.applicationDelay };
 	
-	return config;
+	return triggerConfig;
 }
 
-ApplicationConfig.prototype.save = function(config) {
-	var preferences = {
-		'applicationState': config.applicationState,
-		'applicationId': config.applicationId,
-		'applicationDelay': config.applicationDelay };
+ApplicationConfig.prototype.save = function(triggerConfig) {
+	var triggerPreferences = {
+		'applicationState': triggerConfig.applicationState,
+		'applicationId': triggerConfig.applicationId,
+		'applicationDelay': triggerConfig.applicationDelay };
 	
-	return preferences;
+	return triggerPreferences;
 }
 
 //
@@ -90,9 +90,9 @@ ApplicationConfig.prototype.listApplications = function() {
 			this.launchPoints = response.launchPoints;
 				
 			this.launchPoints.sort(this.sortAlphabeticallyFunction);
-				
+			
 			this.launchPoints.each(function(item, index){
-				this.choicesApplicationSelector.push({'label': item.title, 'value': item.id});
+				this.choicesApplicationSelector.push({'label': item.title, 'value': item.appId});
 			}.bind(this));
 			
 			var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
@@ -103,16 +103,16 @@ ApplicationConfig.prototype.listApplications = function() {
 		}.bind(this)});
 }
 
-ApplicationConfig.prototype.sortAlphabeticallyFunction = function(a,b){
-	if(a.type != undefined) {
-		var c = a.type.toLowerCase();
-		var d = b.type.toLowerCase();
+ApplicationConfig.prototype.sortAlphabeticallyFunction = function(compareA, compareB){
+	if(compareA.type != undefined) {
+		var a = compareA.type.toLowerCase();
+		var b = compareB.type.toLowerCase();
 	}
 	else {
-		var c = a.title.toLowerCase();
-		var d = b.title.toLowerCase();
+		var a = compareA.title.toLowerCase();
+		var b = compareB.title.toLowerCase();
 	}
 	
-	return ((c < d) ? -1 : ((c > d) ? 1 : 0));
+	return ((a < b) ? -1 : ((a > b) ? 1 : 0));
 }
 

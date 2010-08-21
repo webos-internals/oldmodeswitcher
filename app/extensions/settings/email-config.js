@@ -65,7 +65,7 @@ EmailConfig.prototype.setup = function(controller) {
 
 	// Listen for change event for ringtone selector
 	
-	Mojo.Event.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -167,8 +167,8 @@ EmailConfig.prototype.handleListChange = function(event) {
 			
 			var callback = this.handlePerAccountAlert.bind(this, event.model);
 	
-			this.controller.stageController.pushScene("scene", "emailAlert", 
-				this.controller.defaultChoiseLabel, event.model.emailAlertCfg, callback);
+			this.controller.stageController.pushScene("scene", "emailAlert", null, callback,
+				this.controller.defaultChoiseLabel, event.model.emailAlertCfg);
 		}
 		else {
 			if(event.model.emailAlertCfg)
@@ -197,8 +197,8 @@ EmailConfig.prototype.handleListChange = function(event) {
 		
 			var callback = this.handlePerAccountRingtone.bind(this, event.model);
 	
-			this.controller.stageController.pushScene("scene", "emailRingtone", 
-				this.controller.defaultChoiseLabel, event.model.emailRingtoneCfg, callback);
+			this.controller.stageController.pushScene("scene", "emailRingtone", null, callback,
+				this.controller.defaultChoiseLabel, event.model.emailRingtoneCfg);
 		}
 		else {
 			if(event.model.emailRingtoneCfg)
@@ -223,11 +223,13 @@ EmailConfig.prototype.handleListChange = function(event) {
 			
 			var callback = this.handlePerAccountSync.bind(this, event.model);
 	
-			this.controller.stageController.pushScene("scene", "emailSync", 
-				this.controller.defaultChoiseLabel, event.model.emailSyncCfg, callback);
+			this.controller.stageController.pushScene("scene", "emailSync", null, callback,
+				this.controller.defaultChoiseLabel, event.model.emailSyncCfg);
 		}
 		else if(event.model.emailSyncCfg)
 			event.model.emailSyncCfg.clear();
+
+		this.controller.modelChanged(event.model, this);
 	}	
 }
 
@@ -262,13 +264,13 @@ EmailConfig.prototype.handlePerAccountAlert = function(model, config, returnValu
 			model.emailAlert = -1;
 		
 		model.emailRingtoneDisplay = "block";
+
+		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
+
+		this.controller.get("SettingsList").mojo.invalidateItems(0);
+
+		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
-
-	var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
-
-	this.controller.get("SettingsList").mojo.invalidateItems(0);
-
-	this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 }
 
 EmailConfig.prototype.handlePerAccountRingtone = function(model, config, returnValue) {
@@ -284,9 +286,9 @@ EmailConfig.prototype.handlePerAccountRingtone = function(model, config, returnV
 		
 		if(model.emailRingtoneCfg.length == 0)
 			model.emailRingtoneName = "";
-	}
 
-	this.controller.modelChanged(model, this);
+		this.controller.modelChanged(model, this);
+	}
 }
 
 EmailConfig.prototype.handlePerAccountSync = function(model, config, returnValue) {
@@ -302,8 +304,8 @@ EmailConfig.prototype.handlePerAccountSync = function(model, config, returnValue
 
 		if(model.emailSyncCfg.length == 0)
 			model.emailSync = -1;
-	}
 
-	this.controller.modelChanged(model, this);
+		this.controller.modelChanged(model, this);
+	}
 }
 

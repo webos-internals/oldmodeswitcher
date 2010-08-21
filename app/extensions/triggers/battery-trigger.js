@@ -1,27 +1,30 @@
-function BatteryTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
+function BatteryTrigger(Config, Control) {
+	this.config = Config;
+	
+	this.service = Control.service;
 
-	this.callback = null;
 	this.initialized = false;
-
-	this.config = null;
-	this.enabled = false;
+	
+	this.startupCallback = null;
+	this.executeCallback = null;
 	
 	this.batteryLevel = 0;
 }
 
 //
 
-BatteryTrigger.prototype.init = function(callback) {
-	this.callback = callback;
-
+BatteryTrigger.prototype.init = function(startupCallback) {
 	this.initialized = false;
+
+	this.startupCallback = startupCallback;
 
 	this.subscribeBatteryStatus();
 }
 
 BatteryTrigger.prototype.shutdown = function() {
 	this.initialized = false;
+
+	this.startupCallback = null;
 
 	this.batteryLevel = 0;
 
@@ -32,21 +35,19 @@ BatteryTrigger.prototype.shutdown = function() {
 
 //
 
-BatteryTrigger.prototype.enable = function(config) {
-	this.config = config;
-	
-	this.enabled = true;
+BatteryTrigger.prototype.enable = function(executeCallback) {
+	this.executeCallback = executeCallback;
 }
 
 BatteryTrigger.prototype.disable = function() {
-	this.enabled = false;
+	this.executeCallback = null;
 }
 
 //
 
-BatteryTrigger.prototype.check = function(config) {
-	if((this.batteryLevel <= config.batteryHigh) && 
-		(this.batteryLevel >= config.batteryLow))
+BatteryTrigger.prototype.check = function(triggerConfig, modeName) {
+	if((this.batteryLevel <= triggerConfig.batteryHigh) && 
+		(this.batteryLevel >= triggerConfig.batteryLow))
 	{
 		return true;
 	}
@@ -56,77 +57,77 @@ BatteryTrigger.prototype.check = function(config) {
 
 //
 
-BatteryTrigger.prototype.execute = function(level, launchCallback) {
-	Mojo.Log.info("Battery trigger received: " + level);
+BatteryTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Battery trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();
 	
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "battery") {
-				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
-					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
-				{
-					startModes.push(this.config.modesConfig[i]);
+	if((triggerData.level) && (triggerData.level != this.batteryLevel)) {
+		this.batteryLevel = triggerData.level;
+	
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].extension == "battery") {
+					if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+					{
+						if(this.check(this.config.modesConfig[i].triggersList[j])) {
+							startModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
+					else {
+						if(!this.check(this.config.modesConfig[i].triggersList[j])) {
+							closeModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
 				}
-				else {
-					closeModes.push(this.config.modesConfig[i]);
-				}
-				
-				break;
 			}
 		}
-	}
 
-	launchCallback(startModes, closeModes);
+		if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
+			this.executeCallback(startModes, closeModes);
+	}
 }
 
 //
 
 BatteryTrigger.prototype.subscribeBatteryStatus = function() {
-	// Subscribe to Battery Notifications
-	
 	this.subscribtionBatteryStatus = this.service.request("palm://com.palm.bus/signal/", {
 		'method': "addmatch", 'parameters': {'category':"/com/palm/power",'method':"batteryStatus"},
 		'onSuccess': this.handleBatteryStatus.bind(this),
 		'onFailure': this.handleTriggerError.bind(this)});
 
-	// Get the Initial Value for battery status (returned as signals)
-	
 	this.requestBatteryStatus = this.service.request("palm://com.palm.power/com/palm/power/", {
 		'method': "batteryStatusQuery"});
 }
 
-BatteryTrigger.prototype.handleBatteryStatus = function(response) {
+BatteryTrigger.prototype.handleBatteryStatus = function(serviceResponse) {
 	if(!this.initialized) {
-		if (response.percent_ui != undefined)
-			this.batteryLevel = response.percent_ui;
+		if (serviceResponse.percent_ui != undefined)
+			this.batteryLevel = serviceResponse.percent_ui;
 
 		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
+		this.startupCallback(true);
+		this.startupCallback = null;
 	}
-	else if((this.enabled) && (response.percent_ui != undefined)) {
-		// Save the Battery Level
-
-		var oldLevel = this.batteryLevel;
-	
-		this.batteryLevel = response.percent_ui;
-
-		if((oldLevel != this.batteryLevel) && (((this.batteryLevel % 5) == 0) || 
-			((this.batteryLevel % 5) == 1) || ((this.batteryLevel % 5) == 4))) {
-			this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-				'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-					'event': "battery", 'data': this.batteryLevel}}});
+	else if(serviceResponse.percent_ui != undefined) {
+		if((serviceResponse.percent_ui != this.batteryLevel) && (((serviceResponse.percent_ui % 5) == 0) || 
+			((serviceResponse.percent_ui % 5) == 1) || ((serviceResponse.percent_ui % 5) == 4)))
+		{
+			this.execute({'level': serviceResponse.percent_ui}, false);
 		}
 	}
 }
 
-BatteryTrigger.prototype.handleTriggerError = function(response) {
-	if(this.callback) {
-		this.callback(false);
-		this.callback = null;
+//
+
+BatteryTrigger.prototype.handleTriggerError = function(serviceResponse) {
+	if(this.startupCallback) {
+		this.startupCallback(false);
+		this.startupCallback = null;
 	}
 }
 

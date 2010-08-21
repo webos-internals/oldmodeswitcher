@@ -1,77 +1,83 @@
-function BluetoothTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
+function BluetoothTrigger(Config, Control) {
+	this.config = Config;
 
-	this.callback = null;
+	this.service = Control.service;
+
 	this.initialized = false;
 
-	this.config = null;
-	this.enabled = false;
-		
-	this.connected = new Array();
+	this.startupCallback = null;
+	this.executeCallback = null;
+
+	this.btConnected = new Array();
 }
 
 //
 
-BluetoothTrigger.prototype.init = function(callback) {
-	this.callback = callback;
-
+BluetoothTrigger.prototype.init = function(startupCallback) {
 	this.initialized = false;
-	
-	this.checkRadioState();
+
+	this.startupCallback = startupCallback;
+
+	this.checkRadioState(false);
 }
 
 BluetoothTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.connected = new Array();
-
-	if(this.subscribtionMonitorStatus)
-		this.subscribtionMonitorStatus.cancel();
+	this.startupCallback = null;
 	
-	this.subscribeProfileStatus("cancel");
+	this.btConnected = new Array();
 }
 
 //
 
-BluetoothTrigger.prototype.enable = function(config) {
-	this.config = config;
+BluetoothTrigger.prototype.enable = function(executeCallback) {
+	this.executeCallback = executeCallback;
+
+	this.checkRadioState(true);
 	
-	this.enabled = true;
+	this.subscribeMonitorStatus();
 }
 
 BluetoothTrigger.prototype.disable = function() {
-	this.enabled = false;
+	this.executeCallback = null;
+
+	if(this.subscribtionProfileStatus)
+		this.subscribtionProfileStatus.cancel();
+
+	if(this.subscribtionMonitorStatus)
+		this.subscribtionMonitorStatus.cancel();
 }
 
 //
 
-BluetoothTrigger.prototype.check = function(config) {
-	for(var i = 0; i < this.connected.length; i++) {
-		if((config.bluetoothState == 0) && ((config.bluetoothProfile == "any") || 
-			(config.bluetoothProfile == this.connected[i].profile)))
+BluetoothTrigger.prototype.check = function(triggerConfig, modeName) {
+	for(var i = 0; i < this.btConnected.length; i++) {
+		if((triggerConfig.bluetoothState == 0) && ((triggerConfig.bluetoothProfile == "any") || 
+			(triggerConfig.bluetoothProfile == this.btConnected[i].profile)))
 		{
 			return true;
 		}
-		else if((config.bluetoothState == 1) && ((config.bluetoothProfile != "any") && 
-			(config.bluetoothProfile == this.connected[i].profile)))
+		else if((triggerConfig.bluetoothState == 1) && ((triggerConfig.bluetoothProfile != "any") && 
+			(triggerConfig.bluetoothProfile == this.btConnected[i].profile)))
 		{
 			return false;
 		}
-		else if((config.bluetoothState == 2) && ((config.bluetoothProfile == "any") || 
-			(config.bluetoothProfile == this.connected[i].profile)) && 
-			(config.bluetoothDevice == this.connected[i].name))
+		else if((triggerConfig.bluetoothState == 2) && ((triggerConfig.bluetoothProfile == "any") || 
+			(triggerConfig.bluetoothProfile == this.btConnected[i].profile)) && 
+			(triggerConfig.bluetoothDevice.toLowerCase() == this.btConnected[i].name.toLowerCase()))
 		{
 			return true;
 		}
-		else if((config.bluetoothState == 3) && ((config.bluetoothProfile != "any") && 
-			(config.bluetoothProfile == this.connected[i].profile)) &&
-			(config.bluetoothDevice == this.connected[i].name))
+		else if((triggerConfig.bluetoothState == 3) && ((triggerConfig.bluetoothProfile != "any") && 
+			(triggerConfig.bluetoothProfile == this.btConnected[i].profile)) &&
+			(triggerConfig.bluetoothDevice.toLowerCase() == this.btConnected[i].name.toLowerCase()))
 		{
 			return false;
 		}
 	}
 
-	if((config.bluetoothState == 0) | (config.bluetoothState == 2))
+	if((triggerConfig.bluetoothState == 0) || (triggerConfig.bluetoothState == 2))
 		return false;
 	else 
 		return true;
@@ -79,56 +85,91 @@ BluetoothTrigger.prototype.check = function(config) {
 
 //
 
-BluetoothTrigger.prototype.execute = function(connected, launchCallback) {
-	Mojo.Log.error("Btprofile trigger received: " + connected);
+BluetoothTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Btprofile trigger received: " + Object.toJSON(triggerData));
+
+	var oldConnected = Object.toJSON(this.btConnected);
 
 	var startModes = new Array();
 	var closeModes = new Array();
 
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "bluetooth") {
-				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
-					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
-				{
-					startModes.push(this.config.modesConfig[i]);
-				}
-				else {
-					closeModes.push(this.config.modesConfig[i]);
-				}
-				
+	if(triggerData.reset)
+		this.btConnected = new Array();
+	
+	if(triggerData.connected) {
+		var index = -1;
+	
+		for(var i = 0; i < this.btConnected.length; i++) {
+			if((this.btConnected[i].profile == triggerData.connected.profile) &&
+				(this.btConnected[i].name == triggerData.connected.name))
+			{
+				index = i;
+				break;
+			}
+		}	
+
+		if(index == -1)
+			this.btConnected.push(triggerData.connected);
+	}
+
+	if(triggerData.disconnected) {
+		for(var i = 0; i < this.btConnected.length; i++) {
+			if((this.btConnected[i].profile == triggerData.disconnected.profile) &&
+				(this.btConnected[i].name == triggerData.disconnected.name))
+			{
+				this.btConnected.splice(i, 1);
 				break;
 			}
 		}
 	}
 
-	launchCallback(startModes, closeModes);
+	if(oldConnected != Object.toJSON(this.btConnected)) {
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].extension == "bluetooth") {
+					if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+					{
+						if(this.check(this.config.modesConfig[i].triggersList[j])) {
+							startModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
+					else {
+						if(!this.check(this.config.modesConfig[i].triggersList[j])) {
+							closeModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
+			this.executeCallback(startModes, closeModes);
+	}
 }
 
 //
 
-BluetoothTrigger.prototype.checkRadioState = function() {
+BluetoothTrigger.prototype.checkRadioState = function(subscribeRequest) {
 	this.service.request("palm://com.palm.btmonitor/monitor/", {
 		'method': "getradiostate", 'parameters': {}, 
-		'onSuccess': this.handleRadioState.bind(this),
+		'onSuccess': this.handleRadioState.bind(this, subscribeRequest),
 		'onFailure': this.handleTriggerError.bind(this)});
 }
 
-BluetoothTrigger.prototype.handleRadioState = function(response) {
-	// Subscribe to bluetooth radio state notifications.
-
-	if(response.radio == "on"){
+BluetoothTrigger.prototype.handleRadioState = function(subscribeRequest, serviceResponse) {
+	if(serviceResponse.radio == "on"){
 		// Radio on so start monitoring for profile messages.
 		
-		this.subscribeProfileStatus();
+		this.subscribeProfileStatus(subscribeRequest);
 	}
 	else if(!this.initialized) {
 		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
+		this.startupCallback(true);
+		this.startupCallback = null;
 	}
-
-	this.subscribeMonitorStatus();
 }
 
 //
@@ -141,99 +182,70 @@ BluetoothTrigger.prototype.subscribeMonitorStatus = function() {
 		'onComplete': this.handleMonitorNotifications.bind(this)});
 }
 
-BluetoothTrigger.prototype.handleMonitorNotifications = function(response) {
+BluetoothTrigger.prototype.handleMonitorNotifications = function(serviceResponse) {
 	// Bluetooth radio state notification handler.
 	
-	if((response) && ((response.notification) || (response.radio))) {
-		if(response.notification == "notifnradioon" || response.radio == "on") {
-			this.subscribeProfileStatus();
+	if((serviceResponse) && ((serviceResponse.notification) || (serviceResponse.radio))) {
+		if(serviceResponse.notification == "notifnradioon" || serviceResponse.radio == "on") {
+			this.subscribeProfileStatus(true);
 		}
-		else if(response.notification == "notifnradioturningoff") {
+		else if(serviceResponse.notification == "notifnradioturningoff") {
 			if (this.subscribtionProfileStatus)
 				this.subscribtionProfileStatus.cancel();
 
-			this.connected = new Array();
-					   
-		   if(this.enabled){
-				this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-					 'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-					 	'event': "bluetooth", 'data': false}}});
-			}
+			this.execute({'reset': true}, false);
 		}
 	}
 }
 
 //
 
-BluetoothTrigger.prototype.subscribeProfileStatus = function() {
+BluetoothTrigger.prototype.subscribeProfileStatus = function(subscripeRequest) {
 	// Bluetooth radio must be on for these so only cal when you know it's on.
 	
-	this.subscribtionStatus = this.service.request("palm://com.palm.bluetooth/prof/", {
-		'method': "subscribenotifications", 'parameters': {'subscribe': true},
+	this.subscribtionProfileStatus = this.service.request("palm://com.palm.bluetooth/prof/", {
+		'method': "subscribenotifications", 'parameters': {'subscribe': subscripeRequest},
 		'onComplete': this.handleProfileStatus.bind(this)});
 }
 
-BluetoothTrigger.prototype.handleProfileStatus = function(response) {
-	if((response) && (response.profile)) {
-
-	Mojo.Log.error("AAA " + Object.toJSON(response));
-	
-		if(response.notification == "notifnconnected")
+BluetoothTrigger.prototype.handleProfileStatus = function(serviceResponse) {
+	if((serviceResponse) && (serviceResponse.profile)) {
+		if(serviceResponse.notification == "notifnconnected")
 			var connected = true;
 		else
 			var connected = false;
 
-		if((connected) && (response.error)) {
-			if(parseFloat(response.error) !== 0)
-				connected = 0;
+		if((connected) && (serviceResponse.error)) {
+			if(parseFloat(serviceResponse.error) !== 0)
+				connected = false;
 		}
 		
-		if(response.notification == "notifndisconnected")
+		if(serviceResponse.notification == "notifndisconnected")
 			var disconnected = true;
 		else
 			var disconnected = false;
 
 		// Only act of connected or disconnected notifications.
 		
-		if(connected || disconnected) {
-			var index = -1;
-		
-			for(var i = 0; i < this.connected.length; i++) {
-				if((this.connected[i].profile == response.profile) &&
-					(this.connected[i].name == response.name))
-				{
-					index = i;
-					break;
-				}
-			}
-			
-			if((index == -1) && (connected))
-				this.connected.push({'profile': response.profile, 'name': response.name});
-
-			if((index != -1) && (disconnected))
-				this.connected.splice(index, 1);
-			
-			if(this.enabled) {
-				this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-					'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-						'event': "bluetooth", 'data': connected}}});
-			}
-		}
+		if(connected)
+			this.execute({'connected': {'profile': serviceResponse.profile, 'name': serviceResponse.name}});
+		else if(disconnected)
+			this.execute({'disconnected': {'profile': serviceResponse.profile, 'name': serviceResponse.name}});
 	}
 	
 	if(!this.initialized) {
 		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
+		this.startupCallback(true);
+		this.startupCallback = null;
 	}
 }
 
 //
 
-BluetoothTrigger.prototype.handleTriggerError = function(response) {
-	if(this.callback) {
-		this.callback(false);
-		this.callback = null;
+BluetoothTrigger.prototype.handleTriggerError = function(serviceResponse) {
+	if(this.startupCallback) {
+		this.startupCallback(false);
+		this.startupCallback = null;
 	}
 }
 

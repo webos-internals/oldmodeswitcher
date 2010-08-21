@@ -1,59 +1,61 @@
-function ApplicationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
+function ApplicationTrigger(Config, Control) {
+	this.config = Config;
 
-	this.callback = null;
+	this.service = Control.service;
+
 	this.initialized = false;
 
-	this.config = null;
-	this.enabled = false;
-	
-	this.current = "unknown";
-	
-	this.previous = "unknown";
+	this.startupCallback = null;
+	this.executeCallback = null;
+
+	this.currentAppid = "none";
 	
 	this.closeTimer = null;
 }
 
 //
 
-ApplicationTrigger.prototype.init = function(callback) {
-	this.callback = callback;
-
+ApplicationTrigger.prototype.init = function(startupCallback) {
 	this.initialized = false;
 
-	this.subscribeForegroundApp();
+	this.startupCallback = startupCallback;
+
+	this.subscribeForegroundApp(false);
 }
 
 ApplicationTrigger.prototype.shutdown = function() {
 	this.initialized = false;
-
-	this.current = "unknown";
-	this.previous = "unknown";
 	
+	this.startupCallback = null;
+
+	this.currentAppid = "none";
+	
+	this.closeTimer = null;
+}
+
+
+//
+
+ApplicationTrigger.prototype.enable = function(executeCallback) {
+	this.executeCallback = executeCallback;
+
+	this.subscribeForegroundApp(true);
+}
+
+ApplicationTrigger.prototype.disable = function() {
+	this.executeCallback = null;
+
 	if(this.subscribtionForegroundApp)
 		this.subscribtionForegroundApp.cancel();
 }
 
-
 //
 
-ApplicationTrigger.prototype.enable = function(config) {
-	this.config = config;
-	
-	this.enabled = true;
-}
-
-ApplicationTrigger.prototype.disable = function() {
-	this.enabled = false;
-}
-
-//
-
-ApplicationTrigger.prototype.check = function(config) {
-	if((config.applicationState == 0) && (config.applicationId == this.current))
+ApplicationTrigger.prototype.check = function(triggerConfig, modeName) {
+	if((triggerConfig.applicationState == 0) && (triggerConfig.applicationId == this.currentAppid))
 		return true;
 		
-	if((config.applicationState == 1) && (config.applicationId != this.current))
+	if((triggerConfig.applicationState == 1) && (triggerConfig.applicationId != this.currentAppid))
 		return true;
 
 	return false;
@@ -61,97 +63,91 @@ ApplicationTrigger.prototype.check = function(config) {
 
 //
 
-ApplicationTrigger.prototype.execute = function(appid, launchCallback) {
-	Mojo.Log.info("Application trigger received: " + appid);
+ApplicationTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Application trigger received: " + Object.toJSON(triggerData));
+
+	var delay = null;
 
 	var startModes = new Array();
 	var closeModes = new Array();
 	
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "application") {
-				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
-					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
-				{
-					startModes.push(this.config.modesConfig[i]);
-				}
-				else {
-					closeModes.push(this.config.modesConfig[i]);
-				}
-				
-				break;
-			}
-		}
-	}
+	if((triggerData.appid) && (triggerData.appid != this.currentAppid)) {
+		this.currentAppid = triggerData.appid;
 
-	launchCallback(startModes, closeModes);
-}
-
-//
-
-ApplicationTrigger.prototype.subscribeForegroundApp = function() {
-	this.subscriptionForegroundApp = this.service.request("palm://com.palm.systemmanager/", {
-		'method': "getForegroundApplication", 'parameters': {'subscribe': true},
-		'onSuccess': this.handleForegroundApp.bind(this),
-		'onFailure': this.handleTriggerError.bind(this)});
-}
-
-ApplicationTrigger.prototype.handleForegroundApp = function(response) {
-	if(this.current != "unknown")
-		this.previous = this.current;
-
-	if(response.id != undefined)
-		this.current = response.id;
-	else
-		this.current = "unknown";
-
-	if(!this.initialized) {
-		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
-	}
-	else if(this.enabled) {
-		var found = false;
-		var delay = null;
-	
 		for(var i = 0; i < this.config.modesConfig.length; i++) {
 			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
 				if(this.config.modesConfig[i].triggersList[j].extension == "application") {
-					if(this.config.modesConfig[i].triggersList[j].applicationId == this.previous) {
-						if((this.config.currentMode.name == this.config.modesConfig[i].name) ||
-							(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
-						{
-							delay = this.config.modesConfig[i].triggersList[j].applicationDelay;
+					if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+					{
+						if(this.check(this.config.modesConfig[i].triggersList[j])) {
+							startModes.push(this.config.modesConfig[i]);
+							break;
 						}
 					}
+					else {
+						if(!this.check(this.config.modesConfig[i].triggersList[j])) {
+							delay = this.config.modesConfig[i].triggersList[j].applicationDelay;
 
-					if(this.config.modesConfig[i].triggersList[j].applicationId == this.current) {
-						found = true;
-					}						
+							closeModes.push(this.config.modesConfig[i]);
+						
+							break;
+						}
+					}
 				}
 			}
 		}
 
 		if(this.closeTimeout)
 			clearTimeout(this.closeTimeout);
-	
-		if((found) && (this.current != "unknown"))
-			this.notifyTriggerUpdate();
-		else if((delay) && (this.current == "unknown"))
-			this.closeTimeout = setTimeout(this.notifyTriggerUpdate.bind(this), delay * 1000);
+
+		if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0))) {
+			if(!delay) {
+				this.executeCallback(startModes, closeModes);
+			}
+			else {
+				var func = this.executeCallback.bind(this, startModes, closeModes);
+		
+				this.closeTimeout = setTimeout(func, delay * 1000);
+			}
+		}
 	}
 }
 
-ApplicationTrigger.prototype.notifyTriggerUpdate = function() {	
-		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-				'event': "application", 'data': this.current}}});
+//
+
+ApplicationTrigger.prototype.subscribeForegroundApp = function(subscribeRequest) {
+	this.subscriptionForegroundApp = this.service.request("palm://com.palm.systemmanager/", {
+		'method': "getForegroundApplication", 'parameters': {'subscribe': subscribeRequest},
+		'onSuccess': this.handleForegroundApp.bind(this),
+		'onFailure': this.handleTriggerError.bind(this)});
 }
 
-ApplicationTrigger.prototype.handleTriggerError = function(response) {
-	if(this.callback) {
-		this.callback(false);
-		this.callback = null;
+ApplicationTrigger.prototype.handleForegroundApp = function(serviceResponse) {
+	if(serviceResponse.id != undefined)
+		var currentAppid = serviceResponse.id;
+	else
+		var currentAppid = "none";
+
+	if(!this.initialized) {
+		this.currentAppid = currentAppid;
+	
+		this.initialized = true;
+		this.startupCallback(true);
+		this.startupCallback = null;
+	}
+	else {
+		if(this.currentAppid != currentAppid)
+			this.execute({'appid': currentAppid}, false);
+	}
+}
+
+//
+
+ApplicationTrigger.prototype.handleTriggerError = function(serviceResponse) {
+	if(this.startupCallback) {
+		this.startupCallback(false);
+		this.startupCallback = null;
 	}
 }
 

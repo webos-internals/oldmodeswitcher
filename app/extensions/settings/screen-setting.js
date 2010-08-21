@@ -1,5 +1,5 @@
-function ScreenSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function ScreenSetting(Control) {
+	this.service = Control.service;
 }
 
 //

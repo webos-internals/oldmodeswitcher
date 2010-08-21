@@ -1,5 +1,5 @@
-function RingerSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function RingerSetting(Control) {
+	this.service = Control.service;
 }
 
 //

@@ -39,13 +39,22 @@ SecurityConfig.prototype.setup = function(controller) {
 		'modifierState': Mojo.Widget.numLock, 'modelProperty': "securitySecretPIN", 
 		'charsAllow': this.checkPINCharacter.bind(this)});
 
+	this.controller.setupWidget("SecurityPINText2", {'hintText': "Enter PIN Again...", 
+		'multiline': false, 'enterSubmits': false, 'focus': false, 
+		'modifierState': Mojo.Widget.numLock, 'modelProperty': "securitySecretPIN2", 
+		'charsAllow': this.checkPINCharacter.bind(this)});
+
 	this.controller.setupWidget("SecurityPWText", {'hintText': "Enter Password...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "securitySecretPW"});
 
+	this.controller.setupWidget("SecurityPWText2", {'hintText': "Enter Password Again...", 
+		'multiline': false, 'enterSubmits': false, 'focus': false, 
+		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "securitySecretPW2"});
+
 	// Listen for keyboard event for secret text field
 
-	Mojo.Event.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -56,6 +65,8 @@ SecurityConfig.prototype.config = function() {
 		'securityLock': -1, 
 		'securitySecretPIN': "",
 		'securitySecretPW': "",
+		'securitySecretPIN2': "",
+		'securitySecretPW2': "",
 		'securityPINDisplay': "none",
 		'securityPWDisplay': "none",
 		'securityLockRow': "single" };
@@ -80,16 +91,20 @@ SecurityConfig.prototype.load = function(preferences) {
 
 	config.securitySecretPIN = "";
 	config.securitySecretPW = "";
+	config.securitySecretPIN2 = "";
+	config.securitySecretPW2 = "";
 		
 	if(config.securityLock == 1) {
 		config.securityLockRow = "first";
 		config.securityPINDisplay = "block";
 		config.securitySecretPIN = config.securitySecret;
+		config.securitySecretPIN2 = config.securitySecret;
 	}
 	else if(config.securityLock == 2) {
 		config.securityLockRow = "first";
 		config.securityPWDisplay = "block";
 		config.securitySecretPW = config.securitySecret;
+		config.securitySecretPW2 = config.securitySecret;
 	}
 	
 	return config;
@@ -104,11 +119,15 @@ SecurityConfig.prototype.save = function(config) {
 	}
 	else if(config.securityLock == 1) {
 		preferences.securityLock = 1;
-		preferences.securitySecret = config.securitySecretPIN;
+		
+		if(config.securitySecretPIN == config.securitySecretPIN2)
+			preferences.securitySecret = config.securitySecretPIN;
 	}
 	else if(config.securityLock == 2) {
 		preferences.securityLock = 2;
-		preferences.securitySecret = config.securitySecretPW;
+
+		if(config.securitySecretPW == config.securitySecretPW2)
+			preferences.securitySecret = config.securitySecretPW;
 	}
 
 	return preferences;

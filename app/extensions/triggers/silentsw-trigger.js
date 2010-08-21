@@ -1,52 +1,50 @@
-function SilentswTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
+function SilentswTrigger(Config, Control) {
+	this.config = Config;
 
-	this.callback = null;
+	this.service = Control.service;
+
 	this.initialized = false;
 
-	this.config = null;
-	this.enabled = false;
-	
-	this.state = false;
+	this.startupCallback = null;
+	this.executeCallback = null;
+
+	this.switchState = "off";
 }
 
 //
 
-SilentswTrigger.prototype.init = function(callback) {
-	this.callback = callback;
+SilentswTrigger.prototype.init = function(startupCallback) {
+	this.initialized = true;
 
-	this.initialized = false;
-
-	this.subscribeSwitchState();
+	startupCallback(true);
 }
 
 SilentswTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.state = false;
+	this.switchState = "off";
+}
 
+//
+
+SilentswTrigger.prototype.enable = function(executeCallback) {
+	this.executeCallback = executeCallback;
+	
+	this.subscribeSwitchState();
+}
+
+SilentswTrigger.prototype.disable = function() {
+	this.executeCallback = null;
+	
 	if(this.subscribtionSwitchState)
 		this.subscribtionSwitchState.cancel();
 }
 
-
 //
 
-SilentswTrigger.prototype.enable = function(config) {
-	this.config = config;
-	
-	this.enabled = true;
-}
-
-SilentswTrigger.prototype.disable = function() {
-	this.enabled = false;
-}
-
-//
-
-SilentswTrigger.prototype.check = function(config) {
-	if(((config.silentswState == 0) && (this.state)) ||
-		((config.silentswState == 1) && (!this.state)))
+SilentswTrigger.prototype.check = function(triggerConfig, modeName) {
+	if(((triggerConfig.silentswState == 0) && (this.switchState == "on")) ||
+		((triggerConfig.silentswState == 1) && (this.switchState == "off")))
 	{
 		return true;
 	}
@@ -56,30 +54,39 @@ SilentswTrigger.prototype.check = function(config) {
 
 //
 
-SilentswTrigger.prototype.execute = function(state, launchCallback) {
-	Mojo.Log.info("Silentsw trigger received: " + state);
+SilentswTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Silentsw trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();
-	
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "silentsw") {
-				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
-					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
-				{
-					startModes.push(this.config.modesConfig[i]);
+
+	if((triggerData.state) && (triggerData.state != this.switchState)) {
+		this.switchState = triggerData.state;
+			
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].extension == "silentsw") {
+					if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+						(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+					{
+						if(this.check(this.config.modesConfig[i].triggersList[j])) {
+							startModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
+					else {
+						if(!this.check(this.config.modesConfig[i].triggersList[j])) {
+							closeModes.push(this.config.modesConfig[i]);
+							break;
+						}
+					}
 				}
-				else {
-					closeModes.push(this.config.modesConfig[i]);
-				}
-				
-				break;
 			}
 		}
-	}
 
-	launchCallback(startModes, closeModes);
+		if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
+			this.executeCallback(startModes, closeModes);
+	}
 }
 
 //
@@ -87,34 +94,17 @@ SilentswTrigger.prototype.execute = function(state, launchCallback) {
 SilentswTrigger.prototype.subscribeSwitchState = function() {
 	this.subscribtionSwitchState = this.service.request("palm://com.palm.keys/switches/", {
 		'method': "status", 'parameters': {'subscribe': true},
-		'onSuccess': this.handleSwitchState.bind(this),
-		'onFailure': this.handleTriggerError.bind(this)});
+		'onSuccess': this.handleSwitchState.bind(this)});
 }
 
-SilentswTrigger.prototype.handleSwitchState = function(response) {
-	if(response.key == "ringer") {
-		if(response.state == "down")
-			this.state = true;
+SilentswTrigger.prototype.handleSwitchState = function(serviceResponse) {
+	if(serviceResponse.key == "ringer") {
+		if(serviceResponse.state == "down")
+			var state = "on";
 		else
-			this.state = false;
-	}
+			var state = "off";
 
-	if(!this.initialized) {
-		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
-	}
-	else if((this.enabled) && (response.key == "ringer")) {
-		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-				'event': "silentsw", 'data': this.state}}});
-	}
-}
-
-SilentswTrigger.prototype.handleTriggerError = function(response) {
-	if(this.callback) {
-		this.callback(false);
-		this.callback = null;
+		this.execute({'state': state}, false);
 	}
 }
 

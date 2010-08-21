@@ -19,8 +19,8 @@ BluetoothConfig.prototype.deactivate = function() {
 
 //
 
-BluetoothConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+BluetoothConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesProfileStateSelector = [
 		{'label': "Connected", 'value': 0},
@@ -28,7 +28,7 @@ BluetoothConfig.prototype.setup = function(controller) {
 		{'label': "Connected to", 'value': 2},
 		{'label': "Disconnected from", 'value': 3} ];
 		
-	controller.setupWidget("BluetoothStateSelector", {'label': "State",
+	sceneController.setupWidget("BluetoothStateSelector", {'label': "State",
 		'labelPlacement': "left", 'modelProperty': "bluetoothState",
 		'choices': this.choicesProfileStateSelector});        
 
@@ -41,72 +41,74 @@ BluetoothConfig.prototype.setup = function(controller) {
 		{'label': "Personal Area Network", 'value': "pan"},
 		{'label': "Phone Book Access", 'value': "pba"} ];
 
-	controller.setupWidget("BluetoothProfileSelector", {'label': "Profile",
+	sceneController.setupWidget("BluetoothProfileSelector", {'label': "Profile",
 		'labelPlacement': "left", 'modelProperty': "bluetoothProfile",
 		'choices': this.choicesProfileSelector});        
 
-	controller.setupWidget("BluetoothDeviceText", {'hintText': "Bluetooth Device Name", 
+	sceneController.setupWidget("BluetoothDeviceText", {'hintText': "Bluetooth Device Name", 
 		'multiline': false, 'enterSubmits': false, 'focus': true, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "bluetoothDevice"}); 
 
 	// Listen for state selector change event
 
-	Mojo.Event.listen(controller.get("TriggersList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("TriggersList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 BluetoothConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'bluetoothState': 0,
 		'bluetoothProfile': "any",
 		'bluetoothDevice': "",
 		'bluetoothProfileRow': "last",
 		'bluetoothDeviceDisplay': "none" };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-BluetoothConfig.prototype.load = function(preferences) {
+BluetoothConfig.prototype.load = function(triggerPreferences) {
 	var row = "last";
 	var display = "none";
 
-	if(preferences.bluetoothState >= 2) {
+	if(triggerPreferences.bluetoothState >= 2) {
 		row = "";
 		display = "block";
 	}
 
-	var config = {
-		'bluetoothState': preferences.bluetoothState,
-		'bluetoothProfile': preferences.bluetoothProfile,
-		'bluetoothDevice': preferences.bluetoothDevice,
+	var triggerConfig = {
+		'bluetoothState': triggerPreferences.bluetoothState,
+		'bluetoothProfile': triggerPreferences.bluetoothProfile,
+		'bluetoothDevice': triggerPreferences.bluetoothDevice,
 		'bluetoothProfileRow': row,
 		'bluetoothDeviceDisplay': display };
 	
-	return config;
+	return triggerConfig;
 }
 
-BluetoothConfig.prototype.save = function(config) {
-	var preferences = {
-		'bluetoothState': config.bluetoothState,
-		'bluetoothProfile': config.bluetoothProfile,
-		'bluetoothDevice': config.bluetoothDevice };
+BluetoothConfig.prototype.save = function(triggerConfig) {
+	var triggerPreferences = {
+		'bluetoothState': triggerConfig.bluetoothState,
+		'bluetoothProfile': triggerConfig.bluetoothProfile,
+		'bluetoothDevice': triggerConfig.bluetoothDevice };
 	
-	return preferences;
+	return triggerPreferences;
 }
 
-BluetoothConfig.prototype.handleListChange = function(event) {
-	if(event.property == "bluetoothState") {
-		if(event.value >= 2) {
-			event.model.bluetoothProfileRow = "";			
-			event.model.bluetoothDeviceDisplay = "block";
+//
+
+BluetoothConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "bluetoothState") {
+		if(changeEvent.value >= 2) {
+			changeEvent.model.bluetoothProfileRow = "";			
+			changeEvent.model.bluetoothDeviceDisplay = "block";
 		}
 		else {
-			event.model.bluetoothProfileRow = "last";			
-			event.model.bluetoothDeviceDisplay = "none";
+			changeEvent.model.bluetoothProfileRow = "last";			
+			changeEvent.model.bluetoothDeviceDisplay = "none";
 		}
 		
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
@@ -116,5 +118,4 @@ BluetoothConfig.prototype.handleListChange = function(event) {
 		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
 }
-
 

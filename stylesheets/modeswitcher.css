@@ -20,67 +20,63 @@
 	background: #afafa8;
 }
 
-.connection-settings {
-	display: none;
+.dashboard .dashboard-title,
+.dashboard .palm-dashboard-text { 
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-width: 125px;
 }
 
-.messaging-settings {
-	display: none;
+.dashboard .controls {
+	position: absolute;
+	right: 5px;	
+	z-index: 2;
 }
 
-.ringer-settings {
-	display: none;
+.dashboard .controls .control-button {
+	float: left;
+	width: 48px;
+	height: 48px;
+	background: url(../images/appsrv_ctls.png) top left no-repeat;
 }
 
-.screen-settings {
-	display: none;
+.dashboard .controls .start {
+	background-position-x: 0px;
 }
 
-.sound-settings {
-	display: none;
+.dashboard .controls .close {
+	background-position-x: -48px;
 }
 
-.connection .connection-settings {
-	display: block;
+.dashboard .controls .lock {
+	background-position-x: -96px;
 }
 
-.messaging .messaging-settings {
-	display: block;
+.dashboard .controls .unlock {
+	background-position-x: -144px;
 }
 
-.ringer .ringer-settings {
-	display: block;
+.header-input {     
+   width: 100%;
+}
+                                                                                                               
+.header-input input {
+   font-weight: bold;
+   height: 46px;
+   outline: none;
+   background: none;
+   border-width: 0 0 0 0;
+   font-size: 16px;
+   line-height: 22px;
+   color: white;
+   margin: 0 16px 0 0px;
+   padding: 0;
+   text-align: left;
 }
 
-.screen .screen-settings {
-	display: block;
-}
-
-.sound .sound-settings {
-	display: block;
-}
-
-.charger-trigger {
-	display: none;
-}
-
-.timeout-trigger {
-	display: none;
-}
-
-.location-trigger {
-	display: none;
-}
-
-.charger .charger-trigger {
-	display: block;
-}
-
-.timeout .timeout-trigger {
-	display: block;
-}
-
-.location .location-trigger {
-	display: block;
+.header-input .hint-text {
+   font-weight: bold;
+   color: white;
 }
 

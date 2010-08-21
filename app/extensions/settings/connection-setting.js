@@ -1,5 +1,5 @@
-function ConnectionSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function ConnectionSetting(Control) {
+	this.service = Control.service;
 }
 
 //

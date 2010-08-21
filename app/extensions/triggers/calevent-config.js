@@ -22,13 +22,13 @@ CaleventConfig.prototype.deactivate = function() {
 
 //
 
-CaleventConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+CaleventConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesCaleventCalendarSelector = [
 		{'label': "Any Calendar", 'value': 0} ];
 		
-	controller.setupWidget("CaleventCalendarSelector", {'label': "Calendar",
+	sceneController.setupWidget("CaleventCalendarSelector", {'label': "Calendar",
 		'labelPlacement': "left", 'modelProperty': "caleventCalendar",
 		'choices': this.choicesCaleventCalendarSelector});
 
@@ -36,11 +36,11 @@ CaleventConfig.prototype.setup = function(controller) {
 		{'label': "Match", 'value': 0},
 		{'label': "No Match", 'value': 1} ];
 		
-	controller.setupWidget("CaleventMatchSelector", {'label': "Active On",
+	sceneController.setupWidget("CaleventMatchSelector", {'label': "Active On",
 		'labelPlacement': "left", 'modelProperty': "caleventMode",
 		'choices': this.choicesCaleventMatchSelector});
 
-	controller.setupWidget("CaleventMatchText", {'hintText': "Text to Match in Events", 
+	sceneController.setupWidget("CaleventMatchText", {'hintText': "Text to Match in Events", 
 		'multiline': false, 'enterSubmits': false, 'focus': true, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "caleventMatch"}); 
 }
@@ -48,46 +48,46 @@ CaleventConfig.prototype.setup = function(controller) {
 //
 
 CaleventConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'caleventCalendar': 0,
 		'caleventMode': 0,
 		'caleventMatch': "" };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-CaleventConfig.prototype.load = function(preferences) {
-	var config = {
-		'caleventCalendar': preferences.caleventCalendar,
-		'caleventMode': preferences.caleventMode,
-		'caleventMatch': preferences.caleventMatch };
+CaleventConfig.prototype.load = function(triggerPreferences) {
+	var triggerConfig = {
+		'caleventCalendar': triggerPreferences.caleventCalendar,
+		'caleventMode': triggerPreferences.caleventMode,
+		'caleventMatch': triggerPreferences.caleventMatch };
 	
-	return config;
+	return triggerConfig;
 }
 
-CaleventConfig.prototype.save = function(config) {
-	var preferences = {
-		'caleventCalendar': config.caleventCalendar,
-		'caleventMode': config.caleventMode,
-		'caleventMatch': config.caleventMatch };
+CaleventConfig.prototype.save = function(triggerConfig) {
+	var triggerPreferences = {
+		'caleventCalendar': triggerConfig.caleventCalendar,
+		'caleventMode': triggerConfig.caleventMode,
+		'caleventMatch': triggerConfig.caleventMatch };
 	
-	return preferences;
+	return triggerPreferences;
 }
 
 //
 
-CaleventConfig.prototype.handleCalendarAccounts = function(response) {
+CaleventConfig.prototype.handleCalendarAccounts = function(serviceResponse) {
 	this.choicesCaleventCalendarSelector.clear();
 	
 	this.choicesCaleventCalendarSelector.push({'label': "Any Calendar", 'value': 0});
 
-	for(var i = 0; i < response.accounts.length; i++) {
-		for(var j = 0; j < response.accounts[i].calendars.length; j++) {
+	for(var i = 0; i < serviceResponse.accounts.length; i++) {
+		for(var j = 0; j < serviceResponse.accounts[i].calendars.length; j++) {
 			this.choicesCaleventCalendarSelector.push({
-				'label': response.accounts[i].calendars[j].name, 
-				'value': response.accounts[i].calendars[j].id});
+				'label': serviceResponse.accounts[i].calendars[j].name, 
+				'value': serviceResponse.accounts[i].calendars[j].id});
 		}
 	}
 	

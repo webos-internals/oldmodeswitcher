@@ -57,7 +57,7 @@ MessagingConfig.prototype.setup = function(controller) {
 
 	// Listen for change event for ringtone selector
 	
-	Mojo.Event.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -160,8 +160,8 @@ MessagingConfig.prototype.handleListChange = function(event) {
 
 			this.controller.modelChanged(event.model, this);
 
-			this.controller.stageController.pushScene("scene", "imStatus", 
-				this.controller.defaultChoiseLabel, event.model.messagingIMStatusCfg, callback);
+			this.controller.stageController.pushScene("scene", "imStatus", null, callback,
+				this.controller.defaultChoiseLabel, event.model.messagingIMStatusCfg);
 		}
 		else if(event.model.messagingIMStatusCfg)
 			event.model.messagingIMStatusCfg.clear();

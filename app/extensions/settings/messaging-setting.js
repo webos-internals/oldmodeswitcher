@@ -1,5 +1,5 @@
-function MessagingSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function MessagingSetting(Control) {
+	this.service = Control.service;
 }
 
 //

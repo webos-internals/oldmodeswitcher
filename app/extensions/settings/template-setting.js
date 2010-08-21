@@ -1,7 +1,7 @@
-function TemplateSetting(ServiceRequestWrapper) {
+function TemplateSetting(Control) {
 	// The service request wrapper needs to be used for making system requests.
 		
-	this.service = ServiceRequestWrapper;
+	this.service = Control.service;
 }
 
 //

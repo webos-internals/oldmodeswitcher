@@ -7,6 +7,9 @@
 	},
 
 	{
+		"source": "app\/assistants\/appsrv-assistant.js"
+	},
+	{
 		"source": "app\/assistants\/scene-assistant.js"
 	},
 
@@ -135,10 +138,22 @@
 		"source": "app\/extensions/triggers\/charger-trigger.js"
 	},
 	{
+		"source": "app\/extensions/triggers\/display-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/display-trigger.js"
+	},
+	{
 		"source": "app\/extensions/triggers\/headset-config.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/headset-trigger.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/interval-config.js"
+	},
+	{
+		"source": "app\/extensions/triggers\/interval-trigger.js"
 	},
 	{
 		"source": "app\/extensions/triggers\/location-config.js"

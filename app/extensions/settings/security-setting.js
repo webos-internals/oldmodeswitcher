@@ -1,5 +1,5 @@
-function SecuritySetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function SecuritySetting(Control) {
+	this.service = Control.service;
 }
 
 //

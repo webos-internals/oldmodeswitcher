@@ -19,7 +19,7 @@ BatteryConfig.prototype.deactivate = function() {
 
 //
 
-BatteryConfig.prototype.setup = function(controller) {
+BatteryConfig.prototype.setup = function(sceneController) {
 	this.choicesHighLimitSelector = [
 		{'label': "0%", 'value': 0}, {'label': "5%", 'value': 5},
 		{'label': "10%", 'value': 10}, {'label': "15%", 'value': 15},
@@ -33,7 +33,7 @@ BatteryConfig.prototype.setup = function(controller) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	controller.setupWidget("BatteryHighSelector", {'label': "High Limit", 
+	sceneController.setupWidget("BatteryHighSelector", {'label': "High Limit", 
 		'labelPlacement': "left", 'modelProperty': "batteryHigh",
 		'choices': this.choicesHighLimitSelector});
 	
@@ -50,7 +50,7 @@ BatteryConfig.prototype.setup = function(controller) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	controller.setupWidget("BatteryLowSelector", {'label': "Low Limit", 
+	sceneController.setupWidget("BatteryLowSelector", {'label': "Low Limit", 
 		'labelPlacement': "left", 'modelProperty': "batteryLow",
 		'choices': this.choicesLowLimitSelector});
 }
@@ -58,28 +58,28 @@ BatteryConfig.prototype.setup = function(controller) {
 //
 
 BatteryConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'batteryHigh': 100,
 		'batteryLow': 0 };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-BatteryConfig.prototype.load = function(preferences) {
-	var config = {
-		'batteryHigh': preferences.batteryHigh,
-		'batteryLow': preferences.batteryLow };
+BatteryConfig.prototype.load = function(triggerPreferences) {
+	var triggerConfig = {
+		'batteryHigh': triggerPreferences.batteryHigh,
+		'batteryLow': triggerPreferences.batteryLow };
 	
-	return config;
+	return triggerConfig;
 }
 
-BatteryConfig.prototype.save = function(config) {
-	var preferences = {
-		'batteryHigh': config.batteryHigh,
-		'batteryLow': config.batteryLow };
+BatteryConfig.prototype.save = function(triggerConfig) {
+	var triggerPreferences = {
+		'batteryHigh': triggerConfig.batteryHigh,
+		'batteryLow': triggerConfig.batteryLow };
 	
-	return preferences;
+	return triggerPreferences;
 }
 

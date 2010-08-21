@@ -1,72 +1,67 @@
-function LocationTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
-	this.alarms = SystemAlarmsWrapper;
+function LocationTrigger(Config, Control) {
+	this.config = Config;
 
-	this.callback = null;
+	this.service = Control.service;
+	this.alarms = Control.alarms;
+
 	this.initialized = false;
 
-	this.config = null;
-	this.enabled = false;
+	this.startupCallback = null;
+	this.executeCallback = null;
+
+	this.gpsLatitude = null;
+	this.gpsLongitude = null;
 	
-	this.latitude = null;
-	this.longitude = null;
-	
-	this.accuracy = -1;
+	this.gpsAccuracy = -1;
 }
 
 //
 
-LocationTrigger.prototype.init = function(callback) {
-	this.callback = callback;
-
+LocationTrigger.prototype.init = function(startupCallback) {
 	this.initialized = true;
-
-	this.callback(true);
-	this.callback = null;
+	
+	startupCallback(true);
 }
 
 LocationTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.latitude = null;
-	this.longitude = null;
+	this.gpsLatitude = null;
+	this.gpsLongitude = null;
 
-	this.accuracy = -1;
+	this.gpsAccuracy = -1;
 }
 
 //
 
-LocationTrigger.prototype.enable = function(config) {
+LocationTrigger.prototype.enable = function(executeCallback) {
 	// Re-schedule and setup all timers including the location timeout. 
 
-	this.config = config;
+	this.executeCallback = executeCallback;
 
 	var tracking = {entering: [], leaving: []};
 
-	for(var i = 0; i <this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
-				this.alarms.setupDelayTimeout("location", 5, tracking);
-				
-				break;
-			}
-		}
-	}
+	this.alarms.setupDelayTimeout("location", 5, tracking, 0);
 }
 
 LocationTrigger.prototype.disable = function() {
 	// Disable location timer and all timeout trigger timers.
 
-	this.alarms.clearDelayTimeout("location");
+	this.executeCallback = null;
+
+	this.alarms.clearDelayTimeout("location", 0);
 }
 
 //
 
-LocationTrigger.prototype.check = function(config) {
-	if((this.latitude == null) || (this.longitude == null))
+LocationTrigger.prototype.check = function(triggerConfig, modeName) {
+	if((this.gpsLatitude == null) || (this.gpsLongitude == null))
 		return false;
 
-	if(this.calculateTimeEstimation(config) == 0)
+	if((triggerConfig.locationActive == 0) && (this.calculateTimeEstimation(triggerConfig) == 0))
+		return true;
+	
+	if((triggerConfig.locationActive == 1) && (this.calculateTimeEstimation(triggerConfig) != 0))
 		return true;
 	
 	return false;
@@ -74,8 +69,8 @@ LocationTrigger.prototype.check = function(config) {
 
 //
 
-LocationTrigger.prototype.execute = function(tracking, launchCallback) {
-	Mojo.Log.error("Location trigger received: " + Object.toJSON(tracking));
+LocationTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Location trigger received: " + Object.toJSON(triggerData));
 
 	// Go through all locations to find the needed accuracy level.
 	// If there is no modes with location trigger then do nothing.
@@ -83,78 +78,81 @@ LocationTrigger.prototype.execute = function(tracking, launchCallback) {
 	// If current location fails then reschedule the timer (5 min).
 	// If location retrieved succesfully then handleCurrentLocation.
 
-	var count = 0;
-	var accuracy = 0;
+	if((triggerData.entering) && (triggerData.leaving)) {
+		var gpsAccuracy = 0;
 
-	for(var i = 0; i <this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
-				if((this.config.modesConfig[i].triggersList[j].locationLatitude != "(failed)") &&
-					(this.config.modesConfig[i].triggersList[j].locationLongitude != "(failed)"))
-				{
-					if(this.config.modesConfig[i].triggersList[j].locationRadius > 0)
-						accuracy = 1;
-					if(this.config.modesConfig[i].triggersList[j].locationRadius > 500)
-						accuracy = 2;
+		for(var i = 0; i <this.config.modesConfig.length; i++) {
+			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+				if(this.config.modesConfig[i].triggersList[j].extension == "location") {
+					if((this.config.modesConfig[i].triggersList[j].locationLatitude != "(failed)") &&
+						(this.config.modesConfig[i].triggersList[j].locationLongitude != "(failed)"))
+					{
+						if(this.config.modesConfig[i].triggersList[j].locationRadius > 0)
+							gpsAccuracy = 1;
+						if(this.config.modesConfig[i].triggersList[j].locationRadius > 500)
+							gpsAccuracy = 2;
+					}
 				}
 			}
 		}
-	}
 	
-	if(accuracy != 0) {
-		// This will call handleLocationTrigger on successful retrieval.
+		if(gpsAccuracy != 0) {
+			// This will call handleLocationTrigger on successful retrieval.
 
-		this.fetchCurrentLocation(count, accuracy, tracking, launchCallback);
+			this.fetchCurrentLocation(0, gpsAccuracy, triggerData);
+		}
 	}
 }
 
 //
 
-LocationTrigger.prototype.fetchCurrentLocation = function(count, accuracy, tracking, launchCallback) {
+LocationTrigger.prototype.fetchCurrentLocation = function(retryCount, gpsAccuracy, trackingData) {
 	this.service.request("palm://com.palm.power/com/palm/power", {'method': "activityStart", 
 		'parameters': {'id': Mojo.Controller.appInfo.id, 'duration_ms': 60000}});
 
-	if(count < 10) {
+	if(retryCount < 10) {
 		if(this.requestLocation)
 			this.requestLocation.cancel();
 
 		this.requestLocation = this.service.request("palm://com.palm.location/", {
-			'method': "getCurrentPosition", 'parameters': {'accuracy': accuracy},
-			'onComplete': this.handleCurrentLocation.bind(this, count, accuracy, tracking, launchCallback)});
+			'method': "getCurrentPosition", 'parameters': {'accuracy': gpsAccuracy},
+			'onComplete': this.handleCurrentLocation.bind(this, retryCount, gpsAccuracy, trackingData)});
 	}
 	else {
 		// Failed to get location so lets try again after 5 minutes.
 
-		this.alarms.setupDelayTimeout("location", 5, tracking);
+		this.alarms.setupDelayTimeout("location", 5, trackingData, 0);
 	}
 }
 
-LocationTrigger.prototype.handleCurrentLocation = function(count, accuracy, tracking, launchCallback, response) {
-	if(response.returnValue) {
-		if((response.horizAccuracy == -1) || (response.horizAccuracy > accuracy)) {	
-			Mojo.Log.error("Insufficient GPS accuracy: " + response.horizAccuracy);
+LocationTrigger.prototype.handleCurrentLocation = function(retryCount, gpsAccuracy, trackingData, serviceResponse) {
+	if((serviceResponse.returnValue) && (!serviceResponse.errorCode)) {
+		if((serviceResponse.horizAccuracy == -1) || (serviceResponse.horizAccuracy > 50 * gpsAccuracy)) {	
+			Mojo.Log.error("Insufficient GPS accuracy: " + serviceResponse.horizAccuracy);
 		
-			this.fetchCurrentLocation(++count, accuracy, tracking, launchCallback);
+			this.fetchCurrentLocation(++retryCount, gpsAccuracy, trackingData);
 		}
 		else {
-			this.latitude = response.latitude;
-			this.longitude = response.longitude;
+		Mojo.Log.error("AAA " + Object.toJSON(serviceResponse));
+		
+			this.gpsLatitude = serviceResponse.latitude;
+			this.gpsLongitude = serviceResponse.longitude;
 			
-			this.accuracy = response.horizAccuracy;
+			this.gpsAccuracy = serviceResponse.horizAccuracy;
 				
-			this.handleLocationTrigger(tracking, launchCallback);
+			this.handleLocationTrigger(trackingData);
 		}
 	}
 	else {
-		Mojo.Log.error("Failed to retrieve current location: " + count);
+		Mojo.Log.error("Failed to retrieve current location: " + retryCount);
 		
-		this.fetchCurrentLocation(++count, accuracy, tracking, launchCallback);
+		this.fetchCurrentLocation(++retryCount, gpsAccuracy, trackingData);
 	}
 }
 
 //
 
-LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallback) {
+LocationTrigger.prototype.handleLocationTrigger = function(trackingData) {
 	var startModes = new Array();
 	var closeModes = new Array();
 
@@ -174,8 +172,10 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 			if(this.config.modesConfig[i].triggersList[j].extension == "location") {
 				hasLocationTriggers = true;
 			
-				if(this.check(this.config.modesConfig[i].triggersList[j]))
+				if(this.check(this.config.modesConfig[i].triggersList[j])) {
 					hasValidTriggers = true;
+					break;
+				}
 			}
 		}
 	
@@ -195,10 +195,10 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 
 			// Reset leaving tracking if the mode is not current anymore.
 			
-			var index = tracking.leaving.indexOf(this.config.modesConfig[i].name);
+			var index = trackingData.leaving.indexOf(this.config.modesConfig[i].name);
 			
 			if(index != -1)
-				tracking.leaving.splice(index, 1);
+				trackingData.leaving.splice(index, 1);
 
 			// First check if all start triggers of the mode are already valid!
 			// If yes then add to list, if no then calculate new check time.
@@ -212,8 +212,8 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 					
 				// If not already asked then suggest mode for start process.
 			
-				if(tracking.entering.indexOf(this.config.modesConfig[i].name) == -1) {
-					tracking.entering.push(this.config.modesConfig[i].name);
+				if(trackingData.entering.indexOf(this.config.modesConfig[i].name) == -1) {
+					trackingData.entering.push(this.config.modesConfig[i].name);
 				
 					startModes.push(this.config.modesConfig[i]);
 				}
@@ -223,10 +223,10 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 
 				// Remove mode from the tracking list since it is not valid.
 			
-				var index = tracking.entering.indexOf(this.config.modesConfig[i].name);
+				var index = trackingData.entering.indexOf(this.config.modesConfig[i].name);
 				
 				if(index != -1)
-					tracking.entering.splice(index, 1);				
+					trackingData.entering.splice(index, 1);				
 
 				// Calculate the estimation for the time for the next check.
 
@@ -261,8 +261,8 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 
 				// Check if user has been already notified of closing.
 		
-				if(tracking.leaving.indexOf(this.config.currentMode.name) == -1) {
-					tracking.leaving.push(this.config.currentMode.name);
+				if(trackingData.leaving.indexOf(this.config.currentMode.name) == -1) {
+					trackingData.leaving.push(this.config.currentMode.name);
 			
 					closeModes.push(this.config.modesConfig[i]);
 				}
@@ -277,18 +277,19 @@ LocationTrigger.prototype.handleLocationTrigger = function(tracking, launchCallb
 
 	// Handle launching and closing of modes if needed.
 	
-	this.alarms.setupDelayTimeout("location", Math.floor(time / 60), tracking);
+	this.alarms.setupDelayTimeout("location", Math.floor(time / 60), trackingData), 0;
 
-	launchCallback(startModes, closeModes);
+	if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
+		this.executeCallback(startModes, closeModes);
 }
 
 //
 
-LocationTrigger.prototype.calculateTimeEstimation = function(trigger) {
-	var lat1 = this.latitude;
-	var lng1 = this.longitude;
-	var lat2 = trigger.locationLatitude;
-	var lng2 = trigger.locationLongitude;
+LocationTrigger.prototype.calculateTimeEstimation = function(triggerConfig) {
+	var lat1 = this.gpsLatitude;
+	var lng1 = this.gpsLongitude;
+	var lat2 = triggerConfig.locationLatitude;
+	var lng2 = triggerConfig.locationLongitude;
 	
 	var radius = 6371; // in kilometers (change for miles)
 	
@@ -307,11 +308,11 @@ LocationTrigger.prototype.calculateTimeEstimation = function(trigger) {
 
 	Mojo.Log.error("Calculated location distance: " + distance);
 
-	Mojo.Log.error("Location information accuracy: " + this.accuracy);
+	Mojo.Log.error("Location information accuracy: " + this.gpsAccuracy);
 
 	// Reduce the radius - error from the distance.
 
-	distance = distance - (trigger.locationRadius - this.accuracy);
+	distance = distance - (triggerConfig.locationRadius - this.gpsAccuracy);
 
 	Mojo.Log.error("Calculated location result: " + distance);
 

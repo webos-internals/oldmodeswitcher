@@ -19,8 +19,8 @@ TimeofdayConfig.prototype.deactivate = function() {
 
 //
 
-TimeofdayConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+TimeofdayConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesTimeSelector = [
 		{'label': "Every Day", 'value': 0},
@@ -28,27 +28,27 @@ TimeofdayConfig.prototype.setup = function(controller) {
 		{'label': "Weekends", 'value': 2},
 		{'label': "Custom", 'value': 3} ];  
 
-	controller.setupWidget("TimeofdayTimeSelector", { 'label': "Days", 
+	sceneController.setupWidget("TimeofdayTimeSelector", { 'label': "Days", 
 		'labelPlacement': "left", 'modelProperty': "timeofdayDays",
 		'choices': this.choicesTimeSelector});
 
-	controller.setupWidget("DayCheckBoxMon", {'modelProperty': "timeofdayDay1"});
-	controller.setupWidget("DayCheckBoxTue", {'modelProperty': "timeofdayDay2"});
-	controller.setupWidget("DayCheckBoxWed", {'modelProperty': "timeofdayDay3"});
-	controller.setupWidget("DayCheckBoxThu", {'modelProperty': "timeofdayDay4"});		
-	controller.setupWidget("DayCheckBoxFri", {'modelProperty': "timeofdayDay5"});
-	controller.setupWidget("DayCheckBoxSat", {'modelProperty': "timeofdayDay6"});
-	controller.setupWidget("DayCheckBoxSun", {'modelProperty': "timeofdayDay0"});		
+	sceneController.setupWidget("DayCheckBoxMon", {'modelProperty': "timeofdayDay1"});
+	sceneController.setupWidget("DayCheckBoxTue", {'modelProperty': "timeofdayDay2"});
+	sceneController.setupWidget("DayCheckBoxWed", {'modelProperty': "timeofdayDay3"});
+	sceneController.setupWidget("DayCheckBoxThu", {'modelProperty': "timeofdayDay4"});		
+	sceneController.setupWidget("DayCheckBoxFri", {'modelProperty': "timeofdayDay5"});
+	sceneController.setupWidget("DayCheckBoxSat", {'modelProperty': "timeofdayDay6"});
+	sceneController.setupWidget("DayCheckBoxSun", {'modelProperty': "timeofdayDay0"});		
 
-	controller.setupWidget("TimeofdayStartTime", {'label': "Start", 
+	sceneController.setupWidget("TimeofdayStartTime", {'label': "Start", 
 		'modelProperty': "timeofdayStart"});
 
-	controller.setupWidget("TimeofdayCloseTime", {'label': "Close", 
+	sceneController.setupWidget("TimeofdayCloseTime", {'label': "Close", 
 		'modelProperty': "timeofdayClose"});
 	
 	// Listen for change event for day selector
 	
-	Mojo.Event.listen(controller.get("TriggersList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("TriggersList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -68,7 +68,7 @@ TimeofdayConfig.prototype.config = function() {
 	closeTime.setSeconds(0);
 	closeTime.setMilliseconds(0);
 
-	var config = {
+	var triggerConfig = {
 		'timeofdayDays': 0,
 		'timeofdayCustom': "none",
 		'timeofdayDay0': false,
@@ -81,63 +81,63 @@ TimeofdayConfig.prototype.config = function() {
 		'timeofdayStart': startTime,
 		'timeofdayClose': closeTime };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-TimeofdayConfig.prototype.load = function(preferences) {
-	var startDate = new Date(preferences.timeofdayStart * 1000);
-	var closeDate = new Date(preferences.timeofdayClose * 1000);
+TimeofdayConfig.prototype.load = function(triggerPreferences) {
+	var startDate = new Date(triggerPreferences.timeofdayStart * 1000);
+	var closeDate = new Date(triggerPreferences.timeofdayClose * 1000);
 
-	if(preferences.timeofdayDays == 3)
+	if(triggerPreferences.timeofdayDays == 3)
 		var display = "block";
 	else
 		var display = "none";
 
-	var config = {
+	var triggerConfig = {
 		'timeofdayCustom': display,
-		'timeofdayDays': preferences.timeofdayDays,
-		'timeofdayDay0': preferences.timeofdayCustom[0],
-		'timeofdayDay1': preferences.timeofdayCustom[1],
-		'timeofdayDay2': preferences.timeofdayCustom[2],
-		'timeofdayDay3': preferences.timeofdayCustom[3],
-		'timeofdayDay4': preferences.timeofdayCustom[4],
-		'timeofdayDay5': preferences.timeofdayCustom[5],
-		'timeofdayDay6': preferences.timeofdayCustom[6],
+		'timeofdayDays': triggerPreferences.timeofdayDays,
+		'timeofdayDay0': triggerPreferences.timeofdayCustom[0],
+		'timeofdayDay1': triggerPreferences.timeofdayCustom[1],
+		'timeofdayDay2': triggerPreferences.timeofdayCustom[2],
+		'timeofdayDay3': triggerPreferences.timeofdayCustom[3],
+		'timeofdayDay4': triggerPreferences.timeofdayCustom[4],
+		'timeofdayDay5': triggerPreferences.timeofdayCustom[5],
+		'timeofdayDay6': triggerPreferences.timeofdayCustom[6],
 		'timeofdayStart': startDate,
 		'timeofdayClose': closeDate };
 	
-	return config;
+	return triggerConfig;
 }
 
-TimeofdayConfig.prototype.save = function(config) {
+TimeofdayConfig.prototype.save = function(triggerConfig) {
 	var days = new Array();
 
 	for(var j = 0; j < 7; j++) {
-		if(eval("config.timeofdayDay" + j) == true)
+		if(eval("triggerConfig.timeofdayDay" + j) == true)
 			days.push(true);
 		else
 			days.push(false);
 	}
 
-	var preferences = {
-		'timeofdayDays': config.timeofdayDays,
+	var triggerPreferences = {
+		'timeofdayDays': triggerConfig.timeofdayDays,
 		'timeofdayCustom': days,
-		'timeofdayStart': config.timeofdayStart.getTime() / 1000,
-		'timeofdayClose': config.timeofdayClose.getTime() / 1000 };
+		'timeofdayStart': triggerConfig.timeofdayStart.getTime() / 1000,
+		'timeofdayClose': triggerConfig.timeofdayClose.getTime() / 1000 };
 	
-	return preferences;
+	return triggerPreferences;
 }
 
 //
 
-TimeofdayConfig.prototype.handleListChange = function(event) {
-	if(event.property == "timeofdayDays") {
-		if(event.model.timeofdayDays == 3)
-			event.model.timeofdayCustom = "block";
+TimeofdayConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "timeofdayDays") {
+		if(changeEvent.model.timeofdayDays == 3)
+			changeEvent.model.timeofdayCustom = "block";
 		else
-			event.model.timeofdayCustom = "none";
+			changeEvent.model.timeofdayCustom = "none";
 	
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 

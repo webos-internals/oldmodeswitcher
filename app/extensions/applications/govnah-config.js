@@ -59,14 +59,6 @@ GovnahConfig.prototype.deactivate = function() {
 GovnahConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 
-	this.choicesGovnahTypeSelector = [
-		{'label': "Launch Govnah", value: "app"},
-		{'label': "Set Profile", value: "srv"} ];  
-
-	controller.setupWidget("GovnahTypeSelector", {'label': "Action", 
-		'labelPlacement': "left", 'modelProperty': "appType",
-		'choices': this.choicesGovnahTypeSelector} );
-		
 	this.choicesGovnahLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
@@ -89,21 +81,30 @@ GovnahConfig.prototype.setup = function(controller) {
 
 	// Listen for change event for action selector
 	
-	Mojo.Event.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 GovnahConfig.prototype.config = function(launchPoint) {
+	if(launchPoint.type == "app") {
+		var appDisplay = "block";
+		var srvDisplay = "none";
+	}
+	else {
+		var appDisplay = "none";
+		var srvDisplay = "block";
+	}
+
 	var config = {
 		'name': launchPoint.title,
-		'appType': "app",
+		'appType': launchPoint.type,
 		'launchMode': "start",
 		'startProfile': 0, 
 		'closeProfile': 0,
-		'govnahAppCfgDisplay': "block",
-		'govnahSrvCfgDisplay': "none" };
+		'govnahAppCfgDisplay': appDisplay,
+		'govnahSrvCfgDisplay': srvDisplay };
 	
 	return config;
 }

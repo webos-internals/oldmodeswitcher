@@ -1,5 +1,5 @@
-function NetworkSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function NetworkSetting(Control) {
+	this.service = Control.service;
 }
 
 //

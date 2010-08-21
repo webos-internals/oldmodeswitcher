@@ -1,8 +1,218 @@
-<div id="configuration" style="display:none;">
+<div id="helpinfo" style="display:none;">
+	<div class="palm-page-header">
+		<div class="header-icon modeswitcher"></div>
+		<div class="header-text">
+			<span x-mojo-loc=''>Help</span>
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Info</div>
+
+		<div class="palm-list">
+			<div class="palm-text-wrapper">
+				<div style="float: right;" id="appver"></div>
+				<div  id="appname"></div>
+				<div class="palm-body-text" id="appinfo">by Janne Julkunen</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Usage</div>
+	
+		<div class="palm-list">
+			<div class='palm-row first' x-Mojo-tap-highlight="momentary">
+				<div class='palm-row-wrapper'>
+					<div class="label right">WWW</div>
+					<div class="title truncating-text" id="WikiLink">Wiki</div>
+				</div>
+			</div>
+			<div class='palm-row last' x-Mojo-tap-highlight="momentary">
+				<div class='palm-row-wrapper'>
+					<div class="label right">PDF</div>
+					<div class="title truncating-text" id="ManualLink">Manual</div>
+		 		</div>
+		 	</div>
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Support</div>
+	
+		<div class="palm-list">
+			<div class='palm-row first x-Mojo-tap-highlight="momentary"'>
+				<div class='palm-row-wrapper'>
+					<div class="label right">WWW</div>
+					<div class="title truncating-text" id="ForumLink">Forum</div>
+		 		</div>
+		 	</div>
+			<div class='palm-row last' x-Mojo-tap-highlight="momentary">
+				<div class='palm-row-wrapper'>
+					<div class="label right">EMAIL</div>
+					<div class="title truncating-text" id="EmailLink">E-mail</div>
+		 		</div>
+		 	</div>
+		</div>
+	</div>
+</div>
+
+<div id="import" style="display:none;">
+	<div class="palm-page-header">
+		<div class="header-icon modeswitcher"></div>
+		<div class="header-text">
+			<span x-mojo-loc=''>Import Mode</span>
+		</div>
+	</div>
+	
+	<div class="palm-group">
+		<div class="palm-group-title">Filter Options</div>
+		
+		<div class="palm-list">
+			<div class='palm-row first'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ImportGDMatch" x-mojo-element="TextField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>
+			<div class='palm-row'>
+				<div class='palm-row-wrapper'>
+					<div id="ImportGDShared" x-mojo-element="ToggleButton"></div>
+					<div class="label left">Show shared Modes</div>
+				</div>	
+			</div>		
+			<div class='palm-row last'>
+		 		<div class='palm-row-wrapper'>
+					<div id="ImportGDOrdering" x-mojo-element="ListSelector"></div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	
+	<div class="palm-group">
+		<div class="palm-group-title">Google Docs</div>
+		
+		<div class="palm-list">
+			<div class='palm-row first'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ImportGDUsername" x-mojo-element="TextField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+			<div class='palm-row last'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ImportGDPassword" x-mojo-element="PasswordField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+		</div>	
+	</div>	
+	
+	<div id="ImportGDButton" x-mojo-element="Button"></div>
+</div>
+
+<div id="import-list" style="display:none;">
+	<div class="palm-page-header">
+		<div class="header-icon modeswitcher"></div>
+		<div class="header-text">
+			<span x-mojo-loc=''>Import Mode</span>
+		</div>
+	</div>
+	
+	<div class="palm-list">
+		<div id="ImportGDList" x-mojo-element="List"></div>
+	</div>
+</div>
+
+<div id="export" style="display:none;">
+	<div class="palm-page-header">
+		<div class="header-icon modeswitcher"></div>
+		<div class="header-text">
+			<span x-mojo-loc=''>Export Mode</span>
+		</div>
+	</div>
+	
+	<div class="palm-group">
+		<div class="palm-group-title">Document Info</div>
+		
+		<div class="palm-list">
+			<div class='palm-row first'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ExportGDTitle" x-mojo-element="TextField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+			<div class='palm-row last'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ExportGDDesc" x-mojo-element="TextField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Google Docs</div>
+		
+		<div class="palm-list">
+			<div class='palm-row first'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ExportGDUsername" x-mojo-element="TextField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+			<div class='palm-row'>
+				<div class='palm-row-wrapper'>
+					<div class='textfield-group' x-mojo-focus-highlight="true">
+						<div class="title">
+							<div id="ExportGDPassword" x-mojo-element="PasswordField"></div>
+						</div>
+					</div>
+				</div>	
+			</div>	
+			<div class='palm-row last'>
+				<div class='palm-row-wrapper'>
+					<div id="ExportGDShare" x-mojo-element="ToggleButton"></div>
+					<div class="title left">Share with MS group</div>
+				</div>	
+			</div>	
+		</div>	
+	</div>	
+
+	<div id="ExportGDButton" x-mojo-element="Button"></div>
+</div>
+
+<div id="mapview" style="display:none;">
+	<div class="palm-header center">
+		<div id="MapViewAddress" class="header-input" x-mojo-element="TextField"></div>
+	</div>
+
+	<div id='MapViewCanvas' style="width:320px; height:450px;"></div>
+</div>
+
+<div id="configure" style="display:none;">
 	<div id="ErrorText" style="padding:10px;text-align:justify;"></div>
 
 	<div class="palm-list">
-		<div  id="AccountsList" x-mojo-element="List"></div>
+		<div id="SettingsList" x-mojo-element="List"></div>
 	</div>
 	
 	<div id="DoneButton" x-mojo-element="Button"></div>

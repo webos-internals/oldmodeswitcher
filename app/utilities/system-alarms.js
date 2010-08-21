@@ -7,10 +7,6 @@ function SystemAlarms(ServiceRequestWrapper) {
 
 //
 
-SystemAlarms.prototype.clearAlarmTimeouts = function(trigger) {
-
-}
-
 SystemAlarms.prototype.clearAlarmTimeout = function(trigger, time) {
 	var timestamp = time.getTime() / 1000;
 
@@ -45,8 +41,8 @@ SystemAlarms.prototype.setupAlarmTimeout = function(trigger, time, data) {
 
 //
 
-SystemAlarms.prototype.clearDelayTimeout = function(trigger) {
-	var key = Mojo.Controller.appInfo.id + "." + trigger + ".delay";
+SystemAlarms.prototype.clearDelayTimeout = function(trigger, id) {
+	var key = Mojo.Controller.appInfo.id + "." + trigger + "_" + id + ".delay";
 
 	Mojo.Log.error("Delay for " + trigger + " event canceled");
 		
@@ -54,11 +50,11 @@ SystemAlarms.prototype.clearDelayTimeout = function(trigger) {
 		'method': "clear", 'parameters': {"key": key} });
 }
 
-SystemAlarms.prototype.setupDelayTimeout = function(trigger, delay, data) {
+SystemAlarms.prototype.setupDelayTimeout = function(trigger, delay, data, id) {
 	// Delay will be calculated to be on a half minute so it won't happen 
 	// at the same time with alarm timeout due to bug in Mojo re-launch.
 
-	var key = Mojo.Controller.appInfo.id + "." + trigger + ".delay";
+	var key = Mojo.Controller.appInfo.id + "." + trigger + "_" + id + ".delay";
 
 	var date = new Date();
 	

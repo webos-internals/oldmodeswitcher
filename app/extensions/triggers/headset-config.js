@@ -19,12 +19,12 @@ HeadsetConfig.prototype.deactivate = function() {
 
 //
 
-HeadsetConfig.prototype.setup = function(controller) {
+HeadsetConfig.prototype.setup = function(sceneController) {
 	this.choicesStateSelector = [
 		{'label': "Connected", 'value': 0}, 
 		{'label': "Not Connected", 'value': 1} ];  
 
-	controller.setupWidget("HeadsetStateSelector", {'label': "State", 
+	sceneController.setupWidget("HeadsetStateSelector", {'label': "State", 
 		'labelPlacement': "left", 'modelProperty': "headsetState",
 		'choices': this.choicesStateSelector});
 
@@ -33,7 +33,7 @@ HeadsetConfig.prototype.setup = function(controller) {
 		{'label': "Headset", 'value': 1},
 		{'label': "Headset / Mic", 'value': 2} ];  
 
-	controller.setupWidget("HeadsetScenarioSelector", {'label': "Scenario", 
+	sceneController.setupWidget("HeadsetScenarioSelector", {'label': "Scenario", 
 		'labelPlacement': "left", 'modelProperty': "headsetScenario",
 		'choices': this.choicesScenarioSelector});
 }
@@ -41,28 +41,28 @@ HeadsetConfig.prototype.setup = function(controller) {
 //
 
 HeadsetConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'headsetState': 0,
 		'headsetScenario': 0 };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-HeadsetConfig.prototype.load = function(preferences) {
-	var config = {
-		'headsetState': preferences.headsetState,
-		'headsetScenario': preferences.headsetScenario };
+HeadsetConfig.prototype.load = function(triggerPreferences) {
+	var triggerConfig = {
+		'headsetState': triggerPreferences.headsetState,
+		'headsetScenario': triggerPreferences.headsetScenario };
 	
-	return config;
+	return triggerConfig;
 }
 
-HeadsetConfig.prototype.save = function(config) {
-	var preferences = {
-		'headsetState': config.headsetState,
-		'headsetScenario': config.headsetScenario };
+HeadsetConfig.prototype.save = function(triggerConfig) {
+	var triggerPreferences = {
+		'headsetState': triggerConfig.headsetState,
+		'headsetScenario': triggerConfig.headsetScenario };
 	
-	return preferences;
+	return triggerPreferences;
 }
 

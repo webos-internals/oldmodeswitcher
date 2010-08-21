@@ -1,5 +1,5 @@
-function CalendarSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function CalendarSetting(Control) {
+	this.service = Control.service;
 }
 
 //

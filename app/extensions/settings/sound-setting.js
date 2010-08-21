@@ -1,5 +1,5 @@
-function SoundSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function SoundSetting(Control) {
+	this.service = Control.service;
 }
 
 //

@@ -1,5 +1,5 @@
-function EmailSetting(ServiceRequestWrapper) {
-	this.service = ServiceRequestWrapper;
+function EmailSetting(Control) {
+	this.service = Control.service;
 }
 
 //

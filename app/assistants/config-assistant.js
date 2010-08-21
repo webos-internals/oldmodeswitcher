@@ -30,11 +30,21 @@ ConfigAssistant.prototype.setup = function() {
     * Setup widgets and add event handlers to listen to events from widgets here. 
     */
 
+	if(document.body) {	
+		var script = document.createElement("script");
+
+		script.type = "text/javascript";
+		script.src = "http://maps.google.com/maps/api/js?sensor=true";
+		
+		document.body.appendChild(script);
+	}
+
 	// Application menu
 	
 	this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true},
 		{visible: true, items: [ 
 			{label: $L("Report Problem"), command: 'debug'},
+			{label: $L("Import Mode"), command: 'import'},
 			{label: $L("Donate"), command: 'donate'},
 			{label: $L("Help"), command: 'help'}]});
 	
@@ -94,7 +104,7 @@ ConfigAssistant.prototype.setup = function() {
 	this.modelModesList = {items: this.config.modesConfig};
 	
 	this.controller.setupWidget("ModesList", {
-		itemTemplate: 'templates/listitem-modes',
+		itemTemplate: 'config/listitem-modes',
 		swipeToDelete: true,
 		autoconfirmDelete: false,
 		reorderable: true},
@@ -290,10 +300,66 @@ ConfigAssistant.prototype.handleCommand = function(event) {
 		else if(event.command == "donate") {
 			window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7A4RPR9ZX3TYS&lc=FI&item_name=Mode%20Switcher%20Application&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted');
 		}
+		else if(event.command == "import") {
+			this.controller.stageController.pushScene("scene", "importGDoc", null, this.importMode.bind(this));
+		}
 		else if(event.command == "help") {
-			window.open('http://wee.e-lnx.org/webos/help/modeswitcher.html');
+			this.controller.stageController.pushScene("scene", "showHelp");
 		}
 	}
+}
+
+ConfigAssistant.prototype.importMode = function(mode) {
+	if((mode.name != undefined) && (mode.type != undefined) &&
+		(mode.autoStartMode != undefined) && (mode.autoCloseMode != undefined) &&
+		(mode.settings != undefined) && (mode.settings.notify != undefined) &&
+		(mode.settings.charging != undefined) && (mode.apps != undefined) &&
+		(mode.apps.start != undefined) && (mode.apps.close != undefined) &&
+		(mode.triggers != undefined) && (mode.triggers.required != undefined) &&
+		(mode.triggers.block != undefined) && (mode.settingsList != undefined) &&
+		(mode.appsList != undefined) && (mode.triggersList != undefined))
+	{
+		if((mode.name.length == 0) || (mode.name == "Current Mode") || 
+			(mode.name == "Default Mode") || 
+			(mode.name == "Previous Mode") ||
+			(mode.name == "All Modes") ||
+			(mode.name == "All Normal Modes") ||
+			(mode.name == "All Modifier Modes"))
+		{
+			Mojo.Log.error("Invalid mode name in import");
+		}
+		else {
+			var modeName = mode.name;
+
+			for(var i = 0; i < 100; i++) {
+				if(i > 0)
+					var modeName = mode.name + "-" + i;
+
+				var exists = false;
+	
+				for(var j = 0 ; j < this.config.modesConfig.length ; j++) {
+					if(this.config.modesConfig[j].name == modeName) {
+						exists = true;
+						break;
+					}
+				}
+
+				if(exists)
+					continue;
+				else {
+					mode.name = modeName;
+		
+					break;
+				}
+			}
+
+			this.config.modesConfig.push(mode);
+
+			this.getConfigData();	
+		}
+	}
+	else
+		Mojo.Log.error("Malformed mode data in import");
 }
 
 //

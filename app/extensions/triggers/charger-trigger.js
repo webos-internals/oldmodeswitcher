@@ -1,25 +1,26 @@
-function ChargerTrigger(ServiceRequestWrapper, SystemAlarmsWrapper) {
-	this.service = ServiceRequestWrapper;
+function ChargerTrigger(Config, Control) {
+	this.config = Config;
 
-	this.callback = null;
+	this.service = Control.service;
+
 	this.initialized = false;
 
-	this.config = null;
-	this.enabled = false;
-	
-	this.charger = "none";
+	this.startupCallback = null;
+	this.executeCallback = null;
+
+	this.activeCharger = "none";
+	this.currentCharger = "none";
 
 	this.powerSource = {};
 	this.timeoutTrigger = null;
-	this.triggerEvent = null;
 }
 
 //
 
-ChargerTrigger.prototype.init = function(callback) {
-	this.callback = callback;
-
+ChargerTrigger.prototype.init = function(startupCallback) {
 	this.initialized = false;
+
+	this.startupCallback = startupCallback;
 
 	this.subscribeChargerStatus();
 }
@@ -27,77 +28,98 @@ ChargerTrigger.prototype.init = function(callback) {
 ChargerTrigger.prototype.shutdown = function() {
 	this.initialized = false;
 
-	this.charger = "none";
+	this.startupCallback = null;
 
+	this.activeCharger = "none";
+
+	this.powerSource = {};
+	this.timeoutTrigger = null;
+	this.triggerEvent = null;
+	
 	if(this.subscribtionChargerStatus)
 		this.subscribtionChargerStatus.cancel();
 }
 
 //
 
-ChargerTrigger.prototype.enable = function(config) {
-	this.config = config;
+ChargerTrigger.prototype.enable = function(executeCallback) {
+	this.executeCallback = executeCallback;
 	
-	this.enabled = true;
 }
 
 ChargerTrigger.prototype.disable = function() {
-	this.enabled = false;
+	this.executeCallback = null;
 }
 
 //
 
-ChargerTrigger.prototype.check = function(config) {
+ChargerTrigger.prototype.check = function(triggerConfig, modeName) {
 	var charger = 0;
 
 	var appController = Mojo.Controller.getAppController();
 	var orientation = appController.getScreenOrientation();
 	
-	if(this.charger == "puck")
+	if(this.currentCharger == "puck")
 		charger = 1;
-	else if(this.charger == "wall")
+	else if(this.currentCharger == "wall")
 		charger = 2;
-	else if(this.charger == "pc")
+	else if(this.currentCharger == "pc")
 		charger = 3;	
 
-	if((config.chargerCharger == charger) && ((config.chargerOrientation == 0) ||
-		((config.chargerOrientation == 1) && (orientation == "left")) || 
-		((config.chargerOrientation == 2) && (orientation == "right")) || 
-		((config.chargerOrientation == 3) && (orientation == "up")) || 
-		((config.chargerOrientation == 4) && (orientation == "down"))))
+	if((triggerConfig.chargerCharger == charger) && ((triggerConfig.chargerOrientation == 0) ||
+		((triggerConfig.chargerOrientation == 1) && (orientation == "left")) || 
+		((triggerConfig.chargerOrientation == 2) && (orientation == "right")) || 
+		((triggerConfig.chargerOrientation == 3) && (orientation == "up")) || 
+		((triggerConfig.chargerOrientation == 4) && (orientation == "down"))))
 	{
 		return true;
 	}
-	else
-		return false; 		
+	
+	return false; 		
 }
 
 //
 
-ChargerTrigger.prototype.execute = function(connected, launchCallback) {
-	Mojo.Log.info("Charger trigger received: " + connected);
+ChargerTrigger.prototype.execute = function(triggerData, manualLaunch) {
+	Mojo.Log.error("Charger trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();
 
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-			if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
-				if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
-					(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
-				{
-					startModes.push(this.config.modesConfig[i]);
+	if(triggerData.charger) {
+		if(manualLaunch) {
+			this.currentCharger = triggerData.charger;
+			this.activeCharger = "unknown";
+		}
+
+		if(this.activeCharger != triggerData.charger) {
+			this.activeCharger = triggerData.charger;
+
+			for(var i = 0; i < this.config.modesConfig.length; i++) {
+				for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+					if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
+						if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
+							(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
+						{
+							if(this.check(this.config.modesConfig[i].triggersList[j])) {
+								startModes.push(this.config.modesConfig[i]);
+								break;
+							}
+						}
+						else {
+							if(!this.check(this.config.modesConfig[i].triggersList[j])) {
+								closeModes.push(this.config.modesConfig[i]);
+								break;
+							}
+						}
+					}
 				}
-				else {
-					closeModes.push(this.config.modesConfig[i]);
-				}
-				
-				break;
 			}
+		
+			if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
+				this.executeCallback(startModes, closeModes);
 		}
 	}
-
-	launchCallback(startModes, closeModes);
 }
 
 //
@@ -112,51 +134,48 @@ ChargerTrigger.prototype.subscribeChargerStatus = function() {
 		'method': "chargerStatusQuery"});
 }
 
-ChargerTrigger.prototype.handleChargerStatus = function(response) {
-	if(response.type) {
-		this.powerSource[response.type] = response.connected;
-		
-		// Save last connected state, needed for the charger trigger.
-
-		var connected = this.charger;
-
+ChargerTrigger.prototype.handleChargerStatus = function(serviceResponse) {
+	if(serviceResponse.type) {
+		this.powerSource[serviceResponse.type] = serviceResponse.connected;
+	
 		// Save current charger state and send trigger event if needed.
 
 		if((this.powerSource['usb'] == true) || 
 			(this.powerSource['inductive'] == true))
 		{
-			if((connected == "none") && (response.name)) {
-				this.charger = response.name;
-
-				if(this.enabled)
-					this.handleChargerEvent(connected);
+			if(!this.initialized) {
+				if(serviceResponse.name) {
+					this.activeCharger = serviceResponse.name;
+					this.currentCharger = serviceResponse.name;
+				}
+				
+				this.initialized = true;
+				this.startupCallback(true);
+				this.startupCallback = null;
 			}
+
+			if((this.currentCharger == "none") && (serviceResponse.name))
+				this.handleChargerEvent(serviceResponse.name);
 		}
 		else {
-			this.charger = "none";
-			
-			if((this.enabled) && (connected != "none") )
-				this.handleChargerEvent(connected);
+			if(!this.initialized) {
+				this.activeCharger = "none";
+				this.currentCharger = "none";
+	
+				this.initialized = true;
+				this.startupCallback(true);
+				this.startupCallback = null;
+			}
+		
+			if(this.currentCharger != "none")
+				this.handleChargerEvent("none");
 		}
-	}
-
-	if(!this.initialized) {
-		this.initialized = true;
-		this.callback(true);
-		this.callback = null;
-	}
-}
-
-ChargerTrigger.prototype.handleTriggerError = function(response) {
-	if(this.callback) {
-		this.callback(false);
-		this.callback = null;
 	}
 }
 
 //
 
-ChargerTrigger.prototype.handleChargerEvent = function(connected) {
+ChargerTrigger.prototype.handleChargerEvent = function(connectedCharger) {
 
 	// Delay the actual execution of the trigger to avoid executing 
 	// multiple trigger events instead of one.
@@ -167,57 +186,48 @@ ChargerTrigger.prototype.handleChargerEvent = function(connected) {
 	// This should handle the case of very quick connect / disconnect 
 	// charger events so that only intended events are handled.
 
+	this.currentCharger = connectedCharger;
+
 	var charger = 0;
 	var timeout = 3000;
 
-	if(this.triggerEvent == null)
-		this.triggerEvent = this.charger;
-	
 	if(this.timeoutTrigger)
 		clearTimeout(this.timeoutTrigger);
 
-	if((this.charger == "puck") || (connected == "puck"))
+	if((this.activeCharger == "puck") || (connectedCharger == "puck"))
 		charger = 1;
-	else if((this.charger == "wall") || (connected == "wall"))
+	else if((this.activeCharger == "wall") || (connectedCharger == "wall"))
 		charger = 2;
-	else if((this.charger == "pc") || (connected == "pc"))
+	else if((this.activeCharger == "pc") || (connectedCharger == "pc"))
 		charger = 3;
 
-	Mojo.Log.error("Charger event debug: " + this.charger + " " + connected);
-
-	for(var i = 0; i < this.config.modesConfig.length; i++) {
-		if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
-			(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
-		{
-			for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
-				if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
-					if(this.config.modesConfig[i].triggersList[j].chargerCharger == charger) {
-						Mojo.Log.error("Charger event delay: " + this.config.modesConfig[i].triggersList[j].chargerDelay + " " + timeout);
+	if(connectedCharger == "none") {
+		for(var i = 0; i < this.config.modesConfig.length; i++) {
+			if((this.config.modesConfig[i].name == this.config.currentMode.name) ||
+				(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) != -1))
+			{
+				for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
+					if(this.config.modesConfig[i].triggersList[j].extension == "charger") {
+						if(this.config.modesConfig[i].triggersList[j].chargerCharger == charger) {
 					
-						if(timeout < this.config.modesConfig[i].triggersList[j].chargerDelay * 1000)
-							timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
-					}
-				}		
+							if(timeout < this.config.modesConfig[i].triggersList[j].chargerDelay * 1000)
+								timeout = this.config.modesConfig[i].triggersList[j].chargerDelay * 1000;
+						}
+					}		
+				}
 			}
-			
-			break;
 		}
 	}
-	
-	this.timeoutTrigger = setTimeout(this.handleChargerTrigger.bind(this), timeout);
-
+		
+	this.timeoutTrigger = setTimeout(this.execute.bind(this, {'charger': connectedCharger}, false), timeout);
 }
 
-ChargerTrigger.prototype.handleChargerTrigger = function() {
-	// Only handle the trigger if the last trigger was the same as first.
-	// Otherwise user changed his mind about the charging immediately.
+//
 
-	if(this.triggerEvent == this.charger) {
-		this.service.request("palm://com.palm.applicationManager", {'method': "launch", 
-			'parameters': {'id': Mojo.Controller.appInfo.id, 'params': {'action': "trigger", 
-				'event': "charger", 'data': this.charger}}});
+ChargerTrigger.prototype.handleTriggerError = function(serviceResponse) {
+	if(this.startupCallback) {
+		this.startupCallback(false);
+		this.startupCallback = null;
 	}
-
-	this.triggerEvent = null;
 }
 

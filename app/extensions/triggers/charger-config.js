@@ -19,8 +19,8 @@ ChargerConfig.prototype.deactivate = function() {
 
 //
 
-ChargerConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+ChargerConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesChargerSelector = [
 		{'label': "No Charger", 'value': 0},
@@ -28,7 +28,7 @@ ChargerConfig.prototype.setup = function(controller) {
 		{'label': "Wall Charger", 'value': 2},
 		{'label': "USB Charger", 'value': 3} ];  
 
-	controller.setupWidget("ChargerSourceSelector",	{'label': "Charger", 
+	sceneController.setupWidget("ChargerSourceSelector",	{'label': "Charger", 
 		'labelPlacement': "left", 'modelProperty': "chargerCharger",
 		'choices': this.choicesChargerSelector});
 
@@ -39,7 +39,7 @@ ChargerConfig.prototype.setup = function(controller) {
 		{'label': "Up", 'value': 3},
 		{'label': "Down", 'value': 4} ];  
 
-	controller.setupWidget("ChargerOrientationSelector", {'label': "Orientation", 
+	sceneController.setupWidget("ChargerOrientationSelector", {'label': "Orientation", 
 		'labelPlacement': "left", 'modelProperty': "chargerOrientation",
 		'choices': this.choicesOrientationSelector});
 	
@@ -49,67 +49,67 @@ ChargerConfig.prototype.setup = function(controller) {
 		{'label': "30 Seconds", 'value': 30},
 		{'label': "60 Seconds", 'value': 60} ];  
 
-	controller.setupWidget("ChargerDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("ChargerDelaySelector", {'label': "Delay", 
 		'labelPlacement': "left", 'modelProperty': "chargerDelay",
 		'choices': this.choicesDelaySelector});
 
 	// Listen for change event for charger selector
 	
-	Mojo.Event.listen(controller.get("TriggersList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("TriggersList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 ChargerConfig.prototype.config = function() {
-	var config = {
+	var triggerConfig = {
 		'chargerCharger': 1,
 		'chargerOrientation': 0,
 		'chargerDelay': 3,
 		'chargerOrientationDisplay': "block" };
 	
-	return config;
+	return triggerConfig;
 }
 
 //
 
-ChargerConfig.prototype.load = function(preferences) {
-	if(preferences.chargerCharger == 1)
+ChargerConfig.prototype.load = function(triggerPreferences) {
+	if(triggerPreferences.chargerCharger == 1)
 		var display = "block";
 	else
 		var display = "none";
 
-	var config = {
-		'chargerCharger': preferences.chargerCharger,
-		'chargerOrientation': preferences.chargerOrientation,
-		'chargerDelay': preferences.chargerDelay,
+	var triggerConfig = {
+		'chargerCharger': triggerPreferences.chargerCharger,
+		'chargerOrientation': triggerPreferences.chargerOrientation,
+		'chargerDelay': triggerPreferences.chargerDelay,
 		'chargerOrientationDisplay': display };
 	
-	return config;
+	return triggerConfig;
 }
 
-ChargerConfig.prototype.save = function(config) {
-	if(config.chargerCharger != 1)
+ChargerConfig.prototype.save = function(triggerConfig) {
+	if(triggerConfig.chargerCharger != 1)
 		var orientation = 0;
 	else
-		var orientation = config.chargerOrientation;
+		var orientation = triggerConfig.chargerOrientation;
 
-	var preferences = {
-		'chargerCharger': config.chargerCharger,
+	var triggerPreferences = {
+		'chargerCharger': triggerConfig.chargerCharger,
 		'chargerOrientation': orientation,
-		'chargerDelay': config.chargerDelay };
+		'chargerDelay': triggerConfig.chargerDelay };
 	
-	return preferences;
+	return triggerPreferences;
 }
 
 //
 
-ChargerConfig.prototype.handleListChange = function(event) {
-	if(event.property == "chargerCharger") {
-		if(event.model.chargerCharger == 1)
-			event.model.chargerOrientationDisplay = "block";
+ChargerConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "chargerCharger") {
+		if(changeEvent.model.chargerCharger == 1)
+			changeEvent.model.chargerOrientationDisplay = "block";
 		else
-			event.model.chargerOrientationDisplay = "none";
+			changeEvent.model.chargerOrientationDisplay = "none";
 	
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 
@@ -118,5 +118,4 @@ ChargerConfig.prototype.handleListChange = function(event) {
 		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
 }
-
 

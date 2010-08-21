@@ -1,6 +1,5 @@
-function AirplaneSetting(ServiceRequestWrapper) {
-	
-	this.service = ServiceRequestWrapper;
+function AirplaneSetting(Control) {
+	this.service = Control.service;
 }
 
 //
@@ -21,11 +20,14 @@ AirplaneSetting.prototype.get = function(callback) {
 }
 
 AirplaneSetting.prototype.set = function(settings, callback) {
+	this.setSystemSettings(0, settings, callback);
+/*
 	var current = {};
 	
 	var applyCallback = this.apply.bind(this, current, settings, callback);
 	
 	this.getSystemSettings(0, current, applyCallback);
+	*/
 }
 
 //

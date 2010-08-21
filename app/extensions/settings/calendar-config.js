@@ -46,7 +46,7 @@ CalendarConfig.prototype.setup = function(controller) {
 		
 	// Listen for change event for ringtone selector
 	
-	Mojo.Event.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this) );
 }
 

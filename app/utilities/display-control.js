@@ -21,14 +21,14 @@ DisplayControl.prototype.setup = function() {
 }
 
 DisplayControl.prototype.cleanup = function() {
-	if(this.subscribeChargerStatus)
-		this.subscribeChargerStatus.cancel();
+	if(this.subscribtionChargerStatus)
+		this.subscribtionChargerStatus.cancel();
 	
-	if(this.subscribeDisplayStatus)
-		this.subscribeDisplayStatus.cancel();
+	if(this.subscribtionDisplayStatus)
+		this.subscribtionDisplayStatus.cancel();
 
-	if(this.subscribeLockStatus)
-		this.subscribeLockStatus.cancel();
+	if(this.subscribtionLockStatus)
+		this.subscribtionLockStatus.cancel();
 }
 
 //
@@ -40,10 +40,10 @@ DisplayControl.prototype.setMode = function(mode) {
 	
 	this.checkDisplayBlock();
 
-	if(this.subscribeLockStatus)
-		this.subscribeLockStatus.cancel();
+	if(this.subscribtionLockStatus)
+		this.subscribtionLockStatus.cancel();
 	
-	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
+	this.subscribtionLockStatus = this.service.request('palm://com.palm.systemmanager/', {
 		'method': "getLockStatus", 'parameters': {'subscribe': true},
 		'onComplete': this.handleDisplayStatus.bind(this) });
 }
@@ -53,7 +53,7 @@ DisplayControl.prototype.setMode = function(mode) {
 DisplayControl.prototype.subscribeChargerStatus = function() {
 	// Subscribe to charger status notifications
 	
-	this.subscribeChargerStatus = this.service.request('palm://com.palm.bus/signal/', {
+	this.subscribtionChargerStatus = this.service.request('palm://com.palm.bus/signal/', {
 		'method': "addmatch", 'parameters': {"category":"/com/palm/power","method":"chargerStatus"},
 		'onSuccess': this.handleChargerStatus.bind(this)});
 		
@@ -95,11 +95,11 @@ DisplayControl.prototype.handleChargerStatus = function(response) {
 //
 
 DisplayControl.prototype.subscribeDisplayStatus = function() {
-	this.subscribeDisplayStatus = this.service.request('palm://com.palm.display/control/', {
+	this.subscribtionDisplayStatus = this.service.request('palm://com.palm.display/control/', {
 		'method': "status", 'parameters': {'subscribe': true}, 
 		'onSuccess': this.handleDisplayStatus.bind(this) });
 
-	this.subscribeLockStatus = this.service.request('palm://com.palm.systemmanager/', {
+	this.subscribtionLockStatus = this.service.request('palm://com.palm.systemmanager/', {
 		'method': "getLockStatus", 'parameters': {'subscribe': true},
 		'onSuccess': this.handleDisplayStatus.bind(this) });
 }

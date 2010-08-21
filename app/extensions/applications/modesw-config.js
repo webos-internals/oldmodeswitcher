@@ -32,19 +32,23 @@ ModeswConfig.prototype.deactivate = function() {
 ModeswConfig.prototype.setup = function(controller) {
 	this.controller = controller;
 
-	this.choicesModeswLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"},
-		{'label': "On Mode Switch", value: "switch"}];  
+	this.choicesModeswProcessSelector = [
+		{'label': "Before Mode Start", value: "start"},
+		{'label': "Before Mode Close", value: "close"},
+		{'label': "Before Mode Switch", value: "switch"},
+		{'label': "After Mode Start", value: "started"},
+		{'label': "After Mode Close", value: "closed"},
+		{'label': "After Mode Switch", value: "switched"} ];  
 
-	controller.setupWidget("ModeswLaunchSelector", {'label': "Launch", 
-		'labelPlacement': "left", 'modelProperty': "launchMode",
-		'choices': this.choicesModeswLaunchSelector});
+	controller.setupWidget("ModeswProcessSelector", {'label': "Process", 
+		'labelPlacement': "left", 'modelProperty': "modeProcess",
+		'choices': this.choicesModeswProcessSelector});
 	
 	this.choicesModeswActionSelector = [
-		{'label': "Start Mode(s)", value: "start"},
-		{'label': "Close Mode(s)", value: "close"},
-		{'label': "Trigger Mode(s)", value: "trigger"},
+		{'label': "Start Mode", value: "start"},
+		{'label': "Close Mode", value: "close"},
+		{'label': "Trigger Mode", value: "trigger"},
+		{'label': "Require Mode", value: "require"},
 		{'label': "Disable Triggers", value: "lock"}];  
 
 	controller.setupWidget("ModeswActionSelector", {'label': "Action", 
@@ -57,7 +61,7 @@ ModeswConfig.prototype.setup = function(controller) {
 
 	// Listen for change event for action selector
 	
-	Mojo.Event.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
+	controller.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -75,7 +79,7 @@ ModeswConfig.prototype.config = function(launchPoint) {
 
 	var config = {
 		'name': launchPoint.title,
-		'launchMode': "start", 
+		'modeProcess': "start", 
 		'modeAction': "start", 
 		'modeName': "Previous Mode",
 		'modeActionRow': "",
@@ -117,12 +121,19 @@ ModeswConfig.prototype.load = function(preferences) {
 					this.choicesModeswModeSelector.push(this.modesList[i]);
 				}
 			}
+			else if(preferences.action == "require") {
+				if((this.modesList[i].type == "default") || (this.modesList[i].type == "normal") || 
+					(this.modesList[i].type == "modifier"))
+				{
+					this.choicesModeswModeSelector.push(this.modesList[i]);
+				}
+			}
 		}
 	}
 	
 	var config = {
 		'name': preferences.name,	
-		'launchMode': preferences.event, 
+		'modeProcess': preferences.event, 
 		'modeAction': preferences.action, 
 		'modeName': preferences.mode,
 		'modeActionRow': row,
@@ -133,17 +144,14 @@ ModeswConfig.prototype.load = function(preferences) {
 
 ModeswConfig.prototype.save = function(config) {
 	var force = "no";
-	var event = "close";
-	
-	if(config.launchMode == "start")
-		event = "start";
-	else if(config.launchMode == "switch")
-		force = "yes";
 
+	if((config.modeProcess == "switch") || (config.modeProcess == "switched"))
+		force = "yes";
+	
 	var preferences = {
 		'type': "ms",
 		'name': config.name,
-		'event': event,
+		'event': config.modeProcess,
 		'action': config.modeAction,
 		'mode': config.modeName, 
 		'force': force };
@@ -207,14 +215,23 @@ ModeswConfig.prototype.handleListChange = function(event) {
 							this.choicesModeswModeSelector.push(this.modesList[i]);
 					}
 				}
+				else if(event.value == "require") {
+					if(((this.modesList[i].type == "default") || this.modesList[i].type == "normal") || 
+						(this.modesList[i].type == "modifier"))
+					{
+						this.choicesModeswModeSelector.push(this.modesList[i]);
+					}
+				}
 			}		
 
 			if(event.value == "start")
 				event.model.modeName = "Previous Mode";
 			else if(event.value == "close")
 				event.model.modeName = "Current Mode";
-			else if(event.value == "manual")
+			else if(event.value == "trigger")
 				event.model.modeName = "Previous Mode";
+			else if(event.value == "require")
+				event.model.modeName = "Default Mode";
 		}
 		
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
