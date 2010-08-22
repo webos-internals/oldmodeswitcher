@@ -6,10 +6,10 @@ function TemplateSetting(Control) {
 
 //
 
-TemplateSetting.prototype.init = function(callback) {
+TemplateSetting.prototype.init = function(doneCallback) {
 	// This function should subscribe to needed notifications and setup initial state.
 
-	callback(true);
+	doneCallback(true);
 }
 
 TemplateSetting.prototype.shutdown = function() {
@@ -18,82 +18,82 @@ TemplateSetting.prototype.shutdown = function() {
 
 //
 
-TemplateSetting.prototype.get = function(callback) {
+TemplateSetting.prototype.get = function(doneCallback) {
 	// This function should retrieve current settings and return them through callback.
 
-	var settings = {};
+	var systemSettings = {};
 
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-TemplateSetting.prototype.set = function(settings, callback) {
+TemplateSetting.prototype.set = function(systemSettings, doneCallback) {
 	// This function should set system settings and notify through callback when done.
 	
-	this.setSystemSettings(0, settings, callback);
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-TemplateSetting.prototype.getSystemSettings = function(request, settings, callback) {
+TemplateSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
 	// This is a helper function for executing sequential system settings retrieval.
 
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.systemservice", {'method': "getPreferences", 
 			'parameters': {'subscribe': false, 'keys': ["templateMode"]}, 
-			'onComplete': completeCallback} );
+			'onComplete': requestCallback} );
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-TemplateSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
+TemplateSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
 	// This is a helper function for handling the response and storing the settings data.
 
-	if(response.returnValue) {
+	if(serviceResponse.returnValue) {
 		// System request was succesfull so store the data and move to next request.
 		
-		if(request == 0) {
-			if(response.templateMode == true)
-				settings.templateMode = 1;
-			else if(response.templateMode == false)
-				settings.templateMode = 0;
+		if(requestID == 0) {
+			if(serviceResponse.templateMode == true)
+				systemSettings.templateMode = 1;
+			else if(serviceResponse.templateMode == false)
+				systemSettings.templateMode = 0;
 		}
 	}
 	
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-TemplateSetting.prototype.setSystemSettings = function(request, settings, callback) {
+TemplateSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
 	// This is a helper function for executing sequential system settings applying.
 
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if(settings.templateMode == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if(systemSettings.templateMode == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.templateMode == 1)
+			if(systemSettings.templateMode == 1)
 				var mode = true;
-			else if(settings.templateMode == 0)
+			else if(systemSettings.templateMode == 0)
 				var mode = false;
 				
 			this.service.request("palm://com.palm.systemservice", {'method': "setPreferences", 
-				'parameters': {'templateMode': mode}, 'onComplete': completeCallback});		
+				'parameters': {'templateMode': mode}, 'onComplete': requestCallback});		
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
 //
 
-TemplateSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
+TemplateSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
 	// This is a helper function for handling the response of system settings applying.
 
-	this.setSystemSettings(++request, settings, callback);
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

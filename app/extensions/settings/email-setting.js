@@ -4,8 +4,8 @@ function EmailSetting(Control) {
 
 //
 
-EmailSetting.prototype.init = function(callback) {
-	callback(true);
+EmailSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 EmailSetting.prototype.shutdown = function() {
@@ -13,160 +13,160 @@ EmailSetting.prototype.shutdown = function() {
 
 //
 
-EmailSetting.prototype.get = function(callback) {
-	var settings = {};
+EmailSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-EmailSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, settings, callback);
+EmailSetting.prototype.set = function(systemSettings, doneCallback) {
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-EmailSetting.prototype.getSystemSettings = function(request, settings, callback, data, index) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback, data, index);
+EmailSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback, requestData, index) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback, requestData, index);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.mail/", {'method': "accountList",
-			'parameters': {'subscribe': false}, 'onComplete': completeCallback} );
+			'parameters': {'subscribe': false}, 'onComplete': requestCallback} );
 	}
-	else if((request == 1) && (data != undefined) && (index < data.length)) {
+	else if((requestID == 1) && (requestData != undefined) && (index < requestData.length)) {
 		this.service.request("palm://com.palm.mail/", {'method': "accountPreferences",
-			'parameters': {'subscribe': false, 'account': data[index].id}, 
-			'onComplete': completeCallback} );
+			'parameters': {'subscribe': false, 'account': requestData[index].id}, 
+			'onComplete': requestCallback} );
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-EmailSetting.prototype.handleGetResponse = function(request, settings, callback, data, index, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			if(response.list.length > 0) {
-				settings.emailAlertCfg = [];
-				settings.emailRingtoneCfg = [];
-				settings.emailSyncCfg = [];
+EmailSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, requestData, index, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			if(serviceResponse.list.length > 0) {
+				systemSettings.emailAlertCfg = [];
+				systemSettings.emailRingtoneCfg = [];
+				systemSettings.emailSyncCfg = [];
 			}
 
-			this.getSystemSettings(++request, settings, callback, response.list, 0);
+			this.getSystemSettings(++requestID, systemSettings, doneCallback, serviceResponse.list, 0);
 		}
-		else if(request == 1) {
-			if(data.length > 1) {
-				settings.emailAlertCfg.push({
-					'accountId': response.id, 
-					'emailAlert': response.playSound });
+		else if(requestID == 1) {
+			if(requestData.length > 1) {
+				systemSettings.emailAlertCfg.push({
+					'accountId': serviceResponse.id, 
+					'emailAlert': serviceResponse.playSound });
 
-				if((response.ringtoneName != undefined) &&
-					(response.ringtoneName.length != 0))				
+				if((serviceResponse.ringtoneName != undefined) &&
+					(serviceResponse.ringtoneName.length != 0))				
 				{
 					var ringtone = {
-						'name': response.ringtoneName,
-						'path': response.ringtonePath };
+						'name': serviceResponse.ringtoneName,
+						'path': serviceResponse.ringtonePath };
 				
-					settings.emailRingtoneCfg.push({
-						'accountId': response.id,
+					systemSettings.emailRingtoneCfg.push({
+						'accountId': serviceResponse.id,
 						'emailRingtone': ringtone });
 				}
 				
-				settings.emailSyncCfg.push({
-					'accountId': response.id,
-					'emailSync': response.syncFrequencyMins });
+				systemSettings.emailSyncCfg.push({
+					'accountId': serviceResponse.id,
+					'emailSync': serviceResponse.syncFrequencyMins });
 
-				this.getSystemSettings(request, settings, callback, data, ++index);
+				this.getSystemSettings(requestID, systemSettings, doneCallback, requestData, ++index);
 			}
 			else {
-				settings.emailAlert = response.playSound;
+				systemSettings.emailAlert = serviceResponse.playSound;
 
-				if((response.ringtoneName != undefined) && 
-					(response.ringtoneName.length != 0))
+				if((serviceResponse.ringtoneName != undefined) && 
+					(serviceResponse.ringtoneName.length != 0))
 				{
-					settings.emailRingtone = {
-						'name': response.ringtoneName,
-						'path': response.ringtonePath };
+					systemSettings.emailRingtone = {
+						'name': serviceResponse.ringtoneName,
+						'path': serviceResponse.ringtonePath };
 				}
 			
-				settings.emailSync = response.syncFrequencyMins;
+				systemSettings.emailSync = serviceResponse.syncFrequencyMins;
 
-				this.getSystemSettings(++request, settings, callback);
+				this.getSystemSettings(++requestID, systemSettings, doneCallback);
 			}
 		}
 	}
 	else
-		this.getSystemSettings(++request, settings, callback);
+		this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-EmailSetting.prototype.setSystemSettings = function(request, settings, callback, data, index) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback, data, index);
+EmailSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback, requestData, index) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback, requestData, index);
 	
-	if(request == 0) {
-		if((settings.emailAlert == undefined) && (settings.emailSync == undefined) &&
-			(settings.emailRingtone == undefined) && (settings.emailAlertCfg == undefined) && 
-			(settings.emailSyncCfg == undefined) && (settings.emailRingtoneCfg == undefined))
+	if(requestID == 0) {
+		if((systemSettings.emailAlert == undefined) && (systemSettings.emailSync == undefined) &&
+			(systemSettings.emailRingtone == undefined) && (systemSettings.emailAlertCfg == undefined) && 
+			(systemSettings.emailSyncCfg == undefined) && (systemSettings.emailRingtoneCfg == undefined))
 		{
-			this.setSystemSettings(++request, settings, callback);
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		}
 		else {
 			this.service.request("palm://com.palm.mail/", {'method': "accountList",
-				'parameters': {'subscribe': false}, 'onComplete': completeCallback});
+				'parameters': {'subscribe': false}, 'onComplete': requestCallback});
 		}
 	}
-	else if((request == 1) && (data != undefined) && (index < data.length)) {
-		var params = {'account': data[index].id};
+	else if((requestID == 1) && (requestData != undefined) && (index < requestData.length)) {
+		var params = {'account': requestData[index].id};
 
-		if(settings.emailAlert != undefined)
-			params.playSound = settings.emailAlert;
+		if(systemSettings.emailAlert != undefined)
+			params.playSound = systemSettings.emailAlert;
 			
-		if(settings.emailAlertCfg != undefined) {
-			for(var i = 0; i < settings.emailAlertCfg.length; i++) {
-				if(settings.emailAlertCfg[i].accountId == data[index].id) {
-					params.playSound = settings.emailAlertCfg[i].emailAlert;
+		if(systemSettings.emailAlertCfg != undefined) {
+			for(var i = 0; i < systemSettings.emailAlertCfg.length; i++) {
+				if(systemSettings.emailAlertCfg[i].accountId == requestData[index].id) {
+					params.playSound = systemSettings.emailAlertCfg[i].emailAlert;
 					break;
 				}				
 			}
 		}
 
-		if(settings.emailRingtone != undefined) {
-			params.ringtoneName = settings.emailRingtone.name;
-			params.ringtonePath = settings.emailRingtone.path;
+		if(systemSettings.emailRingtone != undefined) {
+			params.ringtoneName = systemSettings.emailRingtone.name;
+			params.ringtonePath = systemSettings.emailRingtone.path;
 		}
 		
-		if(settings.emailRingtoneCfg != undefined) {
-			for(var i = 0; i < settings.emailRingtoneCfg.length; i++) {
-				if(settings.emailRingtoneCfg[i].accountId == data[index].id) {
-					params.ringtoneName = settings.emailRingtoneCfg[i].emailRingtone.name;
-					params.ringtonePath = settings.emailRingtoneCfg[i].emailRingtone.path;
+		if(systemSettings.emailRingtoneCfg != undefined) {
+			for(var i = 0; i < systemSettings.emailRingtoneCfg.length; i++) {
+				if(systemSettings.emailRingtoneCfg[i].accountId == requestData[index].id) {
+					params.ringtoneName = systemSettings.emailRingtoneCfg[i].emailRingtone.name;
+					params.ringtonePath = systemSettings.emailRingtoneCfg[i].emailRingtone.path;
 					break;
 				}				
 			}
 		}
 		
-		if(settings.emailSync != undefined)
-			params.syncFrequencyMins = settings.emailSync;
+		if(systemSettings.emailSync != undefined)
+			params.syncFrequencyMins = systemSettings.emailSync;
 		
-		if(settings.emailSyncCfg != undefined) {
-			for(var i = 0; i < settings.emailSyncCfg.length; i++) {
-				if(settings.emailSyncCfg[i].accountId == data[index].id) {
-					params.syncFrequencyMins = settings.emailSyncCfg[i].emailSync;
+		if(systemSettings.emailSyncCfg != undefined) {
+			for(var i = 0; i < systemSettings.emailSyncCfg.length; i++) {
+				if(systemSettings.emailSyncCfg[i].accountId == requestData[index].id) {
+					params.syncFrequencyMins = systemSettings.emailSyncCfg[i].emailSync;
 					break;
 				}				
 			}
 		}
 
 		this.service.request("palm://com.palm.mail/", {'method': "setAccountPreferences",
-			'parameters': params, 'onComplete': completeCallback});
+			'parameters': params, 'onComplete': requestCallback});
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-EmailSetting.prototype.handleSetResponse = function(request, settings, callback, data, index, response) {
-	if(request == 0)
-		this.setSystemSettings(++request, settings, callback, response.list, 0);
-	else if(request == 1)
-		this.setSystemSettings(request, settings, callback, data, ++index);
+EmailSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, requestData, index, serviceResponse) {
+	if(requestID == 0)
+		this.setSystemSettings(++requestID, systemSettings, doneCallback, serviceResponse.list, 0);
+	else if(requestID == 1)
+		this.setSystemSettings(requestID, systemSettings, doneCallback, requestData, ++index);
 }
 

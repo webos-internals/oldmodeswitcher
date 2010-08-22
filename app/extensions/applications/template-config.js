@@ -25,14 +25,14 @@ TemplateConfig.prototype.deactivate = function() {
 
 //
 
-TemplateConfig.prototype.setup = function(controller) {
+TemplateConfig.prototype.setup = function(sceneController) {
 	// This function should setup all the widgets in the extension-listitem file.
 	
 	this.choicesTemplateLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
 
-	controller.setupWidget("TemplateLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("TemplateLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesTemplateLaunchSelector} );
 }
@@ -46,16 +46,16 @@ TemplateConfig.prototype.config = function(launchPoint) {
 
 	// The simplest configuration is to use the preferences format.
 
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title,
 		'launchMode': "start" };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-TemplateConfig.prototype.load = function(preferences) {
+TemplateConfig.prototype.load = function(appPreferences) {
 	// This function will do the parsing of the preferences stored by the main 
 	// application into the wanted format for the UI part of the configuration.
 	
@@ -64,14 +64,14 @@ TemplateConfig.prototype.load = function(preferences) {
 
 	// The most simple loading would be just to copy the configuration:
 
-	var config = {
-		'name': preferences.name,
-		'launchMode': preferences.event };
+	var appConfig = {
+		'name': appPreferences.name,
+		'launchMode': appPreferences.event };
 	
-	return config;
+	return appConfig;
 }
 
-TemplateConfig.prototype.save = function(config) {
+TemplateConfig.prototype.save = function(appConfig) {
 	// This function will do the parsing of the configuration used in the UI 
 	// part into the preferences format stored by the main application.
 		
@@ -80,14 +80,14 @@ TemplateConfig.prototype.save = function(config) {
 
 	// The most simple saving would be just to copy the configuration:
 	
-	var preferences = {
+	var appPreferences = {
 		'type': "app",
-		'name': config.name,
-		'event': config.launchMode, 
+		'name': appConfig.name,
+		'event': appConfig.launchMode, 
 		'delay': 0, 
 		'appid': this.appid(), 
 		'params': "" };
 
-	return preferences;
+	return appPreferences;
 }
 

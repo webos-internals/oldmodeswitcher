@@ -4,8 +4,8 @@ function MessagingSetting(Control) {
 
 //
 
-MessagingSetting.prototype.init = function(callback) {
-	callback(true);
+MessagingSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 MessagingSetting.prototype.shutdown = function() {
@@ -13,82 +13,82 @@ MessagingSetting.prototype.shutdown = function() {
 
 //
 
-MessagingSetting.prototype.get = function(callback) {
-	var settings = {};
+MessagingSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-MessagingSetting.prototype.set = function(settings, callback) {
-	var current = {};
+MessagingSetting.prototype.set = function(systemSettings, doneCallback) {
+	var currentSettings = {};
 
-	var applyCallback = this.apply.bind(this, current, settings, callback);
+	var applyCallback = this.apply.bind(this, currentSettings, systemSettings, doneCallback);
 	
-	this.getSystemSettings(0, current, applyCallback);
-}
-
-//
-
-MessagingSetting.prototype.apply = function(current, requested, callback) {
-	this.setSystemSettings(0, current, requested, callback);
+	this.getSystemSettings(0, currentSettings, applyCallback);
 }
 
 //
 
-MessagingSetting.prototype.getSystemSettings = function(request, settings, callback, data, index) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback, data, index);
+MessagingSetting.prototype.apply = function(currentSettings, requestedSettings, doneCallback) {
+	this.setSystemSettings(0, currentSettings, requestedSettings, doneCallback);
+}
+
+//
+
+MessagingSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback, requestData, index) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback, requestData, index);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.messaging/", {'method': "getAllMessagingPreferences", 
-			'parameters': {'subscribe':false}, 'onComplete': completeCallback});
+			'parameters': {'subscribe':false}, 'onComplete': requestCallback});
 	}
-	else if(request == 1) {
+	else if(requestID == 1) {
 		this.service.request('palm://com.palm.messaging/', { 'method': "getAccountList",
-			'parameters': {'subscribe': false}, 'onComplete': completeCallback });
+			'parameters': {'subscribe': false}, 'onComplete': requestCallback });
 	}
-/*	else if((request == 2) && (data != undefined) && (index < data.length)) {
+/*	else if((requestID == 2) && (requestData != undefined) && (index < requestData.length)) {
 		this.service.request('palm://im.libpurpleext.greg/', {'method': "getMyAvailability", 
-			'parameters': {'serviceName': data[index].domain, 'username': data[index].username}, 
-			'onSuccess': completeCallback, 'onFailure': completeCallback});
+			'parameters': {'serviceName': requestData[index].domain, 'username': requestData[index].username}, 
+			'onSuccess': requestCallback, 'onFailure': requestCallback});
 	}*/
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-MessagingSetting.prototype.handleGetResponse = function(request, settings, callback, data, index, response) {
-	if(response.returnValue) { // || (request == 2))
-		if(request == 0) {
-			settings.messagingAlert = response.messagingPrefs.enableNotificationSound;
+MessagingSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, requestData, index, response) {
+	if(response.returnValue) { // || (requestID == 2))
+		if(requestID == 0) {
+			systemSettings.messagingAlert = response.messagingPrefs.enableNotificationSound;
 		
 			if((response.messagingPrefs.notificationRingtoneName != undefined) && 
 				(response.messagingPrefs.notificationRingtoneName.length != 0))
 			{
-				settings.messagingRingtone = {
+				systemSettings.messagingRingtone = {
 					'name': response.messagingPrefs.notificationRingtoneName,
 					'path': response.messagingPrefs.notificationRingtonePath };
 			}
 
-			this.getSystemSettings(++request, settings, callback);
+			this.getSystemSettings(++requestID, systemSettings, doneCallback);
 		}
-		else if(request == 1) {
+		else if(requestID == 1) {
 //			if(response.list.length == 1) {
 			if(response.list.length > 0) {
-				settings.messagingIMStatus = response.list[0].availability;
+				systemSettings.messagingIMStatus = response.list[0].availability;
 				
-				this.getSystemSettings(++request, settings, callback);
+				this.getSystemSettings(++requestID, systemSettings, doneCallback);
 			}
 			else
-				this.getSystemSettings(++request, settings, callback, response.list, 0);
+				this.getSystemSettings(++requestID, systemSettings, doneCallback, response.list, 0);
 		}
-/*		else if(request == 2) {
+/*		else if(requestID == 2) {
 			if(response.errorCode != undefined) {
-				settings.messagingIMStatus = data[0].availability;
+				systemSettings.messagingIMStatus = requestData[0].availability;
 			
-				this.getSystemSettings(++request, settings, callback);
+				this.getSystemSettings(++requestID, systemSettings, doneCallback);
 			}
 			else {
-				if(settings.messagingIMStatusCfg == undefined)
-					settings.messagingIMStatusCfg = [];
+				if(systemSettings.messagingIMStatusCfg == undefined)
+					systemSettings.messagingIMStatusCfg = [];
 			
 				if(response.returnValue == false)
 					var availability = 4;
@@ -99,92 +99,92 @@ MessagingSetting.prototype.handleGetResponse = function(request, settings, callb
 				else
 					var availability = 4;
 				
-				settings.messagingIMStatusCfg.push({
-					'accountId': data[index].id,
-					'accountDomain': data[index].domain,
-					'accountUsername': data[index].username,
+				systemSettings.messagingIMStatusCfg.push({
+					'accountId': requestData[index].id,
+					'accountDomain': requestData[index].domain,
+					'accountUsername': requestData[index].username,
 					'messagingIMStatus': availability });
 
-				this.getSystemSettings(request, settings, callback, data, ++index);
+				this.getSystemSettings(requestID, systemSettings, doneCallback, requestData, ++index);
 			}
 		}*/
 	}
 	else
-		this.getSystemSettings(++request, settings, callback);
+		this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-MessagingSetting.prototype.setSystemSettings = function(request, current, settings, callback, index) {
-	var completeCallback = this.handleSetResponse.bind(this, request, current, settings, callback, index);
+MessagingSetting.prototype.setSystemSettings = function(requestID, currentSettings, systemSettings, doneCallback, index) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, currentSettings, systemSettings, doneCallback, index);
 
-	if(request == 0) {
-		if((settings.messagingAlert == undefined) && (settings.messagingRingtone == undefined))
-			this.setSystemSettings(++request, current, settings, callback);		
+	if(requestID == 0) {
+		if((systemSettings.messagingAlert == undefined) && (systemSettings.messagingRingtone == undefined))
+			this.setSystemSettings(++requestID, currentSettings, systemSettings, doneCallback);		
 		else {
 			var params = {};
 			
-			if(settings.messagingAlert != undefined)
-				params.isEnabledNotificationSound = settings.messagingAlert;
+			if(systemSettings.messagingAlert != undefined)
+				params.isEnabledNotificationSound = systemSettings.messagingAlert;
 			
-			if(settings.messagingRingtone != undefined) {
-				params.ringtoneName = settings.messagingRingtone.name;
-				params.ringtonePath = settings.messagingRingtone.path;
+			if(systemSettings.messagingRingtone != undefined) {
+				params.ringtoneName = systemSettings.messagingRingtone.name;
+				params.ringtonePath = systemSettings.messagingRingtone.path;
 			}
 		
 			this.service.request("palm://com.palm.messaging/", {'method': "setNotificationPreferences", 
-				'parameters': params, 'onComplete': completeCallback});
+				'parameters': params, 'onComplete': requestCallback});
 		}
 	}
-	else if(request == 1) {
-		if((settings.messagingIMStatus == undefined) || (settings.messagingIMStatusCfg != undefined))
-			this.setSystemSettings(++request, current, settings, callback, 0);		
+	else if(requestID == 1) {
+		if((systemSettings.messagingIMStatus == undefined) || (systemSettings.messagingIMStatusCfg != undefined))
+			this.setSystemSettings(++requestID, currentSettings, systemSettings, doneCallback, 0);		
 		else {
 			this.service.request("palm://com.palm.messaging/", {'method': "setMyAvailability", 
-				'parameters': {'availability': settings.messagingIMStatus}, 
-				'onComplete': completeCallback});
+				'parameters': {'availability': systemSettings.messagingIMStatus}, 
+				'onComplete': requestCallback});
 		}
 	}
-/*	else if((request == 2) && (settings.messagingIMStatusCfg) && 
-		(index < settings.messagingIMStatusCfg.length))
+/*	else if((requestID == 2) && (systemSettings.messagingIMStatusCfg) && 
+		(index < systemSettings.messagingIMStatusCfg.length))
 	{
 		var availability = 4;
 	
-		if(settings.messagingIMStatus != undefined)
-			availability = settings.messagingIMStatus;
+		if(systemSettings.messagingIMStatus != undefined)
+			availability = systemSettings.messagingIMStatus;
 				
-		availability = settings.messagingIMStatusCfg[index].messagingIMStatus;
+		availability = systemSettings.messagingIMStatusCfg[index].messagingIMStatus;
 
-		for(var i = 0; i < current.messagingIMStatusCfg.length; i++) {
-			if(current.messagingIMStatusCfg[i].accountId == 
-				settings.messagingIMStatusCfg[index].accountId)
+		for(var i = 0; i < currentSettings.messagingIMStatusCfg.length; i++) {
+			if(currentSettings.messagingIMStatusCfg[i].accountId == 
+				systemSettings.messagingIMStatusCfg[index].accountId)
 			{
-				Mojo.Log.error("III " + current.messagingIMStatusCfg[i].messagingIMStatus + " " + availability);
+				Mojo.Log.error("III " + currentSettings.messagingIMStatusCfg[i].messagingIMStatus + " " + availability);
 
-				if(current.messagingIMStatusCfg[i].messagingIMStatus != availability) {
-					if(current.messagingIMStatusCfg[i].messagingIMStatus == 4) {
+				if(currentSettings.messagingIMStatusCfg[i].messagingIMStatus != availability) {
+					if(currentSettings.messagingIMStatusCfg[i].messagingIMStatus == 4) {
 						Mojo.Log.error("AAA LOGIN");
 
 						this.service.request("palm://com.palm.messaging/", {'method': "updateAccountPassword", 
-							'parameters': {'accountId': settings.messagingIMStatusCfg[index].accountId, "password": "181180"}, 
-							'onComplete': this.test.bind(this,completeCallback, settings,index, availability)});
+							'parameters': {'accountId': systemSettings.messagingIMStatusCfg[index].accountId, "password": "181180"}, 
+							'onComplete': this.test.bind(this,requestCallback, systemSettings,index, availability)});
 					}
 					else {
-						if(settings.messagingIMStatusCfg[index].messagingIMStatus == 4) {
+						if(systemSettings.messagingIMStatusCfg[index].messagingIMStatus == 4) {
 							Mojo.Log.error("AAA LOGOUT");
 
 							this.service.request("palm://im.libpurpleext.greg/", {'method': "logout", 
-								'parameters': {'accountId': settings.messagingIMStatusCfg[index].accountId}, 
-								'onComplete': completeCallback});
+								'parameters': {'accountId': systemSettings.messagingIMStatusCfg[index].accountId}, 
+								'onComplete': requestCallback});
 						}
 						else {
-							Mojo.Log.error("AAA UPDATE " + settings.messagingIMStatusCfg[index].messagingIMStatus);
+							Mojo.Log.error("AAA UPDATE " + systemSettings.messagingIMStatusCfg[index].messagingIMStatus);
 
 							this.service.request('palm://im.libpurpleext.greg/', {'method': "setMyAvailability", 
-								'parameters': {'serviceName': settings.messagingIMStatusCfg[index].accountDomain, 
-									'username': settings.messagingIMStatusCfg[index].accountUsername, 
+								'parameters': {'serviceName': systemSettings.messagingIMStatusCfg[index].accountDomain, 
+									'username': systemSettings.messagingIMStatusCfg[index].accountUsername, 
 									'availability': availability},
-								'onComplete': completeCallback});
+								'onComplete': requestCallback});
 						}
 					}
 					
@@ -195,37 +195,37 @@ MessagingSetting.prototype.setSystemSettings = function(request, current, settin
 			}				
 		}
 		
-		this.setSystemSettings(request, current, settings, callback, ++index);		
+		this.setSystemSettings(requestID, currentSettings, systemSettings, doneCallback, ++index);		
 	}*/
 	else 
-		callback();
+		doneCallback();
 }
 
 /*
-MessagingSetting.prototype.test = function(callback, settings,index,availability,response) {
+MessagingSetting.prototype.test = function(doneCallback, systemSettings,index,availability,response) {
 Mojo.Log.error("TTT1 " + availability);
 
-	setTimeout(this.testi.bind(this, callback, settings,index,availability,response), 15000);
+	setTimeout(this.testi.bind(this, doneCallback, systemSettings,index,availability,response), 15000);
 						
 }
 
-MessagingSetting.prototype.testi = function(callback, settings,index,availability,response) {
+MessagingSetting.prototype.testi = function(doneCallback, systemSettings,index,availability,response) {
 Mojo.Log.error("TTT2 " + availability);
 
 		this.service.request('palm://im.libpurpleext.greg/', {'method': "setMyAvailability", 
-								'parameters': {'serviceName': settings.messagingIMStatusCfg[index].accountDomain, 
-									'username': settings.messagingIMStatusCfg[index].accountUsername, 
+								'parameters': {'serviceName': systemSettings.messagingIMStatusCfg[index].accountDomain, 
+									'username': systemSettings.messagingIMStatusCfg[index].accountUsername, 
 									'availability': availability}});
 						
 }
 */
 
-MessagingSetting.prototype.handleSetResponse = function(request, current, settings, callback, index, response) {
-	if(request == 1)
-		this.setSystemSettings(++request, current, settings, callback, 0);
-	else if(request == 2)
-		this.setSystemSettings(request, current, settings, callback, ++index);
+MessagingSetting.prototype.handleSetResponse = function(requestID, currentSettings, systemSettings, doneCallback, index, response) {
+	if(requestID == 1)
+		this.setSystemSettings(++requestID, currentSettings, systemSettings, doneCallback, 0);
+	else if(requestID == 2)
+		this.setSystemSettings(requestID, currentSettings, systemSettings, doneCallback, ++index);
 	else
-		this.setSystemSettings(++request, current, settings, callback, index);
+		this.setSystemSettings(++requestID, currentSettings, systemSettings, doneCallback, index);
 }
 

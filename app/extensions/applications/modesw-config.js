@@ -29,8 +29,8 @@ ModeswConfig.prototype.deactivate = function() {
 
 //
 
-ModeswConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+ModeswConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesModeswProcessSelector = [
 		{'label': "Before Mode Start", value: "start"},
@@ -40,7 +40,7 @@ ModeswConfig.prototype.setup = function(controller) {
 		{'label': "After Mode Close", value: "closed"},
 		{'label': "After Mode Switch", value: "switched"} ];  
 
-	controller.setupWidget("ModeswProcessSelector", {'label': "Process", 
+	sceneController.setupWidget("ModeswProcessSelector", {'label': "Process", 
 		'labelPlacement': "left", 'modelProperty': "modeProcess",
 		'choices': this.choicesModeswProcessSelector});
 	
@@ -51,17 +51,17 @@ ModeswConfig.prototype.setup = function(controller) {
 		{'label': "Require Mode", value: "require"},
 		{'label': "Disable Triggers", value: "lock"}];  
 
-	controller.setupWidget("ModeswActionSelector", {'label': "Action", 
+	sceneController.setupWidget("ModeswActionSelector", {'label': "Action", 
 		'labelPlacement': "left", 'modelProperty': "modeAction",
 		'choices': this.choicesModeswActionSelector});
 
-	controller.setupWidget("ModeswModeSelector", {'label': "Mode", 
+	sceneController.setupWidget("ModeswModeSelector", {'label': "Mode", 
 		'labelPlacement': "left", 'modelProperty': "modeName",
 		'choices': this.choicesModeswModeSelector});
 
 	// Listen for change event for action selector
 	
-	controller.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("AppsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -77,7 +77,7 @@ ModeswConfig.prototype.config = function(launchPoint) {
 		}
 	}
 
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title,
 		'modeProcess': "start", 
 		'modeAction': "start", 
@@ -85,43 +85,43 @@ ModeswConfig.prototype.config = function(launchPoint) {
 		'modeActionRow': "",
 		'modeModeDisplay': "block" };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-ModeswConfig.prototype.load = function(preferences) {
+ModeswConfig.prototype.load = function(appPreferences) {
 	var row = "";
 	var display = "block";
 
 	this.choicesModeswModeSelector.clear();
 
-	if(preferences.modeAction == "lock") {
+	if(appPreferences.modeAction == "lock") {
 		row = "last";
 		display = "none";
 	}
 	else {
 		for(var i = 0; i < this.modesList.length; i++) {
-			if(preferences.action == "start") {
+			if(appPreferences.action == "start") {
 				if((this.modesList[i].type != "current") && (this.modesList[i].type != "default") &&
 					(this.modesList[i].type != "alln") && (this.modesList[i].type != "allm")) 
 				{
 					this.choicesModeswModeSelector.push(this.modesList[i]);
 				}
 			}
-			else if(preferences.action == "close") {
+			else if(appPreferences.action == "close") {
 				if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier") ||
 					(this.modesList[i].type == "allm"))
 				{
 					this.choicesModeswModeSelector.push(this.modesList[i]);
 				}
 			}
-			else if(preferences.action == "trigger") {
+			else if(appPreferences.action == "trigger") {
 				if((this.modesList[i].type != "current") && (this.modesList[i].type != "default")) {
 					this.choicesModeswModeSelector.push(this.modesList[i]);
 				}
 			}
-			else if(preferences.action == "require") {
+			else if(appPreferences.action == "require") {
 				if((this.modesList[i].type == "default") || (this.modesList[i].type == "normal") || 
 					(this.modesList[i].type == "modifier"))
 				{
@@ -131,38 +131,38 @@ ModeswConfig.prototype.load = function(preferences) {
 		}
 	}
 	
-	var config = {
-		'name': preferences.name,	
-		'modeProcess': preferences.event, 
-		'modeAction': preferences.action, 
-		'modeName': preferences.mode,
+	var appConfig = {
+		'name': appPreferences.name,	
+		'modeProcess': appPreferences.event, 
+		'modeAction': appPreferences.action, 
+		'modeName': appPreferences.mode,
 		'modeActionRow': row,
 		'modeModeDisplay': display };
 	
-	return config;
+	return appConfig;
 }
 
-ModeswConfig.prototype.save = function(config) {
+ModeswConfig.prototype.save = function(appConfig) {
 	var force = "no";
 
-	if((config.modeProcess == "switch") || (config.modeProcess == "switched"))
+	if((appConfig.modeProcess == "switch") || (appConfig.modeProcess == "switched"))
 		force = "yes";
 	
-	var preferences = {
+	var appPreferences = {
 		'type': "ms",
-		'name': config.name,
-		'event': config.modeProcess,
-		'action': config.modeAction,
-		'mode': config.modeName, 
+		'name': appConfig.name,
+		'event': appConfig.modeProcess,
+		'action': appConfig.modeAction,
+		'mode': appConfig.modeName, 
 		'force': force };
 	
-	return preferences;
+	return appPreferences;
 }
 
 //
 
-ModeswConfig.prototype.handleModeData = function(data) {
-	if(data.modesConfig != undefined) {
+ModeswConfig.prototype.handleModeData = function(modeData) {
+	if(modeData.modesConfig != undefined) {
 		this.modesList.clear();
 
 		this.modesList.push({'label': "All Normal Modes", 'value': "All Normal Modes", 'type': "alln"});  	
@@ -170,31 +170,31 @@ ModeswConfig.prototype.handleModeData = function(data) {
 		this.modesList.push({'label': "Current Mode", 'value': "Current Mode", 'type': "current"});  
 		this.modesList.push({'label': "Previous Mode", 'value': "Previous Mode", 'type': "previous"});  
 	
-		for(var i = 0; i < data.modesConfig.length; i++) {
+		for(var i = 0; i < modeData.modesConfig.length; i++) {
 			this.modesList.push({
-				'label': data.modesConfig[i].name, 
-				'value': data.modesConfig[i].name, 
-				'type': data.modesConfig[i].type});  
+				'label': modeData.modesConfig[i].name, 
+				'value': modeData.modesConfig[i].name, 
+				'type': modeData.modesConfig[i].type});  
 		}
 	}
 }
 
 //
 
-ModeswConfig.prototype.handleListChange = function(event) {
-	if(event.property == "modeAction") {
+ModeswConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "modeAction") {
 		this.choicesModeswModeSelector.clear();
 
-		if(event.value == "lock") {
-			event.model.modeActionRow = "last";
-			event.model.modeModeDisplay = "none";
+		if(changeEvent.value == "lock") {
+			changeEvent.model.modeActionRow = "last";
+			changeEvent.model.modeModeDisplay = "none";
 		}
 		else {
-			event.model.modeActionRow = "";
-			event.model.modeModeDisplay = "block";
+			changeEvent.model.modeActionRow = "";
+			changeEvent.model.modeModeDisplay = "block";
 
 			for(var i = 0; i < this.modesList.length; i++) {
-				if(event.value == "start") {
+				if(changeEvent.value == "start") {
 					if((this.modesList[i].type != "current") && (this.modesList[i].type != "default") &&
 						(this.modesList[i].type != "alln")) 
 					{
@@ -202,20 +202,20 @@ ModeswConfig.prototype.handleListChange = function(event) {
 							this.choicesModeswModeSelector.push(this.modesList[i]);
 					}
 				}
-				else if(event.value == "close") {
+				else if(changeEvent.value == "close") {
 					if((this.modesList[i].type == "current") || (this.modesList[i].type == "modifier") ||
 						(this.modesList[i].type == "allm"))
 					{
 						this.choicesModeswModeSelector.push(this.modesList[i]);
 					}
 				}
-				else if(event.value == "trigger") {
+				else if(changeEvent.value == "trigger") {
 					if((this.modesList[i].type != "current") && (this.modesList[i].type != "default")) {
 						if(this.controller.get("NameText").mojo.getValue() != this.modesList[i].value)
 							this.choicesModeswModeSelector.push(this.modesList[i]);
 					}
 				}
-				else if(event.value == "require") {
+				else if(changeEvent.value == "require") {
 					if(((this.modesList[i].type == "default") || this.modesList[i].type == "normal") || 
 						(this.modesList[i].type == "modifier"))
 					{
@@ -224,14 +224,14 @@ ModeswConfig.prototype.handleListChange = function(event) {
 				}
 			}		
 
-			if(event.value == "start")
-				event.model.modeName = "Previous Mode";
-			else if(event.value == "close")
-				event.model.modeName = "Current Mode";
-			else if(event.value == "trigger")
-				event.model.modeName = "Previous Mode";
-			else if(event.value == "require")
-				event.model.modeName = "Default Mode";
+			if(changeEvent.value == "start")
+				changeEvent.model.modeName = "Previous Mode";
+			else if(changeEvent.value == "close")
+				changeEvent.model.modeName = "Current Mode";
+			else if(changeEvent.value == "trigger")
+				changeEvent.model.modeName = "Previous Mode";
+			else if(changeEvent.value == "require")
+				changeEvent.model.modeName = "Default Mode";
 		}
 		
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();

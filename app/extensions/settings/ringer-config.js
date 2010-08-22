@@ -21,116 +21,116 @@ RingerConfig.prototype.deactivate = function() {
 
 //
 
-RingerConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+RingerConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesRingerOnSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},		
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},		
 		{'label': "Sound & Vibrate", 'value': 1},
 		{'label': "Sound Only", 'value': 0} ];  
 
-	controller.setupWidget("RingerOnSelector", {'label': "Ringer On", 
+	sceneController.setupWidget("RingerOnSelector", {'label': "Ringer On", 
 		'labelPlacement': "left", 'modelProperty': "ringerRingerOn",
 		'choices': this.choicesRingerOnSelector});
 
 	this.choicesRingerOffSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Vibrate", 'value': 1},
 		{'label': "Mute", 'value': 0}];  
 
-	controller.setupWidget("RingerOffSelector", {'label': "Ringer Off", 
+	sceneController.setupWidget("RingerOffSelector", {'label': "Ringer Off", 
 		'labelPlacement': "left", 'modelProperty': "ringerRingerOff",
 		'choices': this.choicesRingerOffSelector});
 
 	this.choicesRingerRingtone = [
-		{'label': controller.defaultChoiseLabel, 'value': ""},
+		{'label': sceneController.defaultChoiseLabel, 'value': ""},
 		{'label': "Select", 'value': "select"} ];  
 
-	controller.setupWidget("RingerRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("RingerRingtoneSelector", {'label': "Ringtone", 
 		'labelPlacement': "left", 'modelProperty': "ringerRingtoneName",
 		'choices': this.choicesRingerRingtone});
 		
 	// Listen for change event for ringtone selector
 	
-	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 RingerConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'ringerRingerOn': -1, 
 		'ringerRingerOff': -1, 
 		'ringerRingtoneName': "", 
 		'ringerRingtonePath': "" };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-RingerConfig.prototype.load = function(preferences) {
-	var config = this.config();
+RingerConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.ringerRingerOn != undefined)
-		config.ringerRingerOn = preferences.ringerRingerOn;
+	if(settingPreferences.ringerRingerOn != undefined)
+		settingConfig.ringerRingerOn = settingPreferences.ringerRingerOn;
 
-	if(preferences.ringerRingerOff != undefined)
-		config.ringerRingerOff = preferences.ringerRingerOff;
+	if(settingPreferences.ringerRingerOff != undefined)
+		settingConfig.ringerRingerOff = settingPreferences.ringerRingerOff;
 
-	if(preferences.ringerRingtone != undefined) {
-		config.ringerRingtoneName = preferences.ringerRingtone.name;
-		config.ringerRingtonePath = preferences.ringerRingtone.path;
+	if(settingPreferences.ringerRingtone != undefined) {
+		settingConfig.ringerRingtoneName = settingPreferences.ringerRingtone.name;
+		settingConfig.ringerRingtonePath = settingPreferences.ringerRingtone.path;
 	}
 	
-	return config;
+	return settingConfig;
 }
 
-RingerConfig.prototype.save = function(config) {
-	var preferences = {};
+RingerConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 	
-	if(config.ringerRingerOn != -1)
-		preferences.ringerRingerOn = config.ringerRingerOn;
+	if(settingConfig.ringerRingerOn != -1)
+		settingPreferences.ringerRingerOn = settingConfig.ringerRingerOn;
 
-	if(config.ringerRingerOff != -1)
-		preferences.ringerRingerOff = config.ringerRingerOff;
+	if(settingConfig.ringerRingerOff != -1)
+		settingPreferences.ringerRingerOff = settingConfig.ringerRingerOff;
 
-	if(config.ringerRingtoneName.length != 0) {
-		preferences.ringerRingtone = {
-			'name': config.ringerRingtoneName,
-			'path': config.ringerRingtonePath };
+	if(settingConfig.ringerRingtoneName.length != 0) {
+		settingPreferences.ringerRingtone = {
+			'name': settingConfig.ringerRingtoneName,
+			'path': settingConfig.ringerRingtonePath };
 	}
 
-	return preferences;
+	return settingPreferences;
 }
 
 //
 
-RingerConfig.prototype.handleListChange = function(event) {
-	if(event.property == "ringerRingtoneName") {
-		event.model.ringerRingtoneName = "";		
-		event.model.ringerRingtonePath = "";		
+RingerConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "ringerRingtoneName") {
+		changeEvent.model.ringerRingtoneName = "";		
+		changeEvent.model.ringerRingtonePath = "";		
 
-		this.controller.modelChanged(event.model, this);
+		this.controller.modelChanged(changeEvent.model, this);
 
-		if(event.value == "select") {
-			this.executeRingerSelect(event.model);
+		if(changeEvent.value == "select") {
+			this.executeRingerSelect(changeEvent.model);
 		}
 	}	
 }
 
 //
 
-RingerConfig.prototype.executeRingerSelect = function(config) {
+RingerConfig.prototype.executeRingerSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
 		'actionType': "attach", 'actionName': "Done", 'onSelect': 
-			function(config, payload) {
-				config.ringerRingtoneName = payload.name;
-				config.ringerRingtonePath = payload.fullPath;
+			function(eventModel, serviceResponse) {
+				eventModel.ringerRingtoneName = serviceResponse.name;
+				eventModel.ringerRingtonePath = serviceResponse.fullPath;
 				
-				this.controller.modelChanged(config, this);	
-			}.bind(this, config)},
+				this.controller.modelChanged(eventModel, this);	
+			}.bind(this, eventModel)},
 		this.controller.stageController);
 }
 

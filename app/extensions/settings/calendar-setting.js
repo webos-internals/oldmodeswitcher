@@ -4,8 +4,8 @@ function CalendarSetting(Control) {
 
 //
 
-CalendarSetting.prototype.init = function(callback) {
-	callback(true);
+CalendarSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 CalendarSetting.prototype.shutdown = function() {
@@ -13,67 +13,67 @@ CalendarSetting.prototype.shutdown = function() {
 
 //
 
-CalendarSetting.prototype.get = function(callback) {
-	var settings = {};
+CalendarSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-CalendarSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, settings, callback);
+CalendarSetting.prototype.set = function(systemSettings, doneCallback) {
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-CalendarSetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+CalendarSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var completeCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.calendar/", {'method': "getCalendarPrefs", 
 			'parameters': {'subscribe': false}, 'onComplete': completeCallback});
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-CalendarSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.errorCode != undefined)
+CalendarSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.errorCode != undefined)
 		return;
 
-	if(response.returnValue) {
-		if(request == 0) {
-			settings.calendarAlarm = response.alarmSoundOn;
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			systemSettings.calendarAlarm = serviceResponse.alarmSoundOn;
 		
-			if((response.ringtoneName != undefined) && 
-				(response.ringtoneName.length != 0))
+			if((serviceResponse.ringtoneName != undefined) && 
+				(serviceResponse.ringtoneName.length != 0))
 			{
-				settings.calendarRingtone = {
-					'name': response.ringtoneName,
-					'path': response.ringtonePath };
+				systemSettings.calendarRingtone = {
+					'name': serviceResponse.ringtoneName,
+					'path': serviceResponse.ringtonePath };
 			}
 		}
 	}
 	
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-CalendarSetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+CalendarSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var completeCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if((settings.calendarAlarm == undefined) && (settings.calendarRingtone == undefined))
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if((systemSettings.calendarAlarm == undefined) && (systemSettings.calendarRingtone == undefined))
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
 			var params = {};
 		
-			if(settings.calendarAlarm != undefined)
-				params.alarmSoundOn = settings.calendarAlarm;
+			if(systemSettings.calendarAlarm != undefined)
+				params.alarmSoundOn = systemSettings.calendarAlarm;
 		
-			if(settings.calendarRingtone != undefined) {
-				params.ringtoneName = settings.calendarRingtone.name;
-				params.ringtonePath = settings.calendarRingtone.path;
+			if(systemSettings.calendarRingtone != undefined) {
+				params.ringtoneName = systemSettings.calendarRingtone.name;
+				params.ringtonePath = systemSettings.calendarRingtone.path;
 			}
 			
 			this.service.request("palm://com.palm.calendar/", {'method': "setCalendarPrefs", 
@@ -81,10 +81,10 @@ CalendarSetting.prototype.setSystemSettings = function(request, settings, callba
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-CalendarSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+CalendarSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

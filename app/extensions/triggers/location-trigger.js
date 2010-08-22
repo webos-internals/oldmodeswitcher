@@ -110,7 +110,7 @@ LocationTrigger.prototype.fetchCurrentLocation = function(retryCount, gpsAccurac
 	this.service.request("palm://com.palm.power/com/palm/power", {'method': "activityStart", 
 		'parameters': {'id': Mojo.Controller.appInfo.id, 'duration_ms': 60000}});
 
-	if(retryCount < 10) {
+	if(retryCount < 25) {
 		if(this.requestLocation)
 			this.requestLocation.cancel();
 
@@ -133,8 +133,6 @@ LocationTrigger.prototype.handleCurrentLocation = function(retryCount, gpsAccura
 			this.fetchCurrentLocation(++retryCount, gpsAccuracy, trackingData);
 		}
 		else {
-		Mojo.Log.error("AAA " + Object.toJSON(serviceResponse));
-		
 			this.gpsLatitude = serviceResponse.latitude;
 			this.gpsLongitude = serviceResponse.longitude;
 			
@@ -257,12 +255,12 @@ LocationTrigger.prototype.handleLocationTrigger = function(trackingData) {
 			// Check if all triggers of the current mode are still valid.
 		
 			if(!hasValidTriggers) {
-				Mojo.Log.error("Location trigger changed: " + this.config.currentMode.name);
+				Mojo.Log.error("Location trigger changed: " + this.config.modesConfig[i].name);
 
 				// Check if user has been already notified of closing.
 		
-				if(trackingData.leaving.indexOf(this.config.currentMode.name) == -1) {
-					trackingData.leaving.push(this.config.currentMode.name);
+				if(trackingData.leaving.indexOf(this.config.modesConfig[i].name) == -1) {
+					trackingData.leaving.push(this.config.modesConfig[i].name);
 			
 					closeModes.push(this.config.modesConfig[i]);
 				}

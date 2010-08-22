@@ -4,8 +4,8 @@ function ScreenSetting(Control) {
 
 //
 
-ScreenSetting.prototype.init = function(callback) {
-	callback(true);
+ScreenSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 ScreenSetting.prototype.shutdown = function() {
@@ -13,122 +13,122 @@ ScreenSetting.prototype.shutdown = function() {
 
 //
 
-ScreenSetting.prototype.get = function(callback) {
-	var settings = {};
+ScreenSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-ScreenSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, settings, callback);
+ScreenSetting.prototype.set = function(systemSettings, doneCallback) {
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-ScreenSetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+ScreenSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.display/control/", {'method': "getProperty",
 			'parameters': {'properties': ["maximumBrightness", "timeout"]}, 
-			'onComplete': completeCallback});
+			'onComplete': requestCallback});
 	}
-	else if(request == 1) {
+	else if(requestID == 1) {
 		this.service.request("palm://com.palm.systemservice/", {'method': "getPreferences", 
 			'parameters': {'subscribe': false, 'keys': ["BlinkNotifications", 
-			"showAlertsWhenLocked", "wallpaper"]}, 'onComplete': completeCallback});
+			"showAlertsWhenLocked", "wallpaper"]}, 'onComplete': requestCallback});
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-ScreenSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			settings.screenBrightnessLevel = response.maximumBrightness;
-			settings.screenTurnOffTimeout = response.timeout;
+ScreenSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			systemSettings.screenBrightnessLevel = serviceResponse.maximumBrightness;
+			systemSettings.screenTurnOffTimeout = serviceResponse.timeout;
 		}
-		else if(request == 1) {
-			if(response.BlinkNotifications)
-				settings.screenBlinkNotify = 1;
+		else if(requestID == 1) {
+			if(serviceResponse.BlinkNotifications)
+				systemSettings.screenBlinkNotify = 1;
 			else
-				settings.screenBlinkNotify = 0;			
+				systemSettings.screenBlinkNotify = 0;			
 
-			if(response.showAlertsWhenLocked)
-				settings.screenLockedNotify = 1;
+			if(serviceResponse.showAlertsWhenLocked)
+				systemSettings.screenLockedNotify = 1;
 			else
-				settings.screenLockedNotify = 0;			
+				systemSettings.screenLockedNotify = 0;			
 
-			if(response.wallpaper.wallpaperName.length != 0) {
-				settings.screenWallpaper = {
-					'name': response.wallpaper.wallpaperName,
-					'path': response.wallpaper.wallpaperFile };
+			if(serviceResponse.wallpaper.wallpaperName.length != 0) {
+				systemSettings.screenWallpaper = {
+					'name': serviceResponse.wallpaper.wallpaperName,
+					'path': serviceResponse.wallpaper.wallpaperFile };
 			}
 		}
 	}
 
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-ScreenSetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+ScreenSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if((settings.screenBrightnessLevel == undefined) && (settings.screenTurnOffTimeout == undefined))
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if((systemSettings.screenBrightnessLevel == undefined) && (systemSettings.screenTurnOffTimeout == undefined))
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
 			var params = {};
 
-			if(settings.screenBrightnessLevel != undefined)
-				params.maximumBrightness = settings.screenBrightnessLevel;
+			if(systemSettings.screenBrightnessLevel != undefined)
+				params.maximumBrightness = systemSettings.screenBrightnessLevel;
 			
-			if(settings.screenTurnOffTimeout != undefined)
-				params.timeout = settings.screenTurnOffTimeout;
+			if(systemSettings.screenTurnOffTimeout != undefined)
+				params.timeout = systemSettings.screenTurnOffTimeout;
 		
 			this.service.request("palm://com.palm.display/control/", {'method': "setProperty",
-				'parameters': params, 'onComplete': completeCallback });
+				'parameters': params, 'onComplete': requestCallback });
 		}
 	}
-	else if(request == 1) {
-		if((settings.screenBlinkNotify == undefined) && (settings.screenLockedNotify == undefined) &&
-			(settings.screenWallpaper == undefined))
+	else if(requestID == 1) {
+		if((systemSettings.screenBlinkNotify == undefined) && (systemSettings.screenLockedNotify == undefined) &&
+			(systemSettings.screenWallpaper == undefined))
 		{
-			this.setSystemSettings(++request, settings, callback);
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		}
 		else {
 			var params = {};
 			
-			if(settings.screenBlinkNotify != undefined) {
-				if(settings.screenBlinkNotify == 1)
+			if(systemSettings.screenBlinkNotify != undefined) {
+				if(systemSettings.screenBlinkNotify == 1)
 					params.BlinkNotifications = true;
 				else
 					params.BlinkNotifications = false;
 			}
 			
-			if(settings.screenLockedNotify != undefined) {
-				if(settings.screenLockedNotify == 1)
+			if(systemSettings.screenLockedNotify != undefined) {
+				if(systemSettings.screenLockedNotify == 1)
 					params.showAlertsWhenLocked = true;
 				else
 					params.showAlertsWhenLocked = false;
 			}
 			
-			if(settings.screenWallpaper != undefined) {
+			if(systemSettings.screenWallpaper != undefined) {
 				params.wallpaper = {
-					'wallpaperName': settings.screenWallpaper.name,
-					'wallpaperFile': settings.screenWallpaper.path };
+					'wallpaperName': systemSettings.screenWallpaper.name,
+					'wallpaperFile': systemSettings.screenWallpaper.path };
 			}
 			
 			this.service.request("palm://com.palm.systemservice/", {'method': "setPreferences", 
-				'parameters': params, 'onComplete': completeCallback});
+				'parameters': params, 'onComplete': requestCallback});
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-ScreenSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+ScreenSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

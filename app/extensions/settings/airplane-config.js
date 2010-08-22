@@ -21,13 +21,13 @@ AirplaneConfig.prototype.deactivate = function() {
 
 //
 
-AirplaneConfig.prototype.setup = function(controller) {
+AirplaneConfig.prototype.setup = function(sceneController) {
 	this.choicesAirplaneModeSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Enabled", 'value': 1},
 		{'label': "Disabled", 'value': 0} ];  
 
-	controller.setupWidget("AirplaneModeSelector", {
+	sceneController.setupWidget("AirplaneModeSelector", {
 		'label': "Flight Mode",	'labelPlacement': "left",
 		'modelProperty': "airplaneMode", 
 		'choices': this.choicesAirplaneModeSelector});
@@ -36,29 +36,29 @@ AirplaneConfig.prototype.setup = function(controller) {
 //
 
 AirplaneConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'airplaneMode': -1 };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-AirplaneConfig.prototype.load = function(preferences) {
-	var config = this.config();
+AirplaneConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 
-	if(preferences.airplaneMode != undefined)
-		config.airplaneMode = preferences.airplaneMode;
+	if(settingPreferences.airplaneMode != undefined)
+		settingConfig.airplaneMode = settingPreferences.airplaneMode;
 	
-	return config;
+	return settingConfig;
 }
 
-AirplaneConfig.prototype.save = function(config) {
-	var preferences = {};
+AirplaneConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 	
-	if(config.airplaneMode != -1)
-		preferences.airplaneMode = config.airplaneMode;
+	if(settingConfig.airplaneMode != -1)
+		settingPreferences.airplaneMode = settingConfig.airplaneMode;
 	
-	return preferences;
+	return settingPreferences;
 }
 

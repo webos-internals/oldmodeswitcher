@@ -21,50 +21,50 @@ MessagingConfig.prototype.deactivate = function() {
 
 //
 
-MessagingConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+MessagingConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 	
 	this.choicesMsgAlertSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Vibrate", 'value': 3},
 		{'label': "System Sound", 'value': 1},
 		{'label': "Ringtone", 'value': 2},
 		{'label': "Mute", 'value': 0} ];  
 
-	controller.setupWidget("MessagingAlertSelector", {'label': "Msg Alert", 
+	sceneController.setupWidget("MessagingAlertSelector", {'label': "Msg Alert", 
 		'labelPlacement': "left", 'modelProperty': "messagingAlert",
 		'choices': this.choicesMsgAlertSelector});
 
 	this.choicesMsgRingtoneSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': ""},
+		{'label': sceneController.defaultChoiseLabel, 'value': ""},
 		{'label': "Select", 'value': "select"} ];  
 
-	controller.setupWidget("MessagingRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("MessagingRingtoneSelector", {'label': "Ringtone", 
 		'labelPlacement': "left", 'modelProperty': "messagingRingtoneName",
 		'choices': this.choicesMsgRingtoneSelector});
 
 /*		{'label': "Set Per Account", 'value': -2},*/
 
 	this.choicesIMStatusSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Available", 'value': 0},
 		{'label': "Busy", 'value': 2},
 		{'label': "Sign Off", 'value': 4} ];
 
-	controller.setupWidget("MessagingIMStatusSelector", {'label': "IM Status", 
+	sceneController.setupWidget("MessagingIMStatusSelector", {'label': "IM Status", 
 		'labelPlacement': "left", 'modelProperty': "messagingIMStatus",
 		'choices': this.choicesIMStatusSelector});
 
 	// Listen for change event for ringtone selector
 	
-	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 MessagingConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'messagingAlert': -1, 
 		'messagingRingtoneName': "", 
 		'messagingRingtonePath': "",
@@ -72,66 +72,66 @@ MessagingConfig.prototype.config = function() {
 		'messagingIMStatusCfg': [],
 		'messagingRingtoneDisplay': "none" };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-MessagingConfig.prototype.load = function(preferences) {
-	var config = this.config();
+MessagingConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.messagingAlert != undefined)
-		config.messagingAlert = preferences.messagingAlert;
+	if(settingPreferences.messagingAlert != undefined)
+		settingConfig.messagingAlert = settingPreferences.messagingAlert;
 
-	if(preferences.messagingAlert == 2)
-		config.messagingRingtoneDisplay = "block";
+	if(settingPreferences.messagingAlert == 2)
+		settingConfig.messagingRingtoneDisplay = "block";
 
-	if(preferences.messagingRingtone != undefined) {
-		config.messagingRingtoneName = preferences.messagingRingtone.name;
-		config.messagingRingtonePath = preferences.messagingRingtone.path;
+	if(settingPreferences.messagingRingtone != undefined) {
+		settingConfig.messagingRingtoneName = settingPreferences.messagingRingtone.name;
+		settingConfig.messagingRingtonePath = settingPreferences.messagingRingtone.path;
 	}
 	
-	if(preferences.messagingIMStatusCfg != undefined) {
-		config.messagingIMStatus = "Per Account";
+	if(settingPreferences.messagingIMStatusCfg != undefined) {
+		settingConfig.messagingIMStatus = "Per Account";
 
-		config.messagingIMStatusCfg = preferences.messagingIMStatusCfg;	
+		settingConfig.messagingIMStatusCfg = settingPreferences.messagingIMStatusCfg;	
 	}
-	else if(preferences.messagingIMStatus != undefined)
-		config.messagingIMStatus = preferences.messagingIMStatus;
+	else if(settingPreferences.messagingIMStatus != undefined)
+		settingConfig.messagingIMStatus = settingPreferences.messagingIMStatus;
 		
-	return config;
+	return settingConfig;
 }
 
-MessagingConfig.prototype.save = function(config) {
-	var preferences = {};
+MessagingConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 
-	if(config.messagingAlert != -1)
-		preferences.messagingAlert = config.messagingAlert;
+	if(settingConfig.messagingAlert != -1)
+		settingPreferences.messagingAlert = settingConfig.messagingAlert;
 
-	if(config.messagingAlert == 2) {
-		if(config.messagingRingtoneName.length != 0) {
-			preferences.messagingRingtone = {
-				'name': config.messagingRingtoneName, 
-				'path': config.messagingRingtonePath };
+	if(settingConfig.messagingAlert == 2) {
+		if(settingConfig.messagingRingtoneName.length != 0) {
+			settingPreferences.messagingRingtone = {
+				'name': settingConfig.messagingRingtoneName, 
+				'path': settingConfig.messagingRingtonePath };
 		}
 	}
 
-	if(config.messagingIMStatus == "Per Account")
-		preferences.messagingIMStatusCfg = config.messagingIMStatusCfg;
-	else if(config.messagingIMStatus != -1)
-		preferences.messagingIMStatus = config.messagingIMStatus;
+	if(settingConfig.messagingIMStatus == "Per Account")
+		settingPreferences.messagingIMStatusCfg = settingConfig.messagingIMStatusCfg;
+	else if(settingConfig.messagingIMStatus != -1)
+		settingPreferences.messagingIMStatus = settingConfig.messagingIMStatus;
 	
-	return preferences;
+	return settingPreferences;
 }
 
 //
 
-MessagingConfig.prototype.handleListChange = function(event) {
-	if(event.property == "messagingAlert") {
-		event.model.messagingRingtoneDisplay = "none";
+MessagingConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "messagingAlert") {
+		changeEvent.model.messagingRingtoneDisplay = "none";
 		
-		if(event.value == 2)
-			event.model.messagingRingtoneDisplay = "block";
+		if(changeEvent.value == 2)
+			changeEvent.model.messagingRingtoneDisplay = "block";
 
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 
@@ -139,66 +139,66 @@ MessagingConfig.prototype.handleListChange = function(event) {
 		
 		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
-	else if(event.property == "messagingRingtoneName") {
-		event.model.messagingRingtoneName = "";		
-		event.model.messagingRingtonePath = "";		
+	else if(changeEvent.property == "messagingRingtoneName") {
+		changeEvent.model.messagingRingtoneName = "";		
+		changeEvent.model.messagingRingtonePath = "";		
 		
-		this.controller.modelChanged(event.model, this);
+		this.controller.modelChanged(changeEvent.model, this);
 
-		if(event.value == "select") {
-			this.executeRingtoneSelect(event.model);
+		if(changeEvent.value == "select") {
+			this.executeRingtoneSelect(changeEvent.model);
 		}
 	}
-	else if(event.property == "messagingIMStatus") {
-		if(event.value == -2) {
-			var callback = this.handlePerAccount.bind(this, event.model);
+	else if(changeEvent.property == "messagingIMStatus") {
+		if(changeEvent.value == -2) {
+			var callback = this.handlePerAccount.bind(this, changeEvent.model);
 
-			if(event.model.messagingIMStatusCfg.length > 0)
-				event.model.messagingIMStatus = "Per Account";		
+			if(changeEvent.model.messagingIMStatusCfg.length > 0)
+				changeEvent.model.messagingIMStatus = "Per Account";		
 			else
-				event.model.messagingIMStatus = -1;
+				changeEvent.model.messagingIMStatus = -1;
 
-			this.controller.modelChanged(event.model, this);
+			this.controller.modelChanged(changeEvent.model, this);
 
 			this.controller.stageController.pushScene("scene", "imStatus", null, callback,
-				this.controller.defaultChoiseLabel, event.model.messagingIMStatusCfg);
+				this.controller.defaultChoiseLabel, changeEvent.model.messagingIMStatusCfg);
 		}
-		else if(event.model.messagingIMStatusCfg)
-			event.model.messagingIMStatusCfg.clear();
+		else if(changeEvent.model.messagingIMStatusCfg)
+			changeEvent.model.messagingIMStatusCfg.clear();
 	}
 }
 
 //
 
-MessagingConfig.prototype.executeRingtoneSelect = function(config) {
+MessagingConfig.prototype.executeRingtoneSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
 		'actionType': "attach", 'actionName': "Done", 'onSelect': 
-			function(config, payload) {
-				config.messagingRingtoneName = payload.name;
-				config.messagingRingtonePath = payload.fullPath;
+			function(eventModel, serviceResponse) {
+				eventModel.messagingRingtoneName = serviceResponse.name;
+				eventModel.messagingRingtonePath = serviceResponse.fullPath;
 				
-				this.controller.modelChanged(config, this);
-			}.bind(this, config)},
+				this.controller.modelChanged(eventModel, this);
+			}.bind(this, eventModel)},
 		this.controller.stageController);
 }
 
 //
 
-MessagingConfig.prototype.handlePerAccount = function(model, config, returnValue) {
-	if((returnValue) && (config.length > 0)) {
-		model.messagingIMStatus = "Per Account";
+MessagingConfig.prototype.handlePerAccount = function(eventModel, configList, returnValue) {
+	if((returnValue) && (configList.length > 0)) {
+		eventModel.messagingIMStatus = "Per Account";
 		
-		model.messagingIMStatusCfg.clear();
+		eventModel.messagingIMStatusCfg.clear();
 		
-		for(var i = 0; i < config.length; i++) {
-			if(config[i].messagingIMStatus != -1)
-				model.messagingIMStatusCfg.push(config[i]);
+		for(var i = 0; i < configList.length; i++) {
+			if(configList[i].messagingIMStatus != -1)
+				eventModel.messagingIMStatusCfg.push(configList[i]);
 		}
 		
-		if(model.messagingIMStatusCfg.length == 0)
-			model.messagingIMStatus = -1;
+		if(eventModel.messagingIMStatusCfg.length == 0)
+			eventModel.messagingIMStatus = -1;
 	}
 	
-	this.controller.modelChanged(model, this);
+	this.controller.modelChanged(eventModel, this);
 }
 

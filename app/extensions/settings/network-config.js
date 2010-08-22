@@ -21,33 +21,33 @@ NetworkConfig.prototype.deactivate = function() {
 
 //
 
-NetworkConfig.prototype.setup = function(controller) {
+NetworkConfig.prototype.setup = function(sceneController) {
 	this.choicesNetworkTypeSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Automatic", 'value': 1},
 		{'label': "2G Only", 'value': 2},
 		{'label': "3G Only", 'value': 3} ];  
 
-	controller.setupWidget("NetworkTypeSelector", {'label': "Network Type", 
+	sceneController.setupWidget("NetworkTypeSelector", {'label': "Network Type", 
 		'labelPlacement': "left", 'modelProperty': "networkType",
 		'choices': this.choicesNetworkTypeSelector});
 
 	this.choicesDataRoamingSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Enabled", 'value': 1},
 		{'label': "Disabled", 'value': 2} ];  
 
-	controller.setupWidget("NetworkDataSelector", {'label': "Data Roaming", 
+	sceneController.setupWidget("NetworkDataSelector", {'label': "Data Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkData",
 		'choices': this.choicesDataRoamingSelector});
 
 	this.choicesVoiceRoamingSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Automatic", 'value': 1},
 		{'label': "Home Only", 'value': 2},
 		{'label': "Roam Only", 'value': 3} ];  
 
-	controller.setupWidget("NetworkVoiceSelector", {'label': "Voice Roaming", 
+	sceneController.setupWidget("NetworkVoiceSelector", {'label': "Voice Roaming", 
 		'labelPlacement': "left", 'modelProperty': "networkVoice",
 		'choices': this.choicesVoiceRoamingSelector});
 }
@@ -55,43 +55,43 @@ NetworkConfig.prototype.setup = function(controller) {
 //
 
 NetworkConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'networkType': -1, 
 		'networkData': -1, 
 		'networkVoice': -1 };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-NetworkConfig.prototype.load = function(preferences) {
-	var config = this.config();
+NetworkConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.networkType != undefined)
-		config.networkType = preferences.networkType;
+	if(settingPreferences.networkType != undefined)
+		settingConfig.networkType = settingPreferences.networkType;
 
-	if(preferences.networkData != undefined)
-		config.networkData = preferences.networkData;
+	if(settingPreferences.networkData != undefined)
+		settingConfig.networkData = settingPreferences.networkData;
 	
-	if(preferences.networkVoice != undefined)
-		config.networkVoice = preferences.networkVoice;
+	if(settingPreferences.networkVoice != undefined)
+		settingConfig.networkVoice = settingPreferences.networkVoice;
 	
-	return config;
+	return settingConfig;
 }
 
-NetworkConfig.prototype.save = function(config) {
-	var preferences = {};
+NetworkConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 	
-	if(config.networkType != -1)
-		preferences.networkType = config.networkType;
+	if(settingConfig.networkType != -1)
+		settingPreferences.networkType = settingConfig.networkType;
 
-	if(config.networkData != -1)
-		preferences.networkData = config.networkData;
+	if(settingConfig.networkData != -1)
+		settingPreferences.networkData = settingConfig.networkData;
 
-	if(config.networkVoice != -1)
-		preferences.networkVoice = config.networkVoice;
+	if(settingConfig.networkVoice != -1)
+		settingPreferences.networkVoice = settingConfig.networkVoice;
 	
-	return preferences;
+	return settingPreferences;
 }
 

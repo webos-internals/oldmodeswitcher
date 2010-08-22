@@ -19,12 +19,12 @@ DefaultConfig.prototype.deactivate = function() {
 
 //
 
-DefaultConfig.prototype.setup = function(controller) {
+DefaultConfig.prototype.setup = function(sceneController) {
 	this.choicesDefaultLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
 
-	controller.setupWidget("DefaultLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("DefaultLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesDefaultLaunchSelector} );
 		
@@ -35,7 +35,7 @@ DefaultConfig.prototype.setup = function(controller) {
 		{'label': "15 Seconds", value: 15},
 		{'label': "30 Seconds", value: 30} ];  
 
-	controller.setupWidget("DefaultDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("DefaultDelaySelector", {'label': "Delay", 
 		'labelPlacement': "left", 'modelProperty': "launchDelay",
 		'choices': this.choicesDefaultDelaySelector} );
 }
@@ -43,36 +43,36 @@ DefaultConfig.prototype.setup = function(controller) {
 //
 
 DefaultConfig.prototype.config = function(launchPoint) {
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title, 
 		'appid': launchPoint.id,
 		'launchMode': "start", 
 		'launchDelay': 0 };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-DefaultConfig.prototype.load = function(preferences) {
-	var config = {
-		'name': preferences.name,
-		'appid': preferences.appid,
-		'launchMode': preferences.event, 
-		'launchDelay': preferences.delay };
+DefaultConfig.prototype.load = function(appPreferences) {
+	var appConfig = {
+		'name': appPreferences.name,
+		'appid': appPreferences.appid,
+		'launchMode': appPreferences.event, 
+		'launchDelay': appPreferences.delay };
 	
-	return config;
+	return appConfig;
 }
 
-DefaultConfig.prototype.save = function(config) {
-	var preferences = {
+DefaultConfig.prototype.save = function(appConfig) {
+	var appPreferences = {
 		'type': "app",
-		'name': config.name,
-		'event': config.launchMode,
-		'delay': config.launchDelay,		
-		'appid': config.appid, 
+		'name': appConfig.name,
+		'event': appConfig.launchMode,
+		'delay': appConfig.launchDelay,		
+		'appid': appConfig.appid, 
 		'params': "" };
 	
-	return preferences;
+	return appPreferences;
 }
 

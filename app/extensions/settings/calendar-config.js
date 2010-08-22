@@ -21,96 +21,96 @@ CalendarConfig.prototype.deactivate = function() {
 
 //
 
-CalendarConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+CalendarConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesCalendarAlarmSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Vibrate", 'value': 3},
 		{'label': "System Sound", 'value': 1},
 		{'label': "Ringtone", 'value': 2},
 		{'label': "Mute", 'value': 0} ];  
 
-	controller.setupWidget("CalendarAlarmSelector", {
+	sceneController.setupWidget("CalendarAlarmSelector", {
 		'label': "Reminder",	'labelPlacement': "left",
 		'modelProperty': "calendarAlarm", 
 		'choices': this.choicesCalendarAlarmSelector});
 
 	this.choicesCalendarRingtoneSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': ""},
+		{'label': sceneController.defaultChoiseLabel, 'value': ""},
 		{'label': "Select", 'value': "select"} ];  
 
-	controller.setupWidget("CalendarRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("CalendarRingtoneSelector", {'label': "Ringtone", 
 		'labelPlacement': "left", 'modelProperty': "calendarRingtoneName",
 		'choices': this.choicesCalendarRingtoneSelector});
 		
 	// Listen for change event for ringtone selector
 	
-	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this) );
 }
 
 //
 
 CalendarConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'calendarAlarm': -1,
 		'calendarRingtoneName': "", 
 		'calendarRingtonePath': "",
 		'calendarAlarmRow': "single",
 		'calendarRingtoneDisplay': "none" };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-CalendarConfig.prototype.load = function(preferences) {
-	var config = this.config();
+CalendarConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.calendarAlarm != undefined)
-		config.calendarAlarm = preferences.calendarAlarm;
+	if(settingPreferences.calendarAlarm != undefined)
+		settingConfig.calendarAlarm = settingPreferences.calendarAlarm;
 
-	if(preferences.calendarAlarm == 2) {
-		config.calendarAlarmRow = "first";		
-		config.calendarRingtoneDisplay = "block";
+	if(settingPreferences.calendarAlarm == 2) {
+		settingConfig.calendarAlarmRow = "first";		
+		settingConfig.calendarRingtoneDisplay = "block";
 	}
 			
-	if(preferences.calendarRingtone != undefined) {
-		config.calendarRingtoneName = preferences.calendarRingtone.name;
-		config.calendarRingtonePath = preferences.calendarRingtone.path;
+	if(settingPreferences.calendarRingtone != undefined) {
+		settingConfig.calendarRingtoneName = settingPreferences.calendarRingtone.name;
+		settingConfig.calendarRingtonePath = settingPreferences.calendarRingtone.path;
 	}
 	
-	return config;
+	return settingConfig;
 }
 
-CalendarConfig.prototype.save = function(config) {
-	var preferences = {};
+CalendarConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 	
-	if(config.calendarAlarm != -1)
-		preferences.calendarAlarm = config.calendarAlarm;
+	if(settingConfig.calendarAlarm != -1)
+		settingPreferences.calendarAlarm = settingConfig.calendarAlarm;
 	
-	if(config.calendarAlarm == 3) {	
-		if(config.calendarRingtoneName.length != 0) {
-			preferences.calendarRingtone = {
-				'name': config.calendarRingtoneName,
-				'path': config.calendarRingtonePath };
+	if(settingConfig.calendarAlarm == 3) {	
+		if(settingConfig.calendarRingtoneName.length != 0) {
+			settingPreferences.calendarRingtone = {
+				'name': settingConfig.calendarRingtoneName,
+				'path': settingConfig.calendarRingtonePath };
 		}
 	}
 		
-	return preferences;
+	return settingPreferences;
 }
 
 //
 
-CalendarConfig.prototype.handleListChange = function(event) {
-	if(event.property == "calendarAlarm") {
-		event.model.calendarAlarmRow = "single";		
-		event.model.calendarRingtoneDisplay = "none";
+CalendarConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "calendarAlarm") {
+		changeEvent.model.calendarAlarmRow = "single";		
+		changeEvent.model.calendarRingtoneDisplay = "none";
 		
-		if(event.value == 2) {
-			event.model.calendarAlarmRow = "first";		
-			event.model.calendarRingtoneDisplay = "block";
+		if(changeEvent.value == 2) {
+			changeEvent.model.calendarAlarmRow = "first";		
+			changeEvent.model.calendarRingtoneDisplay = "block";
 		}
 						
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
@@ -119,29 +119,29 @@ CalendarConfig.prototype.handleListChange = function(event) {
 		
 		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
-	else if(event.property == "calendarRingtoneName") {
-		event.model.calendarRingtoneName = "";		
-		event.model.calendarRingtonePath = "";		
+	else if(changeEvent.property == "calendarRingtoneName") {
+		changeEvent.model.calendarRingtoneName = "";		
+		changeEvent.model.calendarRingtonePath = "";		
 		
-		this.controller.modelChanged(event.model, this);
+		this.controller.modelChanged(changeEvent.model, this);
 
-		if(event.value == "select") {
-			this.executeRingtoneSelect(event.model);
+		if(changeEvent.value == "select") {
+			this.executeRingtoneSelect(changeEvent.model);
 		}
 	}	
 }
 
 //
 
-CalendarConfig.prototype.executeRingtoneSelect = function(config) {
+CalendarConfig.prototype.executeRingtoneSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
 		'actionType': "attach", 'actionName': "Done", 'onSelect': 
-			function(config, payload) {
-				config.calendarRingtoneName = payload.name;
-				config.calendarRingtonePath = payload.fullPath;
+			function(eventModel, serviceResponse) {
+				eventModel.calendarRingtoneName = serviceResponse.name;
+				eventModel.calendarRingtonePath = serviceResponse.fullPath;
 				
-				this.controller.modelChanged(config, this);	
-			}.bind(this, config)},
+				this.controller.modelChanged(eventModel, this);	
+			}.bind(this, eventModel)},
 		this.controller.stageController);
 }
 

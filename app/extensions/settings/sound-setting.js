@@ -4,8 +4,8 @@ function SoundSetting(Control) {
 
 //
 
-SoundSetting.prototype.init = function(callback) {
-	callback(true);
+SoundSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 SoundSetting.prototype.shutdown = function() {
@@ -13,91 +13,91 @@ SoundSetting.prototype.shutdown = function() {
 
 //
 
-SoundSetting.prototype.get = function(callback) {
-	var settings = {};
+SoundSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-SoundSetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, settings, callback);
+SoundSetting.prototype.set = function(systemSettings, doneCallback) {
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-SoundSetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+SoundSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.audio/ringtone/", {'method': "getVolume",
-			'parameters': {}, 'onComplete': completeCallback}); 
+			'parameters': {}, 'onComplete': requestCallback}); 
 	}
-	else if(request == 1) {
+	else if(requestID == 1) {
 		this.service.request("palm://com.palm.audio/system/", {'method': "status",
-			'parameters': {}, 'onComplete': completeCallback}); 
+			'parameters': {}, 'onComplete': requestCallback}); 
 	}
-	else if(request == 2) {
+	else if(requestID == 2) {
 		this.service.request("palm://com.palm.audio/media/", {'method': "status",
-			'parameters': {}, 'onComplete': completeCallback }); 
+			'parameters': {}, 'onComplete': requestCallback }); 
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-SoundSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			settings.soundRingerVolume = response.volume;
+SoundSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			systemSettings.soundRingerVolume = serviceResponse.volume;
 		}
-		else if(request == 1) {
-			settings.soundSystemVolume = response.volume;
+		else if(requestID == 1) {
+			systemSettings.soundSystemVolume = serviceResponse.volume;
 		}
-		else if(request == 2) {
-			settings.soundMediaVolume = response.volume;
+		else if(requestID == 2) {
+			systemSettings.soundMediaVolume = serviceResponse.volume;
 		}
 	}
 	
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-SoundSetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+SoundSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if(settings.soundRingerVolume == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if(systemSettings.soundRingerVolume == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
 			this.service.request("palm://com.palm.audio/ringtone/", {'method': "setVolume",
-				'parameters': {'volume': settings.soundRingerVolume}, 
-				'onComplete': completeCallback});
+				'parameters': {'volume': systemSettings.soundRingerVolume}, 
+				'onComplete': requestCallback});
 		}
 	}
-	else if(request == 1) {
-		if(settings.soundSystemVolume == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 1) {
+		if(systemSettings.soundSystemVolume == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
 			this.service.request("palm://com.palm.audio/system/", {'method': "setVolume",
-				'parameters': {'volume': settings.soundSystemVolume}, 
-				'onComplete': completeCallback});
+				'parameters': {'volume': systemSettings.soundSystemVolume}, 
+				'onComplete': requestCallback});
 		}
 	}
-	else if(request == 2) {
-		if(settings.soundMediaVolume == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 2) {
+		if(systemSettings.soundMediaVolume == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
 			this.service.request("palm://com.palm.audio/media/", {'method': "setVolume",
 				'parameters': {'scenario': "media_back_speaker", 
-					'volume': settings.soundMediaVolume},
-				'onComplete': completeCallback });
+					'volume': systemSettings.soundMediaVolume},
+				'onComplete': requestCallback });
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-SoundSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+SoundSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

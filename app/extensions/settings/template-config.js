@@ -27,7 +27,7 @@ TemplateConfig.prototype.deactivate = function() {
 
 //
 
-TemplateConfig.prototype.setup = function(controller) {
+TemplateConfig.prototype.setup = function(sceneController) {
 	// This function should setup all the widgets in the extension-listitem file.
 
 	this.choicesTemplateModeSelector = [
@@ -36,7 +36,7 @@ TemplateConfig.prototype.setup = function(controller) {
 		{'label': "Disabled", 'value': 0}
 	];  
 
-	controller.setupWidget("TemplateModeSelector", {
+	sceneController.setupWidget("TemplateModeSelector", {
 		'label': "Template Mode",	'labelPlacement': "left",
 		'modelProperty': "templateMode", 
 		'choices': this.choicesTemplateModeSelector} );
@@ -49,39 +49,39 @@ TemplateConfig.prototype.config = function() {
 
 	// Configuration returned here is the configuration for the UI part.
 	
-	var config = {
+	var settingConfig = {
 		'templateMode': -1 };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-TemplateConfig.prototype.load = function(preferences) {
+TemplateConfig.prototype.load = function(settingPreferences) {
 	// This function will do the parsing of the preferences stored by the main 
 	// application into the wanted format for the UI part of the configuration.
 	
 	// The data in application preferences is set by the extension itself.
 
-	var config = this.config();
+	var settingConfig = this.config();
 	
-	if(preferences.templateMode != undefined)
-		config.templateMode = preferences.templateMode;
+	if(settingPreferences.templateMode != undefined)
+		settingConfig.templateMode = settingPreferences.templateMode;
 	
-	return config;
+	return settingConfig;
 }
 
-TemplateConfig.prototype.save = function(config) {
+TemplateConfig.prototype.save = function(settingConfig) {
 	// This function will do the parsing of the configuration used in the UI 
 	// part into the preferences format stored by the main application.
 	
 	// The data in the main application preferences should be kept to minimum.
 
-	var preferences = {};
+	var settingPreferences = {};
 	
-	if(config.templateMode != -1)
-		preferences.templateMode = config.templateMode;
+	if(settingConfig.templateMode != -1)
+		settingPreferences.templateMode = settingConfig.templateMode;
 	
-	return preferences;
+	return settingPreferences;
 }
 

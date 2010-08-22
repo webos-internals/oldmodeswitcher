@@ -4,8 +4,8 @@ function ConnectionSetting(Control) {
 
 //
 
-ConnectionSetting.prototype.init = function(callback) {
-	callback(true);
+ConnectionSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 ConnectionSetting.prototype.shutdown = function() {
@@ -13,162 +13,162 @@ ConnectionSetting.prototype.shutdown = function() {
 
 //
 
-ConnectionSetting.prototype.get = function(callback) {
-	var settings = {};
+ConnectionSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-ConnectionSetting.prototype.set = function(settings, callback) {
-	var current = {};
+ConnectionSetting.prototype.set = function(systemSettings, doneCallback) {
+	var currentSettings = {};
 	
-	var applyCallback = this.apply.bind(this, current, settings, callback);
+	var applyCallback = this.apply.bind(this, currentSettings, systemSettings, doneCallback);
 	
-	this.getSystemSettings(0, current, applyCallback);
+	this.getSystemSettings(0, currentSettings, applyCallback);
 }
 
 //
 
-ConnectionSetting.prototype.apply = function(current, requested, callback) {
-	var settings = {};
+ConnectionSetting.prototype.apply = function(currentSettings, requestedSettings, doneCallback) {
+	var systemSettings = {};
 
-	if((requested.connectionPhone != undefined) && (current.connectionPhone != requested.connectionPhone))
-		settings.connectionPhone = requested.connectionPhone;
+	if((requestedSettings.connectionPhone != undefined) && (currentSettings.connectionPhone != requestedSettings.connectionPhone))
+		systemSettings.connectionPhone = requestedSettings.connectionPhone;
 
-	if((requested.connectionData != undefined) && (current.connectionData != requested.connectionData))
-		settings.connectionData = requested.connectionData;
+	if((requestedSettings.connectionData != undefined) && (currentSettings.connectionData != requestedSettings.connectionData))
+		systemSettings.connectionData = requestedSettings.connectionData;
 
-//	if((requested.connectionWiFi != undefined) && (current.connectionWiFi != requested.connectionWiFi))
-		settings.connectionWiFi = requested.connectionWiFi;
+//	if((requestedSettings.connectionWiFi != undefined) && (currentSettings.connectionWiFi != requestedSettings.connectionWiFi))
+		systemSettings.connectionWiFi = requestedSettings.connectionWiFi;
 		
-	if((requested.connectionBT != undefined) && (current.connectionBT != requested.connectionBT))
-		settings.connectionBT = requested.connectionBT;
+	if((requestedSettings.connectionBT != undefined) && (currentSettings.connectionBT != requestedSettings.connectionBT))
+		systemSettings.connectionBT = requestedSettings.connectionBT;
 
-	if((requested.connectionGPS != undefined) && (current.connectionGPS != requested.connectionGPS))
-		settings.connectionGPS = requested.connectionGPS;
+	if((requestedSettings.connectionGPS != undefined) && (currentSettings.connectionGPS != requestedSettings.connectionGPS))
+		systemSettings.connectionGPS = requestedSettings.connectionGPS;
 
-	this.setSystemSettings(0, settings, callback);
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-ConnectionSetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+ConnectionSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.telephony/", {'method': "powerQuery", 
-			'parameters': {}, 'onComplete': completeCallback});
+			'parameters': {}, 'onComplete': requestCallback});
 	}
-	else if(request == 1) {
+	else if(requestID == 1) {
 		this.service.request("palm://com.palm.connectionmanager/", {'method': "getstatus", 
-			'parameters': {}, 'onComplete': completeCallback});
+			'parameters': {}, 'onComplete': requestCallback});
 	}
-	else if(request == 2) {
+	else if(requestID == 2) {
 		this.service.request("palm://com.palm.wifi/", {'method': "getstatus", 
-			'parameters': {'subscribe': false}, 'onComplete': completeCallback});
+			'parameters': {'subscribe': false}, 'onComplete': requestCallback});
 	}
-	else if(request == 3) {
+	else if(requestID == 3) {
 		this.service.request("palm://com.palm.btmonitor/monitor/",{'method': "getradiostate", 
-			'parameters': {}, 'onComplete': completeCallback});
+			'parameters': {}, 'onComplete': requestCallback});
 	}
-	else if(request == 4) {
+	else if(requestID == 4) {
 		this.service.request("palm://com.palm.location/", {'method': "getUseGps", 
-			'parameters': {}, 'onComplete': completeCallback});
+			'parameters': {}, 'onComplete': requestCallback});
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-ConnectionSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			if(response.extended) {
-				if((response.extended.powerState) && (response.extended.powerState == 'on'))
-					settings.connectionPhone = 1;
-				else if((response.extended.powerState) && (response.extended.powerState == 'off'))
-					settings.connectionPhone = 0;
+ConnectionSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			if(serviceResponse.extended) {
+				if((serviceResponse.extended.powerState) && (serviceResponse.extended.powerState == 'on'))
+					systemSettings.connectionPhone = 1;
+				else if((serviceResponse.extended.powerState) && (serviceResponse.extended.powerState == 'off'))
+					systemSettings.connectionPhone = 0;
 			}
 		}
-		else if(request == 1) {
-			if(response.wan) {
-				if(response.wan.state == "connected")
-					settings.connectionData = 1;
-				else if(response.wan.state == "disconnected")
-					settings.connectionData = 0;
+		else if(requestID == 1) {
+			if(serviceResponse.wan) {
+				if(serviceResponse.wan.state == "connected")
+					systemSettings.connectionData = 1;
+				else if(serviceResponse.wan.state == "disconnected")
+					systemSettings.connectionData = 0;
 			}
 		}
-		else if(request == 2) {
-			if (response.status == 'serviceDisabled')
-				settings.connectionWiFi = 0;
+		else if(requestID == 2) {
+			if (serviceResponse.status == 'serviceDisabled')
+				systemSettings.connectionWiFi = 0;
 			else
-				settings.connectionWiFi = 1;
+				systemSettings.connectionWiFi = 1;
 		}
-		else if(request == 3) {
-			if((response.radio == "turningoff") || (response.radio == "off"))
-				settings.connectionBT = 0;
+		else if(requestID == 3) {
+			if((serviceResponse.radio == "turningoff") || (serviceResponse.radio == "off"))
+				systemSettings.connectionBT = 0;
 			else
-				settings.connectionBT = 1;
+				systemSettings.connectionBT = 1;
 		}
-		else if(request == 4) {
-			if(response.useGps == true)
-				settings.connectionGPS = 1;
-			else if(response.useGps == false)
-				settings.connectionGPS = 0;
+		else if(requestID == 4) {
+			if(serviceResponse.useGps == true)
+				systemSettings.connectionGPS = 1;
+			else if(serviceResponse.useGps == false)
+				systemSettings.connectionGPS = 0;
 		}
 	}
 
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-ConnectionSetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+ConnectionSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if(settings.connectionPhone == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if(systemSettings.connectionPhone == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.connectionPhone == 1)
+			if(systemSettings.connectionPhone == 1)
 				var state = "on";
 			else
 				var state = "off";
 		
 			this.service.request("palm://com.palm.telephony", {'method': "powerSet", 
-				'parameters': {'state': state}, 'onComplete': completeCallback});
+				'parameters': {'state': state}, 'onComplete': requestCallback});
 		}
 	}
-	else if(request == 1) {
-		if(settings.connectionData == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 1) {
+		if(systemSettings.connectionData == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.connectionData == 1)
+			if(systemSettings.connectionData == 1)
 				var disabled = "off";
 			else
 				var disabled = "on";
 		
 			this.service.request("palm://com.palm.wan/", {'method': "set",
-				'parameters': {'disablewan': disabled}, 'onComplete': completeCallback});
+				'parameters': {'disablewan': disabled}, 'onComplete': requestCallback});
 		}
 	}
-	else if(request == 2) {
-		if(settings.connectionWiFi == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 2) {
+		if(systemSettings.connectionWiFi == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.connectionWiFi == 1)
+			if(systemSettings.connectionWiFi == 1)
 				var wifiState = "enabled";
 			else
 				var wifiState = "disabled";
 
 			this.service.request("palm://com.palm.wifi/", {'method': "setstate", 
-				'parameters': {'state': wifiState}, 'onComplete': completeCallback});
+				'parameters': {'state': wifiState}, 'onComplete': requestCallback});
 		}
 	}
-	else if(request == 3) {
-		if(settings.connectionBT == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 3) {
+		if(systemSettings.connectionBT == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.connectionBT == 1) {
+			if(systemSettings.connectionBT == 1) {
 				var btmethod = "radioon";
 				var btstates = true;
 			}
@@ -179,27 +179,27 @@ ConnectionSetting.prototype.setSystemSettings = function(request, settings, call
 		
 			this.service.request("palm://com.palm.btmonitor/monitor/", {'method': btmethod, 
 				'parameters': {'visible': btstates, 'connectable': btstates}, 
-				'onComplete': completeCallback});
+				'onComplete': requestCallback});
 		}
 	}
-	else if(request == 4) {
-		if(settings.connectionGPS == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 4) {
+		if(systemSettings.connectionGPS == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.connectionGPS == 1)
+			if(systemSettings.connectionGPS == 1)
 				var useGps = true;
 			else
 				var useGps = false;
 		
 			this.service.request("palm://com.palm.location/", {'method': "setUseGps", 
-				'parameters': {'useGps': useGps}, 'onComplete': completeCallback});
+				'parameters': {'useGps': useGps}, 'onComplete': requestCallback});
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-ConnectionSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+ConnectionSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

@@ -21,33 +21,33 @@ EmailConfig.prototype.deactivate = function() {
 
 //
 
-EmailConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+EmailConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesEmailAlertSelector = [
 		{'label': "Set Per Account", 'value': -2},
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Vibrate", 'value': 2},
 		{'label': "System Sound", 'value': 1},
 		{'label': "Ringtone", 'value': 3},
 		{'label': "Mute", 'value': 0} ];  
 
-	controller.setupWidget("EmailAlertSelector", {'label': "Alert", 
+	sceneController.setupWidget("EmailAlertSelector", {'label': "Alert", 
 		'labelPlacement': "left", 'modelProperty': "emailAlert",
 		'choices': this.choicesEmailAlertSelector});
 
 	this.choicesEmailRingtoneSelector = [
 		{'label': "Set Per Account", 'value': -2},
-		{'label': controller.defaultChoiseLabel, 'value': ""},
+		{'label': sceneController.defaultChoiseLabel, 'value': ""},
 		{'label': "Select", 'value': "select"} ];  
 
-	controller.setupWidget("EmailRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("EmailRingtoneSelector", {'label': "Ringtone", 
 		'labelPlacement': "left", 'modelProperty': "emailRingtoneName",
 		'choices': this.choicesEmailRingtoneSelector});
 
 	this.choicesEmailSyncSelector = [
 		{'label': "Set Per Account", 'value': -2},
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "As Items Arrive", 'value': 0}, 
 		{'label': "5 Minutes", 'value': 5},
 		{'label': "10 Minutes", 'value': 10},
@@ -59,20 +59,20 @@ EmailConfig.prototype.setup = function(controller) {
 		{'label': "24 Hours", 'value': 1440},		
 		{'label': "Manual", 'value': 1000000} ];
 
-	controller.setupWidget("EmailSyncSelector", {'label': "Get Email", 
+	sceneController.setupWidget("EmailSyncSelector", {'label': "Get Email", 
 		'labelPlacement': "left", 'modelProperty': "emailSync",
 		'choices': this.choicesEmailSyncSelector});
 
 	// Listen for change event for ringtone selector
 	
-	controller.listen(controller.get("SettingsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("SettingsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
 //
 
 EmailConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'emailAlert': -1, 
 		'emailAlertCfg': [],
 		'emailRingtoneName': "", 
@@ -82,102 +82,102 @@ EmailConfig.prototype.config = function() {
 		'emailSyncCfg': [],
 		'emailRingtoneDisplay': "none" };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-EmailConfig.prototype.load = function(preferences) {
-	var config = this.config();
+EmailConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.emailAlertCfg != undefined) {
-		config.emailAlert = "Per Account";
+	if(settingPreferences.emailAlertCfg != undefined) {
+		settingConfig.emailAlert = "Per Account";
 
-		config.emailAlertCfg = preferences.emailAlertCfg;	
+		settingConfig.emailAlertCfg = settingPreferences.emailAlertCfg;	
 
-		config.emailRingtoneDisplay = "block";
+		settingConfig.emailRingtoneDisplay = "block";
 	}
-	else if(preferences.emailAlert != undefined)
-		config.emailAlert = preferences.emailAlert;
+	else if(settingPreferences.emailAlert != undefined)
+		settingConfig.emailAlert = settingPreferences.emailAlert;
 
-	if(preferences.emailAlert == 3)
-		config.emailRingtoneDisplay = "block";
+	if(settingPreferences.emailAlert == 3)
+		settingConfig.emailRingtoneDisplay = "block";
 
-	if(preferences.emailRingtoneCfg != undefined) {
-		config.emailRingtoneName = "Per Account";
+	if(settingPreferences.emailRingtoneCfg != undefined) {
+		settingConfig.emailRingtoneName = "Per Account";
 
-		config.emailRingtoneCfg = preferences.emailRingtoneCfg;	
+		settingConfig.emailRingtoneCfg = settingPreferences.emailRingtoneCfg;	
 	}
-	else if(preferences.emailRingtone != undefined) {
-		config.emailRingtoneName = preferences.emailRingtone.name; 
-		config.emailRingtonePath = preferences.emailRingtone.path;
+	else if(settingPreferences.emailRingtone != undefined) {
+		settingConfig.emailRingtoneName = settingPreferences.emailRingtone.name; 
+		settingConfig.emailRingtonePath = settingPreferences.emailRingtone.path;
 	}
 
-	if(preferences.emailSyncCfg != undefined) {
-		config.emailSync = "Per Account";
+	if(settingPreferences.emailSyncCfg != undefined) {
+		settingConfig.emailSync = "Per Account";
 
-		config.emailSyncCfg = preferences.emailSyncCfg;	
+		settingConfig.emailSyncCfg = settingPreferences.emailSyncCfg;	
 	}
-	else if(preferences.emailSync != undefined)
-		config.emailSync = preferences.emailSync;
+	else if(settingPreferences.emailSync != undefined)
+		settingConfig.emailSync = settingPreferences.emailSync;
 	
-	return config;
+	return settingConfig;
 }
 
-EmailConfig.prototype.save = function(config) {
-	var preferences = {};
+EmailConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 
-	if(config.emailAlert == "Per Account")
-		preferences.emailAlertCfg = config.emailAlertCfg;
-	else if(config.emailAlert != -1)
-		preferences.emailAlert = config.emailAlert;
+	if(settingConfig.emailAlert == "Per Account")
+		settingPreferences.emailAlertCfg = settingConfig.emailAlertCfg;
+	else if(settingConfig.emailAlert != -1)
+		settingPreferences.emailAlert = settingConfig.emailAlert;
 
-	if(config.emailRingtoneName == "Per Account")
-		preferences.emailRingtoneCfg = config.emailRingtoneCfg;
+	if(settingConfig.emailRingtoneName == "Per Account")
+		settingPreferences.emailRingtoneCfg = settingConfig.emailRingtoneCfg;
 	else {
-		if(config.emailAlert == 3) {
-			if(config.emailRingtoneName.length != 0) {
-				preferences.emailRingtone = {
-					'name': config.emailRingtoneName, 
-					'path': config.emailRingtonePath };
+		if(settingConfig.emailAlert == 3) {
+			if(settingConfig.emailRingtoneName.length != 0) {
+				settingPreferences.emailRingtone = {
+					'name': settingConfig.emailRingtoneName, 
+					'path': settingConfig.emailRingtonePath };
 			}
 		}
 	}
 		
-	if(config.emailSync == "Per Account")
-		preferences.emailSyncCfg = config.emailSyncCfg;
-	else if(config.emailSync != -1)
-		preferences.emailSync = config.emailSync;
+	if(settingConfig.emailSync == "Per Account")
+		settingPreferences.emailSyncCfg = settingConfig.emailSyncCfg;
+	else if(settingConfig.emailSync != -1)
+		settingPreferences.emailSync = settingConfig.emailSync;
 	
-	return preferences;
+	return settingPreferences;
 }
 
 //
 
-EmailConfig.prototype.handleListChange = function(event) {
-	if(event.property == "emailAlert") {
-		if(event.value == -2) {
-			if(event.model.emailAlertCfg.length > 0)
-				event.model.emailAlert = "Per Account";
+EmailConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "emailAlert") {
+		if(changeEvent.value == -2) {
+			if(changeEvent.model.emailAlertCfg.length > 0)
+				changeEvent.model.emailAlert = "Per Account";
 			else {
-				event.model.emailAlert = -1;
+				changeEvent.model.emailAlert = -1;
 	
-				event.model.emailRingtoneDisplay = "none";
+				changeEvent.model.emailRingtoneDisplay = "none";
 			}
 			
-			var callback = this.handlePerAccountAlert.bind(this, event.model);
+			var callback = this.handlePerAccountAlert.bind(this, changeEvent.model);
 	
 			this.controller.stageController.pushScene("scene", "emailAlert", null, callback,
-				this.controller.defaultChoiseLabel, event.model.emailAlertCfg);
+				this.controller.defaultChoiseLabel, changeEvent.model.emailAlertCfg);
 		}
 		else {
-			if(event.model.emailAlertCfg)
-				event.model.emailAlertCfg.clear();
+			if(changeEvent.model.emailAlertCfg)
+				changeEvent.model.emailAlertCfg.clear();
 
-			event.model.emailRingtoneDisplay = "none";
+			changeEvent.model.emailRingtoneDisplay = "none";
 		
-			if(event.value == 3)
-				event.model.emailRingtoneDisplay = "block";
+			if(changeEvent.value == 3)
+				changeEvent.model.emailRingtoneDisplay = "block";
 		}
 		
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
@@ -186,84 +186,84 @@ EmailConfig.prototype.handleListChange = function(event) {
 		
 		this.controller.get('mojo-scene-editmode-scene-scroller').mojo.setState(state);
 	}
-	else if(event.property == "emailRingtoneName") {
-		if(event.value == -2) {
-			if(event.model.emailRingtoneCfg.length > 0)
-				event.model.emailRingtoneName = "Per Account";		
+	else if(changeEvent.property == "emailRingtoneName") {
+		if(changeEvent.value == -2) {
+			if(changeEvent.model.emailRingtoneCfg.length > 0)
+				changeEvent.model.emailRingtoneName = "Per Account";		
 			else {
-				event.model.emailRingtoneName = "";		
-				event.model.emailRingtonePath = "";		
+				changeEvent.model.emailRingtoneName = "";		
+				changeEvent.model.emailRingtonePath = "";		
 			}
 		
-			var callback = this.handlePerAccountRingtone.bind(this, event.model);
+			var callback = this.handlePerAccountRingtone.bind(this, changeEvent.model);
 	
 			this.controller.stageController.pushScene("scene", "emailRingtone", null, callback,
-				this.controller.defaultChoiseLabel, event.model.emailRingtoneCfg);
+				this.controller.defaultChoiseLabel, changeEvent.model.emailRingtoneCfg);
 		}
 		else {
-			if(event.model.emailRingtoneCfg)
-				event.model.emailRingtoneCfg.clear();
+			if(changeEvent.model.emailRingtoneCfg)
+				changeEvent.model.emailRingtoneCfg.clear();
 			
-			event.model.emailRingtoneName = "";		
-			event.model.emailRingtonePath = "";		
+			changeEvent.model.emailRingtoneName = "";		
+			changeEvent.model.emailRingtonePath = "";		
 		
-			if(event.value == "select") {
-				this.executeRingtoneSelect(event.model);
+			if(changeEvent.value == "select") {
+				this.executeRingtoneSelect(changeEvent.model);
 			}
 		}
 		
-		this.controller.modelChanged(event.model, this);
+		this.controller.modelChanged(changeEvent.model, this);
 	}
-	else if(event.property == "emailSync") {
-		if(event.value == -2) {
-			if(event.model.emailSyncCfg.length > 0)
-				event.model.emailSync = "Per Account";		
+	else if(changeEvent.property == "emailSync") {
+		if(changeEvent.value == -2) {
+			if(changeEvent.model.emailSyncCfg.length > 0)
+				changeEvent.model.emailSync = "Per Account";		
 			else
-				event.model.emailSync = -1;
+				changeEvent.model.emailSync = -1;
 			
-			var callback = this.handlePerAccountSync.bind(this, event.model);
+			var callback = this.handlePerAccountSync.bind(this, changeEvent.model);
 	
 			this.controller.stageController.pushScene("scene", "emailSync", null, callback,
-				this.controller.defaultChoiseLabel, event.model.emailSyncCfg);
+				this.controller.defaultChoiseLabel, changeEvent.model.emailSyncCfg);
 		}
-		else if(event.model.emailSyncCfg)
-			event.model.emailSyncCfg.clear();
+		else if(changeEvent.model.emailSyncCfg)
+			changeEvent.model.emailSyncCfg.clear();
 
-		this.controller.modelChanged(event.model, this);
+		this.controller.modelChanged(changeEvent.model, this);
 	}	
 }
 
 //
 
-EmailConfig.prototype.executeRingtoneSelect = function(config) {
+EmailConfig.prototype.executeRingtoneSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
 		'actionType': "attach", 'actionName': "Done", 'onSelect': 
-			function(config, payload) {
-				config.emailRingtoneName = payload.name;
-				config.emailRingtonePath = payload.fullPath;
+			function(eventModel, serviceResponse) {
+				eventModel.emailRingtoneName = serviceResponse.name;
+				eventModel.emailRingtonePath = serviceResponse.fullPath;
 				
-				this.controller.modelChanged(config, this);
-			}.bind(this, config)},
+				this.controller.modelChanged(eventModel, this);
+			}.bind(this, eventModel)},
 		this.controller.stageController);
 }
 
 //
 
-EmailConfig.prototype.handlePerAccountAlert = function(model, config, returnValue) {
+EmailConfig.prototype.handlePerAccountAlert = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		model.emailAlert = "Per Account";		
+		eventModel.emailAlert = "Per Account";		
 
-		model.emailAlertCfg.clear();
+		eventModel.emailAlertCfg.clear();
 		
-		for(var i = 0; i < config.length; i++) {
-			if(config[i].emailAlert != -1)
-				model.emailAlertCfg.push(config[i]);
+		for(var i = 0; i < configList.length; i++) {
+			if(configList[i].emailAlert != -1)
+				eventModel.emailAlertCfg.push(configList[i]);
 		}
 		
-		if(model.emailAlertCfg.length == 0)
-			model.emailAlert = -1;
+		if(eventModel.emailAlertCfg.length == 0)
+			eventModel.emailAlert = -1;
 		
-		model.emailRingtoneDisplay = "block";
+		eventModel.emailRingtoneDisplay = "block";
 
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
 
@@ -273,39 +273,39 @@ EmailConfig.prototype.handlePerAccountAlert = function(model, config, returnValu
 	}
 }
 
-EmailConfig.prototype.handlePerAccountRingtone = function(model, config, returnValue) {
+EmailConfig.prototype.handlePerAccountRingtone = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		model.emailRingtoneName = "Per Account";		
+		eventModel.emailRingtoneName = "Per Account";		
 
-		model.emailRingtoneCfg.clear();
+		eventModel.emailRingtoneCfg.clear();
 		
-		for(var i = 0; i < config.length; i++) {
-			if(config[i].emailRingtone.name != "")
-				model.emailRingtoneCfg.push(config[i]);
+		for(var i = 0; i < configList.length; i++) {
+			if(configList[i].emailRingtone.name != "")
+				eventModel.emailRingtoneCfg.push(configList[i]);
 		}
 		
-		if(model.emailRingtoneCfg.length == 0)
-			model.emailRingtoneName = "";
+		if(eventModel.emailRingtoneCfg.length == 0)
+			eventModel.emailRingtoneName = "";
 
-		this.controller.modelChanged(model, this);
+		this.controller.modelChanged(eventModel, this);
 	}
 }
 
-EmailConfig.prototype.handlePerAccountSync = function(model, config, returnValue) {
+EmailConfig.prototype.handlePerAccountSync = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		model.emailSync = "Per Account";		
+		eventModel.emailSync = "Per Account";		
 
-		model.emailSyncCfg.clear();
+		eventModel.emailSyncCfg.clear();
 		
-		for(var i = 0; i < config.length; i++) {
-			if(config[i].emailSync != -1)
-				model.emailSyncCfg.push(config[i]);
+		for(var i = 0; i < configList.length; i++) {
+			if(configList[i].emailSync != -1)
+				eventModel.emailSyncCfg.push(configList[i]);
 		}
 
-		if(model.emailSyncCfg.length == 0)
-			model.emailSync = -1;
+		if(eventModel.emailSyncCfg.length == 0)
+			eventModel.emailSync = -1;
 
-		this.controller.modelChanged(model, this);
+		this.controller.modelChanged(eventModel, this);
 	}
 }
 

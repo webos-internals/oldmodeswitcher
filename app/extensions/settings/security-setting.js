@@ -4,8 +4,8 @@ function SecuritySetting(Control) {
 
 //
 
-SecuritySetting.prototype.init = function(callback) {
-	callback(true);
+SecuritySetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 SecuritySetting.prototype.shutdown = function() {
@@ -13,74 +13,74 @@ SecuritySetting.prototype.shutdown = function() {
 
 //
 
-SecuritySetting.prototype.get = function(callback) {
-	var settings = {};
+SecuritySetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-SecuritySetting.prototype.set = function(settings, callback) {
-	this.setSystemSettings(0, settings, callback);
+SecuritySetting.prototype.set = function(systemSettings, doneCallback) {
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-SecuritySetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+SecuritySetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.systemmanager/", {'method': "getDeviceLockMode", 
-			'parameters': {}, 'onComplete': completeCallback});
+			'parameters': {}, 'onComplete': requestCallback});
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-SecuritySetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			if(response.lockMode == "pin")
-				settings.securityLock = 1;
-			else if(response.lockMode == "password")
-				settings.securityLock = 2;
+SecuritySetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			if(serviceResponse.lockMode == "pin")
+				systemSettings.securityLock = 1;
+			else if(serviceResponse.lockMode == "password")
+				systemSettings.securityLock = 2;
 			else
-				settings.securityLock = 0;
+				systemSettings.securityLock = 0;
 				
-			settings.securitySecret = "";
+			systemSettings.securitySecret = "";
 		}
 	}
 			
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-SecuritySetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+SecuritySetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if((settings.securityLock == undefined) || 
-			((settings.securityLock != 0) && (settings.securitySecret == undefined)))
+	if(requestID == 0) {
+		if((systemSettings.securityLock == undefined) || 
+			((systemSettings.securityLock != 0) && (systemSettings.securitySecret == undefined)))
 		{
-			this.setSystemSettings(++request, settings, callback);
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		}
 		else {
-			if(settings.securityLock == 1)
-				var params = {'passCode': settings.securitySecret, 'lockMode': "pin"}
-			else if(settings.securityLock == 2)
-				var params = {'passCode': settings.securitySecret, 'lockMode': "password"}
+			if(systemSettings.securityLock == 1)
+				var params = {'passCode': systemSettings.securitySecret, 'lockMode': "pin"}
+			else if(systemSettings.securityLock == 2)
+				var params = {'passCode': systemSettings.securitySecret, 'lockMode': "password"}
 			else
 				var params = {'lockMode': "none"};
 			
 			this.service.request("palm://com.palm.systemmanager/", {'method': "setDevicePasscode", 
-				'parameters': params, 'onComplete': completeCallback});
+				'parameters': params, 'onComplete': requestCallback});
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-SecuritySetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+SecuritySetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 

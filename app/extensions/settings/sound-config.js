@@ -21,86 +21,86 @@ SoundConfig.prototype.deactivate = function() {
 
 //
 
-SoundConfig.prototype.setup = function(controller) {
+SoundConfig.prototype.setup = function(sceneController) {
 	// Ringer, System and Media volume selectors
 	
 	this.choicesRingerVolumeSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Minimum", 'value': 0},
 		{'label': "Maximum", 'value': 100} ];  
 
-	controller.setupWidget("SoundRingerSelector", {'label': "Ringer", 
+	sceneController.setupWidget("SoundRingerSelector", {'label': "Ringer", 
 		'labelPlacement': "left", 'modelProperty': "soundRingerVolume",
 		'choices': this.choicesRingerVolumeSelector});
 		
-	controller.setupWidget("SoundRingerSlider", {'minValue': -1, 'maxValue': 100, 
+	sceneController.setupWidget("SoundRingerSlider", {'minValue': -1, 'maxValue': 100, 
 		'round': true, 'modelProperty': "soundRingerVolume"});
 
 	this.choicesSystemVolumeSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Minimum", 'value': 0},
 		{'label': "Maximum", 'value': 100} ];  
 
-	controller.setupWidget("SoundSystemSelector", {'label': "System", 
+	sceneController.setupWidget("SoundSystemSelector", {'label': "System", 
 		'labelPlacement': "left", 'modelProperty': "soundSystemVolume",
 		'choices': this.choicesSystemVolumeSelector});
 		
-	controller.setupWidget("SoundSystemSlider", {'minValue': -1, 'maxValue': 100, 
+	sceneController.setupWidget("SoundSystemSlider", {'minValue': -1, 'maxValue': 100, 
 		'round': true, 'modelProperty': "soundSystemVolume"});
 
 	this.choicesMediaVolumeSelector = [
-		{'label': controller.defaultChoiseLabel, 'value': -1},
+		{'label': sceneController.defaultChoiseLabel, 'value': -1},
 		{'label': "Minimum", 'value': 0},
 		{'label': "Maximum", 'value': 100} ];  
 
-	controller.setupWidget("SoundMediaSelector", {'label': "Media", 
+	sceneController.setupWidget("SoundMediaSelector", {'label': "Media", 
 		'labelPlacement': "left", 'modelProperty': "soundMediaVolume",
 		'choices': this.choicesMediaVolumeSelector});
 
-	controller.setupWidget("SoundMediaSlider", {'minValue': -1, 'maxValue': 100, 
+	sceneController.setupWidget("SoundMediaSlider", {'minValue': -1, 'maxValue': 100, 
 		'round': true, 'modelProperty': "soundMediaVolume"});
 }
 
 //
 
 SoundConfig.prototype.config = function() {
-	var config = {
+	var settingConfig = {
 		'soundRingerVolume': -1, 
 		'soundSystemVolume': -1, 
 		'soundMediaVolume': -1 };
 	
-	return config;
+	return settingConfig;
 }
 
 //
 
-SoundConfig.prototype.load = function(preferences) {
-	var config = this.config();
+SoundConfig.prototype.load = function(settingPreferences) {
+	var settingConfig = this.config();
 	
-	if(preferences.soundRingerVolume != undefined)
-		config.soundRingerVolume = preferences.soundRingerVolume;
+	if(settingPreferences.soundRingerVolume != undefined)
+		settingConfig.soundRingerVolume = settingPreferences.soundRingerVolume;
 
-	if(preferences.soundSystemVolume != undefined)
-		config.soundSystemVolume = preferences.soundSystemVolume; 
+	if(settingPreferences.soundSystemVolume != undefined)
+		settingConfig.soundSystemVolume = settingPreferences.soundSystemVolume; 
 
-	if(preferences.soundMediaVolume != undefined)
-		config.soundMediaVolume = preferences.soundMediaVolume;
+	if(settingPreferences.soundMediaVolume != undefined)
+		settingConfig.soundMediaVolume = settingPreferences.soundMediaVolume;
 	
-	return config;
+	return settingConfig;
 }
 
-SoundConfig.prototype.save = function(config) {
-	var preferences = {};
+SoundConfig.prototype.save = function(settingConfig) {
+	var settingPreferences = {};
 	
-	if(config.soundRingerVolume != -1)
-		preferences.soundRingerVolume = config.soundRingerVolume;
+	if(settingConfig.soundRingerVolume != -1)
+		settingPreferences.soundRingerVolume = settingConfig.soundRingerVolume;
 
-	if(config.soundSystemVolume != -1)
-		preferences.soundSystemVolume = config.soundSystemVolume;
+	if(settingConfig.soundSystemVolume != -1)
+		settingPreferences.soundSystemVolume = settingConfig.soundSystemVolume;
 
-	if(config.soundMediaVolume != -1)
-		preferences.soundMediaVolume = config.soundMediaVolume;
+	if(settingConfig.soundMediaVolume != -1)
+		settingPreferences.soundMediaVolume = settingConfig.soundMediaVolume;
 	
-	return preferences;
+	return settingPreferences;
 }
 

@@ -746,22 +746,31 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 		mode.triggers.required = this.modelRequiredSelector.value;
 
 		for(var i = 0; i < this.loaded.triggers.length; i++) {
-			var cfgIndex = this.appAssistant.find("id", this.loaded.triggers[i].extension, this.triggers);
+			if((this.loaded.triggers[i].group == undefined) || (this.loaded.triggers[i].group == 0) ||
+				(this.modelRequiredSelector.value == 2))
+			{
+				var cfgIndex = this.appAssistant.find("id", this.loaded.triggers[i].extension, this.triggers);
 		
-			if(cfgIndex != -1) {
-				var data = this.triggers[cfgIndex].config.save(this.loaded.triggers[i]);
+				if(cfgIndex != -1) {
+					var data = this.triggers[cfgIndex].config.save(this.loaded.triggers[i]);
 			
-				data.extension = this.loaded.triggers[i].extension;
+					data.extension = this.loaded.triggers[i].extension;
 					
-				data.group = this.loaded.triggers[i].group;
+					data.group = this.loaded.triggers[i].group;
 			
-				mode.triggersList.push(data);
+					mode.triggersList.push(data);
+				}
 			}
 		}
 
-		for(var i = 0; i < this.unloaded.triggers.length; i++)
-			mode.triggersList.push(this.unloaded.triggers[i]);
-
+		for(var i = 0; i < this.unloaded.triggers.length; i++) {
+			if((this.loaded.triggers[i].group == undefined) || (this.loaded.triggers[i].group == 0) ||
+				(this.modelRequiredSelector.value == 2))
+			{
+				mode.triggersList.push(this.unloaded.triggers[i]);
+			}
+		}
+		
 		if(this.modeidx == undefined)
 		{
 			this.modeidx = this.appAssistant.config.modesConfig.length;

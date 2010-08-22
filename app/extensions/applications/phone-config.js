@@ -19,16 +19,16 @@ PhoneConfig.prototype.deactivate = function() {
 
 //
 
-PhoneConfig.prototype.setup = function(controller) {
+PhoneConfig.prototype.setup = function(sceneController) {
 	this.choicesPhoneLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
 
-	controller.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesPhoneLaunchSelector} );
 			
-	controller.setupWidget("PhoneNumberText", { 'hintText': "Enter phone number...", 
+	sceneController.setupWidget("PhoneNumberText", { 'hintText': "Enter phone number...", 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchNumber"} );
 }
@@ -36,46 +36,46 @@ PhoneConfig.prototype.setup = function(controller) {
 //
 
 PhoneConfig.prototype.config = function(launchPoint) {
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title,
 		'launchMode': "start",
 		'launchNumber': "" };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-PhoneConfig.prototype.load = function(preferences) {
+PhoneConfig.prototype.load = function(appPreferences) {
 	var launchNumber = "";
 	
-	try {eval("var params = " + preferences.params);} catch(error) {var params = "";}
+	try {eval("var params = " + appPreferences.params);} catch(error) {var params = "";}
 
 	if(params.number != undefined)
 		launchNumber = params.number;
 		
-	var config = {
-		'name': preferences.name,		
-		'launchMode': preferences.event,
+	var appConfig = {
+		'name': appPreferences.name,		
+		'launchMode': appPreferences.event,
 		'launchNumber': launchNumber };
 	
-	return config;
+	return appConfig;
 }
 
-PhoneConfig.prototype.save = function(config) {
+PhoneConfig.prototype.save = function(appConfig) {
 	var params = "";
 
-	if(config.launchNumber.length != 0)
-		params = "{number: '" + config.launchNumber + "'}";
+	if(appConfig.launchNumber.length != 0)
+		params = "{number: '" + appConfig.launchNumber + "'}";
 
-	var preferences = {
+	var appPreferences = {
 		'type': "app",
-		'name': config.name,		
-		'event': config.launchMode,
-		'delay': config.launchDelay,
+		'name': appConfig.name,		
+		'event': appConfig.launchMode,
+		'delay': appConfig.launchDelay,
 		'appid': this.appid(), 
 		'params': params };
 	
-	return preferences;
+	return appPreferences;
 }
 

@@ -19,12 +19,12 @@ WwindowConfig.prototype.deactivate = function() {
 
 //
 
-WwindowConfig.prototype.setup = function(controller) {
+WwindowConfig.prototype.setup = function(sceneController) {
 	this.choicesWwindowLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
 
-	controller.setupWidget("WwindowLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("WwindowLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesWwindowLaunchSelector} );
 	
@@ -32,7 +32,7 @@ WwindowConfig.prototype.setup = function(controller) {
 		{'label': "Do Nothing", value: 0},
 		{'label': "Get Weather", value: 1} ];  
 
-	controller.setupWidget("WwindowActionSelector", {'label': "Action", 
+	sceneController.setupWidget("WwindowActionSelector", {'label': "Action", 
 		'labelPlacement': "left", 'modelProperty': "launchAction",
 		'choices': this.choicesWwindowActionSelector} );
 
@@ -41,7 +41,7 @@ WwindowConfig.prototype.setup = function(controller) {
 		{'label': "15 Seconds", value: 15},
 		{'label': "30 Seconds", value: 30} ];  
 
-	controller.setupWidget("WwindowDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("WwindowDelaySelector", {'label': "Delay", 
 		'labelPlacement': "left", 'modelProperty': "launchDelay",
 		'choices': this.choicesWwindowDelaySelector} );
 }
@@ -49,48 +49,48 @@ WwindowConfig.prototype.setup = function(controller) {
 //
 
 WwindowConfig.prototype.config = function(launchPoint) {
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title,
 		'launchMode': "start",
 		'launchAction': 0,
 		'launchDelay': 0 };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-WwindowConfig.prototype.load = function(preferences) {
+WwindowConfig.prototype.load = function(appPreferences) {
 	var launchAction = 0;
 	
-	try {eval("var params = " + preferences.params);} catch(error) {var params = "";}
+	try {eval("var params = " + appPreferences.params);} catch(error) {var params = "";}
 
 	if(params.action != undefined)
 		launchAction = 1;
 		
-	var config = {
-		'name': preferences.name,
-		'launchMode': preferences.event,
-		'launchDelay': preferences.delay,
+	var appConfig = {
+		'name': appPreferences.name,
+		'launchMode': appPreferences.event,
+		'launchDelay': appPreferences.delay,
 		'launchAction': launchAction };
 	
-	return config;
+	return appConfig;
 }
 
-WwindowConfig.prototype.save = function(config) {
+WwindowConfig.prototype.save = function(appConfig) {
 	var params = "";
 	
-	if(config.launchAction == 1)
+	if(appConfig.launchAction == 1)
 		params = "{action: 'getWeather'}";
 
-	var preferences = {
+	var appPreferences = {
 		'type': "app",
-		'name': config.name,
-		'event': config.launchMode,
-		'delay': config.launchDelay,
+		'name': appConfig.name,
+		'event': appConfig.launchMode,
+		'delay': appConfig.launchDelay,
 		'appid': this.appid(),
 		'params': params };
 	
-	return preferences;
+	return appPreferences;
 }
 

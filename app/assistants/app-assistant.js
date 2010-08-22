@@ -1078,10 +1078,10 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 						var index = this.find("name", modeName, newActiveModes);
 
 						if(index != -1) {
-							if(this.config.modesConfig[index].type == "normal")
+							if(newActiveModes[index].type == "normal")
 								newActiveModes.splice(0, 1, this.config.defaultMode);
-							else if(this.config.modesConfig[index].type == "modifier")
-								newActiveModes.splice(index, 1);
+							else if(newActiveModes[index].type == "modifier"){
+								newActiveModes.splice(index, 1);}
 						}			
 					}
 					else if((config[i].action == "start") || ((config[i].action == "trigger") &&
@@ -1128,8 +1128,8 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 	}
 	
 	if(roundPhase == "init") {
-		if((activeModes != Object.toJSON(newActiveModes)) && (roundCount < 3))
-			this.executeModeUpdate(oldActiveModes, newActiveModes, roundPhase, ++roundCount);
+		if((activeModes != Object.toJSON(newActiveModes)) && (roundCount < 5))
+			this.executeModeUpdate(oldActiveModes, newActiveModes, "init", ++roundCount);
 		else {
 			this.updateCurrentMode(oldActiveModes, newActiveModes, lock);
 
@@ -1139,10 +1139,10 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 			if(!this.running) {
 				Mojo.Log.error("Skipping settings updating on startup");
 		
-				this.prepareApplicationsUpdate(oldActiveModes, newActiveModes);
+				this.prepareApplicationsUpdate(oldActiveModes, newActiveModes, roundCount);
 			}
 			else
-				this.prepareSettingsUpdate(oldActiveModes, newActiveModes);
+				this.prepareSettingsUpdate(oldActiveModes, newActiveModes, roundCount);
 
 			if(!this.background) {
 				var stageController = this.controller.getStageController("appsrv");
@@ -1153,7 +1153,7 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 		}
 	}
 	else if(roundPhase == "done") {
-		if((activeModes != Object.toJSON(newActiveModes)) && (roundCount < 3))
+		if((activeModes != Object.toJSON(newActiveModes)) && (roundCount < 5))
 			this.executeModeUpdate(oldActiveModes, newActiveModes, "init", ++roundCount);
 		else {
 			this.updateHistoryList(oldActiveModes, newActiveModes);
@@ -1282,7 +1282,7 @@ AppAssistant.prototype.updateHistoryList = function(oldActiveModes, newActiveMod
 
 //
 
-AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiveModes) {
+AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiveModes, roundCount) {
 	var modeSettings = new Array();
 
 	var oldSettings = new Array();
@@ -1335,10 +1335,10 @@ AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiv
 		}
 	}			
 
-	this.executeSettingsUpdate(oldActiveModes, newActiveModes, modeSettings, 0);
+	this.executeSettingsUpdate(oldActiveModes, newActiveModes, modeSettings, roundCount, 0);
 }
 
-AppAssistant.prototype.executeSettingsUpdate = function(oldActiveModes, newActiveModes, modeSettings, index) {
+AppAssistant.prototype.executeSettingsUpdate = function(oldActiveModes, newActiveModes, modeSettings, roundCount, index) {
 	if(index == 0) {
 		// Notify about starting of mode updating if configured.
 
@@ -1350,7 +1350,7 @@ AppAssistant.prototype.executeSettingsUpdate = function(oldActiveModes, newActiv
 	if(index < modeSettings.length) {
 		// Request extensions to set the current mode settings.
 
-		var callback = this.executeSettingsUpdate.bind(this, oldActiveModes, newActiveModes, modeSettings, index + 1);
+		var callback = this.executeSettingsUpdate.bind(this, oldActiveModes, newActiveModes, modeSettings, roundCount, index + 1);
 		
 		for(var i = 0; i < this.settings.length; i++) {
 			if(this.settings[i].id == modeSettings[index].extension) {
@@ -1369,10 +1369,10 @@ AppAssistant.prototype.executeSettingsUpdate = function(oldActiveModes, newActiv
 
 	NotifyControlWrapper.notify("done", oldActiveModes[0].name, newActiveModes[0].name);
 
-	this.prepareApplicationsUpdate(oldActiveModes, newActiveModes);
+	this.prepareApplicationsUpdate(oldActiveModes, newActiveModes, roundCount);
 }
 
-AppAssistant.prototype.prepareApplicationsUpdate = function(oldActiveModes, newActiveModes) {
+AppAssistant.prototype.prepareApplicationsUpdate = function(oldActiveModes, newActiveModes, roundCount) {
 	Mojo.Log.error("Executing apps and services update");
 
 	var oldCloseAll = false;
@@ -1469,7 +1469,7 @@ AppAssistant.prototype.prepareApplicationsUpdate = function(oldActiveModes, newA
 
 	// Update apps.
 
-	var doneCallback = this.executeModeUpdate.bind(this, oldActiveModes, newActiveModes, "done", 0);
+	var doneCallback = this.executeModeUpdate.bind(this, oldActiveModes, newActiveModes, "done", roundCount);
 
 	AppsManagerWrapper.update(startApps, closeApps, doneCallback);
 }
@@ -1482,25 +1482,29 @@ AppAssistant.prototype.checkModeTriggers = function(mode) {
 	if(mode.triggersList.length == 0)
 		return true;
 
+	var hadTriggers = false;
+
 	var grouped = new Array(10);
 
 	if(mode.triggers.required == 2)
 		var groups = 10;
 	else
 		var groups = 1;
-
+	
 	// Loop through triggers and test are they valid or no.
 
 	for(var i = 0; i < this.triggers.length; i++) {
-		var triggerState = "unknown";
-
 		for(var group = 0; group < groups; group++) {
+			var triggerState = "unknown";
+	
 			if(grouped[group] != false) {
 				for(var j = 0; j < mode.triggersList.length; j++) {
 					if((mode.triggersList[j].group == undefined) ||
 						(mode.triggersList[j].group == group))
 					{
 						if(this.triggers[i].id == mode.triggersList[j].extension) {
+							hadTriggers = true;
+						
 							triggerState = this.triggers[i].trigger.check(mode.triggersList[j], mode.name);
 
 							if(triggerState == true)
@@ -1508,8 +1512,8 @@ AppAssistant.prototype.checkModeTriggers = function(mode) {
 						}
 					}
 				}		
-		
-				if(mode.triggers.required == 2)
+
+				if((mode.triggers.required == 2) && (triggerState != "unknown"))
 					grouped[group] = triggerState;
 			}
 		}
@@ -1528,11 +1532,11 @@ AppAssistant.prototype.checkModeTriggers = function(mode) {
 	// If all unique and all valid then mode triggers are valid and
 	// if any trigger and all invalid then mode triggers are invalid.
 
-	if(mode.triggers.required == 0) 		
+	if((hadTriggers) && (mode.triggers.required == 0)) 		
 		return true;
-	else if(mode.triggers.required == 1)
+	else if((hadTriggers) && (mode.triggers.required == 1))
 		return false;
-	else if(mode.triggers.required == 2) {
+	else if((hadTriggers) && (mode.triggers.required == 2)) {
 		for(var i = 0; i < grouped.length; i++) {
 			if(grouped[i] == true)
 				return true;
@@ -1540,6 +1544,10 @@ AppAssistant.prototype.checkModeTriggers = function(mode) {
 		
 		return false;
 	}
+	
+	// If triggers left on group pages then triggers are invalid.
+	
+	return true;
 }
 
 //

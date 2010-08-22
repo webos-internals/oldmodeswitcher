@@ -16,8 +16,8 @@ GovnahConfig.prototype.activate = function() {
 		'method': "getProfiles", 'parameters': {'returnid': Mojo.Controller.appInfo.id}});
 }
 
-GovnahConfig.prototype.data = function(data) {
-	if(data.profiles.length > 0) {
+GovnahConfig.prototype.data = function(profileData) {
+	if(profileData.profiles.length > 0) {
 		this.choicesGovnahStartSelector.clear();
 		this.choicesGovnahCloseSelector.clear();
 	}
@@ -26,22 +26,22 @@ GovnahConfig.prototype.data = function(data) {
 	
 	this.normal = true;
 
-	for(var i = 0; i < data.profiles.length; i++) {
-		if(data.profiles[i].id == 0) {
+	for(var i = 0; i < profileData.profiles.length; i++) {
+		if(profileData.profiles[i].id == 0) {
 			this.normal = false;
 			break;
 		}
 	}
 		
-	if((this.normal) && (data.profiles.length > 0)) {
+	if((this.normal) && (profileData.profiles.length > 0)) {
 		this.choicesGovnahStartSelector.push({'label': "Do Nothing", 'value': 0});  
 		this.choicesGovnahCloseSelector.push({'label': "Do Nothing", 'value': 0});  
 	}
 
-	for(var i = 0; i < data.profiles.length; i++) {
-		this.choicesGovnahStartSelector.push({'label': data.profiles[i].name, 'value': data.profiles[i].id});  
+	for(var i = 0; i < profileData.profiles.length; i++) {
+		this.choicesGovnahStartSelector.push({'label': profileData.profiles[i].name, 'value': profileData.profiles[i].id});  
 
-		this.choicesGovnahCloseSelector.push({'label': data.profiles[i].name, 'value': data.profiles[i].id});  
+		this.choicesGovnahCloseSelector.push({'label': profileData.profiles[i].name, 'value': profileData.profiles[i].id});  
 	}
 	
 	var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();
@@ -56,32 +56,32 @@ GovnahConfig.prototype.deactivate = function() {
 
 //
 
-GovnahConfig.prototype.setup = function(controller) {
-	this.controller = controller;
+GovnahConfig.prototype.setup = function(sceneController) {
+	this.controller = sceneController;
 
 	this.choicesGovnahLaunchSelector = [
 		{'label': "On Mode Start", value: "start"},
 		{'label': "On Mode Close", value: "close"} ];  
 
-	controller.setupWidget("GovnahLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("GovnahLaunchSelector", {'label': "Launch", 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesGovnahLaunchSelector} );
 
 	this.choicesGovnahStartSelector = [{'label': "No profiles", 'value': 0}];
 
-	controller.setupWidget("GovnahStartSelector", {'label': "On Start", 
+	sceneController.setupWidget("GovnahStartSelector", {'label': "On Start", 
 		'labelPlacement': "left", 'modelProperty': "startProfile",
 		'choices': this.choicesGovnahStartSelector});
 
 	this.choicesGovnahCloseSelector = [{'label': "No profiles", 'value': 0}];
 
-	controller.setupWidget("GovnahCloseSelector", {'label': "On Close", 
+	sceneController.setupWidget("GovnahCloseSelector", {'label': "On Close", 
 		'labelPlacement': "left", 'modelProperty': "closeProfile",
 		'choices': this.choicesGovnahCloseSelector});
 
 	// Listen for change event for action selector
 	
-	controller.listen(controller.get("AppsList"), Mojo.Event.propertyChange, 
+	sceneController.listen(sceneController.get("AppsList"), Mojo.Event.propertyChange, 
 		this.handleListChange.bind(this));
 }
 
@@ -97,7 +97,7 @@ GovnahConfig.prototype.config = function(launchPoint) {
 		var srvDisplay = "block";
 	}
 
-	var config = {
+	var appConfig = {
 		'name': launchPoint.title,
 		'appType': launchPoint.type,
 		'launchMode': "start",
@@ -106,17 +106,17 @@ GovnahConfig.prototype.config = function(launchPoint) {
 		'govnahAppCfgDisplay': appDisplay,
 		'govnahSrvCfgDisplay': srvDisplay };
 	
-	return config;
+	return appConfig;
 }
 
 //
 
-GovnahConfig.prototype.load = function(preferences) {
+GovnahConfig.prototype.load = function(appPreferences) {
 	var startProfile = 0;
 	var closeProfile = 0;
 
-	if(preferences.type == "app") {
-		var launchMode = preferences.event;
+	if(appPreferences.type == "app") {
+		var launchMode = appPreferences.event;
 		
 		var displayAppCfg = "block";
 		var displaySrvCfg = "none";
@@ -127,9 +127,9 @@ GovnahConfig.prototype.load = function(preferences) {
 		var displayAppCfg = "none";
 		var displaySrvCfg = "block";
 		
-		try {eval("var startParams = " + preferences.params.start);} catch(error) {var startParams = "";}
+		try {eval("var startParams = " + appPreferences.params.start);} catch(error) {var startParams = "";}
 
-		try {eval("var closeParams = " + preferences.params.close);} catch(error) {var closeParams = "";}
+		try {eval("var closeParams = " + appPreferences.params.close);} catch(error) {var closeParams = "";}
 
 		if(startParams.profileid != undefined)
 			startProfile = startParams.profileid;
@@ -138,24 +138,24 @@ GovnahConfig.prototype.load = function(preferences) {
 			closeProfile = closeParams.profileid;
 	}
 	
-	var config = {
-		'name': preferences.name,
-		'appType': preferences.type,
+	var appConfig = {
+		'name': appPreferences.name,
+		'appType': appPreferences.type,
 		'launchMode': launchMode,
 		'startProfile': startProfile,
 		'closeProfile': closeProfile,
 		'govnahAppCfgDisplay': displayAppCfg,
 		'govnahSrvCfgDisplay': displaySrvCfg };
 	
-	return config;
+	return appConfig;
 }
 
-GovnahConfig.prototype.save = function(config) {
-	if(config.appType == "app") {
-		var preferences = {
+GovnahConfig.prototype.save = function(appConfig) {
+	if(appConfig.appType == "app") {
+		var appPreferences = {
 			'type': "app",
-			'name': config.name,
-			'event': config.launchMode,
+			'name': appConfig.name,
+			'event': appConfig.launchMode,
 			'delay': 0,
 			'appid': this.appid(),
 			'params': "" };
@@ -166,44 +166,44 @@ GovnahConfig.prototype.save = function(config) {
 		var event = "both";
 	
 		if(this.normal) {
-			if((config.startProfile == 0) && (config.closeProfile == 0))
+			if((appConfig.startProfile == 0) && (appConfig.closeProfile == 0))
 				event = "none";
-			else if(config.startProfile == 0)
+			else if(appConfig.startProfile == 0)
 				event = "close";
-			else if(config.closeProfile == 0)
+			else if(appConfig.closeProfile == 0)
 				event = "start";
 		}
 
 		var params = {};
 	
-		params.start = "{profileid: " + config.startProfile + "}";
-		params.close = "{profileid: " + config.closeProfile + "}";
+		params.start = "{profileid: " + appConfig.startProfile + "}";
+		params.close = "{profileid: " + appConfig.closeProfile + "}";
 
-		var preferences = {
+		var appPreferences = {
 			'type': "srv",
-			'name': config.name,
+			'name': appConfig.name,
 			'event': event,
 			'url': "palm://org.webosinternals.govnah/",
 			'method': "setProfile",
 			'params': params };
 	}
 		
-	return preferences;
+	return appPreferences;
 }
 
 //
 
-GovnahConfig.prototype.handleListChange = function(event) {
-	if(event.property == "appType") {
-		if(event.value == "app") {
-			event.model.launchMode = "start";
+GovnahConfig.prototype.handleListChange = function(changeEvent) {
+	if(changeEvent.property == "appType") {
+		if(changeEvent.value == "app") {
+			changeEvent.model.launchMode = "start";
 		
-			event.model.govnahAppCfgDisplay = "block";
-			event.model.govnahSrvCfgDisplay = "none";
+			changeEvent.model.govnahAppCfgDisplay = "block";
+			changeEvent.model.govnahSrvCfgDisplay = "none";
 		}
-		else if(event.value == "srv") {
-			event.model.govnahAppCfgDisplay = "none";
-			event.model.govnahSrvCfgDisplay = "block";
+		else if(changeEvent.value == "srv") {
+			changeEvent.model.govnahAppCfgDisplay = "none";
+			changeEvent.model.govnahSrvCfgDisplay = "block";
 		}		
 
 		var state = this.controller.get('mojo-scene-editmode-scene-scroller').mojo.getState();

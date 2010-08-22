@@ -4,8 +4,8 @@ function NetworkSetting(Control) {
 
 //
 
-NetworkSetting.prototype.init = function(callback) {
-	callback(true);
+NetworkSetting.prototype.init = function(doneCallback) {
+	doneCallback(true);
 }
 
 NetworkSetting.prototype.shutdown = function() {
@@ -13,145 +13,145 @@ NetworkSetting.prototype.shutdown = function() {
 
 //
 
-NetworkSetting.prototype.get = function(callback) {
-	var settings = {};
+NetworkSetting.prototype.get = function(doneCallback) {
+	var systemSettings = {};
 	
-	this.getSystemSettings(0, settings, callback);
+	this.getSystemSettings(0, systemSettings, doneCallback);
 }
 
-NetworkSetting.prototype.set = function(settings, callback) {
-	var current = {};
+NetworkSetting.prototype.set = function(systemSettings, doneCallback) {
+	var currentSettings = {};
 	
-	var applyCallback = this.apply.bind(this, current, settings, callback);
+	var applyCallback = this.apply.bind(this, currentSettings, systemSettings, doneCallback);
 	
-	this.getSystemSettings(0, current, applyCallback);
+	this.getSystemSettings(0, currentSettings, applyCallback);
 }
 
 //
 
-NetworkSetting.prototype.apply = function(current, requested, callback) {
-	var settings = {};
+NetworkSetting.prototype.apply = function(currentSettings, requestedSettings, doneCallback) {
+	var systemSettings = {};
 
-	if((requested.networkType != undefined) && (current.networkType != requested.networkType))
-		settings.networkType = requested.networkType;
+	if((requestedSettings.networkType != undefined) && (currentSettings.networkType != requestedSettings.networkType))
+		systemSettings.networkType = requestedSettings.networkType;
 		
-	if((requested.networkData != undefined) && (current.networkData != requested.networkData))
-		settings.networkData = requested.networkData;
+	if((requestedSettings.networkData != undefined) && (currentSettings.networkData != requestedSettings.networkData))
+		systemSettings.networkData = requestedSettings.networkData;
 
-	if((requested.networkVoice != undefined) && (current.networkVoice != requested.networkVoice))
-		settings.networkVoice = requested.networkVoice;
+	if((requestedSettings.networkVoice != undefined) && (currentSettings.networkVoice != requestedSettings.networkVoice))
+		systemSettings.networkVoice = requestedSettings.networkVoice;
 
-	this.setSystemSettings(0, settings, callback);
+	this.setSystemSettings(0, systemSettings, doneCallback);
 }
 
 //
 
-NetworkSetting.prototype.getSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleGetResponse.bind(this, request, settings, callback);
+NetworkSetting.prototype.getSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleGetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
+	if(requestID == 0) {
 		this.service.request("palm://com.palm.telephony/", {'method': "ratQuery",
-			'parameters': {'subscribe': false}, 'onComplete': completeCallback});
+			'parameters': {'subscribe': false}, 'onComplete': requestCallback});
 	}
-	else if(request == 1) {
+	else if(requestID == 1) {
 		this.service.request("palm://com.palm.preferences/appProperties/", {'method': "Get", 
 			'parameters': {'appId': "com.palm.wan", 'key': "roamguard"}, 
-			'onComplete': completeCallback});
+			'onComplete': requestCallback});
 	}
-	else if(request == 2) {
+	else if(requestID == 2) {
 		this.service.request("palm://com.palm.telephony/", {'method': "roamModeQuery", 
-			'parameters': {'subscribe': false}, 'onComplete': completeCallback});
+			'parameters': {'subscribe': false}, 'onComplete': requestCallback});
 	}
 	else
-		callback(settings);
+		doneCallback(systemSettings);
 }
 
-NetworkSetting.prototype.handleGetResponse = function(request, settings, callback, response) {
-	if(response.returnValue) {
-		if(request == 0) {
-			if(response.extended.mode == "automatic")
-				settings.networkType = 1;
-			else if(response.extended.mode == "gsm")
-				settings.networkType = 2;
+NetworkSetting.prototype.handleGetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	if(serviceResponse.returnValue) {
+		if(requestID == 0) {
+			if(serviceResponse.extended.mode == "automatic")
+				systemSettings.networkType = 1;
+			else if(serviceResponse.extended.mode == "gsm")
+				systemSettings.networkType = 2;
 			else
-				settings.networkType = 3;
+				systemSettings.networkType = 3;
 		}
-		else if(request == 1) {
-			if(response.roamguard.roamguard == "neverblock")
-				settings.networkData = 1;
+		else if(requestID == 1) {
+			if(serviceResponse.roamguard.roamguard == "neverblock")
+				systemSettings.networkData = 1;
 			else
-				settings.networkData = 2;
+				systemSettings.networkData = 2;
 		}
-		else if(request == 2) {
-			if(response.extended) {
-				if(response.extended.mode == "homeonly")
-					settings.networkVoice = 2;
-				else if(response.extended.mode == "roamonly")
-					settings.networkVoice = 3;
+		else if(requestID == 2) {
+			if(serviceResponse.extended) {
+				if(serviceResponse.extended.mode == "homeonly")
+					systemSettings.networkVoice = 2;
+				else if(serviceResponse.extended.mode == "roamonly")
+					systemSettings.networkVoice = 3;
 				else
-					settings.networkVoice = 1;
+					systemSettings.networkVoice = 1;
 			}
 		}		
 	}
 
-	this.getSystemSettings(++request, settings, callback);
+	this.getSystemSettings(++requestID, systemSettings, doneCallback);
 }
 
 //
 
-NetworkSetting.prototype.setSystemSettings = function(request, settings, callback) {
-	var completeCallback = this.handleSetResponse.bind(this, request, settings, callback);
+NetworkSetting.prototype.setSystemSettings = function(requestID, systemSettings, doneCallback) {
+	var requestCallback = this.handleSetResponse.bind(this, requestID, systemSettings, doneCallback);
 	
-	if(request == 0) {
-		if(settings.networkType == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	if(requestID == 0) {
+		if(systemSettings.networkType == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {		
-			if(settings.networkType == 2)
+			if(systemSettings.networkType == 2)
 				var mode = "gsm";
-			else if(settings.networkType == 3)
+			else if(systemSettings.networkType == 3)
 				var mode = "umts";
 			else 
 				var mode = "automatic";
 	
 			this.service.request("palm://com.palm.telephony/", {'method': "ratSet", 
-				'parameters': {'mode': mode}, 'onComplete': completeCallback});
+				'parameters': {'mode': mode}, 'onComplete': requestCallback});
 		}
 	}
-	else if(request == 1) {
-		if(settings.networkData == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 1) {
+		if(systemSettings.networkData == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {	
-			if(settings.networkData == 1)
+			if(systemSettings.networkData == 1)
 				var roamguard = "disable";
 			else
 				var roamguard = "enable";
 	
 			this.service.request("palm://com.palm.wan/", {'method': "set", 
 				'parameters': {'roamguard': roamguard}, 
-				'onComplete': completeCallback });
+				'onComplete': requestCallback });
 		}
 	}
-	else if(request == 2) {
-		if(settings.networkVoice == undefined)
-			this.setSystemSettings(++request, settings, callback);
+	else if(requestID == 2) {
+		if(systemSettings.networkVoice == undefined)
+			this.setSystemSettings(++requestID, systemSettings, doneCallback);
 		else {
-			if(settings.networkVoice == 2)
+			if(systemSettings.networkVoice == 2)
 				var roammode = "homeonly";
-			else if(settings.networkVoice == 3)
+			else if(systemSettings.networkVoice == 3)
 				var roammode = "roamonly";
 			else
 				var roammode = "any";
 			
 			this.service.request("palm://com.palm.telephony/", {'method': "roamModeSet", 
 				'parameters': {'mode': roammode,	'client': Mojo.appName},
-				'onComplete': completeCallback});
+				'onComplete': requestCallback});
 		}
 	}
 	else
-		callback();
+		doneCallback();
 }
 
-NetworkSetting.prototype.handleSetResponse = function(request, settings, callback, response) {
-	this.setSystemSettings(++request, settings, callback);
+NetworkSetting.prototype.handleSetResponse = function(requestID, systemSettings, doneCallback, serviceResponse) {
+	this.setSystemSettings(++requestID, systemSettings, doneCallback);
 }	
 
