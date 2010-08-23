@@ -59,7 +59,7 @@ AppAssistant.prototype.cleanup = function() {
 	DisplayControlWrapper.cleanup();
 	NotifyControlWrapper.cleanup();
 	
-	this.shutdownAllTriggers();
+	this.shutdownAllExtensions();
 }
 
 //
