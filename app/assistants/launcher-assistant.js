@@ -39,7 +39,7 @@ LauncherAssistant.prototype.setup = function() {
 	if(this.event == "start")
 		this.modelStartButton = {label: $L("Switch Mode"), buttonClass : 'affirmative popupbutton', disabled : false};
    else
-   	this.modelStartButton = {label: $L("Close Mode"$L(, buttonClass : 'affirmative popupbutton', disabled : false};
+   	this.modelStartButton = {label: $L("Close Mode"), buttonClass : 'affirmative popupbutton', disabled : false};
    	     
 	this.controller.setupWidget('StartButton', {}, this.modelStartButton);
 
