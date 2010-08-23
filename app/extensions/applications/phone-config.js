@@ -21,14 +21,14 @@ PhoneConfig.prototype.deactivate = function() {
 
 PhoneConfig.prototype.setup = function(sceneController) {
 	this.choicesPhoneLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"} ];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"} ];  
 
-	sceneController.setupWidget("PhoneLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("PhoneLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesPhoneLaunchSelector} );
 			
-	sceneController.setupWidget("PhoneNumberText", { 'hintText': "Enter phone number...", 
+	sceneController.setupWidget("PhoneNumberText", { 'hintText': $L("Enter phone number..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchNumber"} );
 }

@@ -1,7 +1,7 @@
 function ModeswConfig() {
 	this.modesList = [];
 
-	this.choicesModeswModeSelector = [];
+	this.choicesModeswModeSelector = [{'label': $L("Previous Mode"), 'value': "Previous Mode"}];
 }
 
 ModeswConfig.prototype.version = function() {
@@ -33,29 +33,29 @@ ModeswConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesModeswProcessSelector = [
-		{'label': "Before Mode Start", value: "start"},
-		{'label': "Before Mode Close", value: "close"},
-		{'label': "Before Mode Switch", value: "switch"},
-		{'label': "After Mode Start", value: "started"},
-		{'label': "After Mode Close", value: "closed"},
-		{'label': "After Mode Switch", value: "switched"} ];  
+		{'label': $L("Before Mode Start"), value: "start"},
+		{'label': $L("Before Mode Close"), value: "close"},
+		{'label': $L("Before Mode Switch"), value: "switch"},
+		{'label': $L("After Mode Start"), value: "started"},
+		{'label': $L("After Mode Close"), value: "closed"},
+		{'label': $L("After Mode Switch"), value: "switched"} ];  
 
-	sceneController.setupWidget("ModeswProcessSelector", {'label': "Process", 
+	sceneController.setupWidget("ModeswProcessSelector", {'label': $L("Process"), 
 		'labelPlacement': "left", 'modelProperty': "modeProcess",
 		'choices': this.choicesModeswProcessSelector});
 	
 	this.choicesModeswActionSelector = [
-		{'label': "Start Mode", value: "start"},
-		{'label': "Close Mode", value: "close"},
-		{'label': "Trigger Mode", value: "trigger"},
-		{'label': "Require Mode", value: "require"},
-		{'label': "Disable Triggers", value: "lock"}];  
+		{'label': $L("Start Mode"), value: "start"},
+		{'label': $L("Close Mode"), value: "close"},
+		{'label': $L("Trigger Mode"), value: "trigger"},
+		{'label': $L("Require Mode"), value: "require"},
+		{'label': $L("Disable Triggers"), value: "lock"}];  
 
-	sceneController.setupWidget("ModeswActionSelector", {'label': "Action", 
+	sceneController.setupWidget("ModeswActionSelector", {'label': $L("Action"), 
 		'labelPlacement': "left", 'modelProperty': "modeAction",
 		'choices': this.choicesModeswActionSelector});
 
-	sceneController.setupWidget("ModeswModeSelector", {'label': "Mode", 
+	sceneController.setupWidget("ModeswModeSelector", {'label': $L("Mode"), 
 		'labelPlacement': "left", 'modelProperty': "modeName",
 		'choices': this.choicesModeswModeSelector});
 
@@ -165,10 +165,10 @@ ModeswConfig.prototype.handleModeData = function(modeData) {
 	if(modeData.modesConfig != undefined) {
 		this.modesList.clear();
 
-		this.modesList.push({'label': "All Normal Modes", 'value': "All Normal Modes", 'type': "alln"});  	
-		this.modesList.push({'label': "All Modifier Modes", 'value': "All Modifier Modes", 'type': "allm"});  	
-		this.modesList.push({'label': "Current Mode", 'value': "Current Mode", 'type': "current"});  
-		this.modesList.push({'label': "Previous Mode", 'value': "Previous Mode", 'type': "previous"});  
+		this.modesList.push({'label': $L("All Normal Modes"), 'value': "All Normal Modes", 'type': "alln"});  	
+		this.modesList.push({'label': $L("All Modifier Modes"), 'value': "All Modifier Modes", 'type': "allm"});  	
+		this.modesList.push({'label': $L("Current Mode"), 'value': "Current Mode", 'type': "current"});  
+		this.modesList.push({'label': $L("Previous Mode"), 'value': "Previous Mode", 'type': "previous"});  
 	
 		for(var i = 0; i < modeData.modesConfig.length; i++) {
 			this.modesList.push({

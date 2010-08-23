@@ -1,13 +1,13 @@
 function IntervalConfig() {
 	this.choicesForActivate = [
-		{'label': "15 Minutes", 'value': 15}, {'label': "30 Minutes", 'value': 30}, 
-		{'label': "1 Hour", 'value': 60}, {'label': "2 Hours", 'value': 120}, 
-		{'label': "3 Hours", 'value': 180}, {'label': "4 Hours", 'value': 240}, 
-		{'label': "5 Hours", 'value': 300}, {'label': "6 Hours", 'value': 360}, 
-		{'label': "7 Hours", 'value': 420}, {'label': "8 Hours", 'value': 480}, 
-		{'label': "9 Hours", 'value': 540}, {'label': "10 Hours", 'value': 600}, 
-		{'label': "11 Hours", 'value': 660}, {'label': "12 Hours", 'value': 720},
-		{'label': "24 Hours", 'value': 1440} ];
+		{'label': "15 " + $L("Minutes"), 'value': 15}, {'label': "30 " + $L("Minutes"), 'value': 30}, 
+		{'label': "1 " + $L("Hour"), 'value': 60}, {'label': "2 " + $L("Hours"), 'value': 120}, 
+		{'label': "3 " + $L("Hours"), 'value': 180}, {'label': "4 " + $L("Hours"), 'value': 240}, 
+		{'label': "5 " + $L("Hours"), 'value': 300}, {'label': "6 " + $L("Hours"), 'value': 360}, 
+		{'label': "7 " + $L("Hours"), 'value': 420}, {'label': "8 " + $L("Hours"), 'value': 480}, 
+		{'label': "9 " + $L("Hours"), 'value': 540}, {'label': "10 " + $L("Hours"), 'value': 600}, 
+		{'label': "11 " + $L("Hours"), 'value': 660}, {'label': "12 " + $L("Hours"), 'value': 720},
+		{'label': "24 " + $L("Hours"), 'value': 1440} ];
 	
 	this.choicesActivateSelector = [];
 }
@@ -17,7 +17,7 @@ IntervalConfig.prototype.version = function() {
 }
 
 IntervalConfig.prototype.label = function() {
-	return "Time Interval Trigger";
+	return $L("Time Interval Trigger");
 }
 
 //
@@ -34,28 +34,28 @@ IntervalConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesModeSelector = [
-		{'label': "Repeating", 'value': 0},
-		{'label': "No Repeating", 'value': 1} ];  
+		{'label': $L("Repeating"), 'value': 0},
+		{'label': $L("No Repeating"), 'value': 1} ];  
 
-	sceneController.setupWidget("IntervalModeSelector", { 'label': "Mode", 
+	sceneController.setupWidget("IntervalModeSelector", { 'label': $L("Mode"), 
 		'labelPlacement': "left", 'modelProperty': "intervalMode",
 		'choices': this.choicesModeSelector});
 
 	this.choicesActiveSelector = [
-		{'label': "5 Minutes", 'value': 5}, {'label': "15 Minutes", 'value': 15},
-		{'label': "30 Minutes", 'value': 30}, {'label': "1 Hour", 'value': 60},
-		{'label': "2 Hours", 'value': 120}, {'label': "3 Hours", 'value': 180},
-		{'label': "4 Hours", 'value': 240}, {'label': "5 Hours", 'value': 300},
-		{'label': "6 Hours", 'value': 360}, {'label': "7 Hours", 'value': 420},
-		{'label': "8 Hours", 'value': 480}, {'label': "9 Hours", 'value': 540},
-		{'label': "10 Hours", 'value': 600}, {'label': "11 Hours", 'value': 660},
-		{'label': "12 Hours", 'value': 600} ];  
+		{'label': "5 " + $L("Minutes"), 'value': 5}, {'label': "15 " + $L("Minutes"), 'value': 15},
+		{'label': "30 " + $L("Minutes"), 'value': 30}, {'label': "1 " + $L("Hour"), 'value': 60},
+		{'label': "2 " + $L("Hours"), 'value': 120}, {'label': "3 " + $L("Hours"), 'value': 180},
+		{'label': "4 " + $L("Hours"), 'value': 240}, {'label': "5 " + $L("Hours"), 'value': 300},
+		{'label': "6 " + $L("Hours"), 'value': 360}, {'label': "7 " + $L("Hours"), 'value': 420},
+		{'label': "8 " + $L("Hours"), 'value': 480}, {'label': "9 " + $L("Hours"), 'value': 540},
+		{'label': "10 " + $L("Hours"), 'value': 600}, {'label': "11 " + $L("Hours"), 'value': 660},
+		{'label': "12 " + $L("Hours"), 'value': 600} ];  
 
-	sceneController.setupWidget("IntervalActiveSelector", { 'label': "Active", 
+	sceneController.setupWidget("IntervalActiveSelector", { 'label': $L("Active"), 
 		'labelPlacement': "left", 'modelProperty': "intervalActive",
 		'choices': this.choicesActiveSelector});
 
-	sceneController.setupWidget("IntervalActivateSelector", { 'label': "Every", 
+	sceneController.setupWidget("IntervalActivateSelector", { 'label': $L("Every"), 
 		'labelPlacement': "left", 'modelProperty': "intervalActivate",
 		'choices': this.choicesActivateSelector});
 	
@@ -75,6 +75,7 @@ IntervalConfig.prototype.config = function() {
 	}
 
 	var triggerConfig = {
+		'intervalTitle': $L("Time Interval"),
 		'intervalMode': 0,
 		'intervalActive': 5,
 		'intervalActivate': 60,
@@ -106,6 +107,7 @@ IntervalConfig.prototype.load = function(triggerPreferences) {
 	}
 					
 	var triggerConfig = {
+		'intervalTitle': $L("Time Interval"),
 		'intervalMode': triggerPreferences.intervalMode,
 		'intervalActive': triggerPreferences.intervalActive,
 		'intervalActivate': triggerPreferences.intervalActivate,

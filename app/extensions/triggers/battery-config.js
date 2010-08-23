@@ -6,7 +6,7 @@ BatteryConfig.prototype.version = function() {
 }
 
 BatteryConfig.prototype.label = function() {
-	return "Battery Level Trigger";
+	return $L("Battery Level Trigger");
 }
 
 //
@@ -33,7 +33,7 @@ BatteryConfig.prototype.setup = function(sceneController) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	sceneController.setupWidget("BatteryHighSelector", {'label': "High Limit", 
+	sceneController.setupWidget("BatteryHighSelector", {'label': $L("High Limit"), 
 		'labelPlacement': "left", 'modelProperty': "batteryHigh",
 		'choices': this.choicesHighLimitSelector});
 	
@@ -50,7 +50,7 @@ BatteryConfig.prototype.setup = function(sceneController) {
 		{'label': "90%", 'value': 90}, {'label': "95%", 'value': 95},
 		{'label': "100%", 'value': 100}];  
 
-	sceneController.setupWidget("BatteryLowSelector", {'label': "Low Limit", 
+	sceneController.setupWidget("BatteryLowSelector", {'label': $L("Low Limit"), 
 		'labelPlacement': "left", 'modelProperty': "batteryLow",
 		'choices': this.choicesLowLimitSelector});
 }
@@ -59,6 +59,7 @@ BatteryConfig.prototype.setup = function(sceneController) {
 
 BatteryConfig.prototype.config = function() {
 	var triggerConfig = {
+		'batteryTitle': $L("Battery Level"),
 		'batteryHigh': 100,
 		'batteryLow': 0 };
 	
@@ -69,6 +70,7 @@ BatteryConfig.prototype.config = function() {
 
 BatteryConfig.prototype.load = function(triggerPreferences) {
 	var triggerConfig = {
+		'batteryTitle': $L("Battery Level"),
 		'batteryHigh': triggerPreferences.batteryHigh,
 		'batteryLow': triggerPreferences.batteryLow };
 	

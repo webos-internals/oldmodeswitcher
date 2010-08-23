@@ -8,7 +8,7 @@ EmailConfig.prototype.version = function() {
 //
 
 EmailConfig.prototype.label = function() {
-	return "Email Settings";
+	return $L("Email Settings");
 }
 
 //
@@ -25,41 +25,41 @@ EmailConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesEmailAlertSelector = [
-		{'label': "Set Per Account", 'value': -2},
+		{'label': $L("Set Per Account"), 'value': -2},
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Vibrate", 'value': 2},
-		{'label': "System Sound", 'value': 1},
-		{'label': "Ringtone", 'value': 3},
-		{'label': "Mute", 'value': 0} ];  
+		{'label': $L("Vibrate"), 'value': 2},
+		{'label': $L("System Sound"), 'value': 1},
+		{'label': $L("Ringtone"), 'value': 3},
+		{'label': $L("Mute"), 'value': 0} ];  
 
-	sceneController.setupWidget("EmailAlertSelector", {'label': "Alert", 
+	sceneController.setupWidget("EmailAlertSelector", {'label': $L("Alert"), 
 		'labelPlacement': "left", 'modelProperty': "emailAlert",
 		'choices': this.choicesEmailAlertSelector});
 
 	this.choicesEmailRingtoneSelector = [
-		{'label': "Set Per Account", 'value': -2},
+		{'label': $L("Set Per Account"), 'value': -2},
 		{'label': sceneController.defaultChoiseLabel, 'value': ""},
-		{'label': "Select", 'value': "select"} ];  
+		{'label': $L("Select"), 'value': "select"} ];  
 
-	sceneController.setupWidget("EmailRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("EmailRingtoneSelector", {'label': $L("Ringtone"), 
 		'labelPlacement': "left", 'modelProperty': "emailRingtoneName",
 		'choices': this.choicesEmailRingtoneSelector});
 
 	this.choicesEmailSyncSelector = [
-		{'label': "Set Per Account", 'value': -2},
+		{'label': $L("Set Per Account"), 'value': -2},
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "As Items Arrive", 'value': 0}, 
-		{'label': "5 Minutes", 'value': 5},
-		{'label': "10 Minutes", 'value': 10},
-		{'label': "15 Minutes", 'value': 15},
-		{'label': "30 Minutes", 'value': 30},
-		{'label': "1 Hour", 'value': 60},
-		{'label': "6 Hours", 'value': 360},		
-		{'label': "12 Hours", 'value': 720},
-		{'label': "24 Hours", 'value': 1440},		
-		{'label': "Manual", 'value': 1000000} ];
+		{'label': $L("As Items Arrive"), 'value': 0}, 
+		{'label': "5 " + $L("Minutes"), 'value': 5},
+		{'label': "10 " + $L("Minutes"), 'value': 10},
+		{'label': "15 " + $L("Minutes"), 'value': 15},
+		{'label': "30 " + $L("Minutes"), 'value': 30},
+		{'label': "1 " + $L("Hour"), 'value': 60},
+		{'label': "6 " + $L("Hours"), 'value': 360},		
+		{'label': "12 " + $L("Hours"), 'value': 720},
+		{'label': "24 " + $L("Hours"), 'value': 1440},		
+		{'label': $L("Manual"), 'value': 1000000} ];
 
-	sceneController.setupWidget("EmailSyncSelector", {'label': "Get Email", 
+	sceneController.setupWidget("EmailSyncSelector", {'label': $L("Get Email"), 
 		'labelPlacement': "left", 'modelProperty': "emailSync",
 		'choices': this.choicesEmailSyncSelector});
 
@@ -73,6 +73,7 @@ EmailConfig.prototype.setup = function(sceneController) {
 
 EmailConfig.prototype.config = function() {
 	var settingConfig = {
+		'emailTitle': $L("Email"),
 		'emailAlert': -1, 
 		'emailAlertCfg': [],
 		'emailRingtoneName': "", 
@@ -91,7 +92,7 @@ EmailConfig.prototype.load = function(settingPreferences) {
 	var settingConfig = this.config();
 	
 	if(settingPreferences.emailAlertCfg != undefined) {
-		settingConfig.emailAlert = "Per Account";
+		settingConfig.emailAlert = $L("Per Account");
 
 		settingConfig.emailAlertCfg = settingPreferences.emailAlertCfg;	
 
@@ -104,7 +105,7 @@ EmailConfig.prototype.load = function(settingPreferences) {
 		settingConfig.emailRingtoneDisplay = "block";
 
 	if(settingPreferences.emailRingtoneCfg != undefined) {
-		settingConfig.emailRingtoneName = "Per Account";
+		settingConfig.emailRingtoneName = $L("Per Account");
 
 		settingConfig.emailRingtoneCfg = settingPreferences.emailRingtoneCfg;	
 	}
@@ -114,7 +115,7 @@ EmailConfig.prototype.load = function(settingPreferences) {
 	}
 
 	if(settingPreferences.emailSyncCfg != undefined) {
-		settingConfig.emailSync = "Per Account";
+		settingConfig.emailSync = $L("Per Account");
 
 		settingConfig.emailSyncCfg = settingPreferences.emailSyncCfg;	
 	}
@@ -127,12 +128,12 @@ EmailConfig.prototype.load = function(settingPreferences) {
 EmailConfig.prototype.save = function(settingConfig) {
 	var settingPreferences = {};
 
-	if(settingConfig.emailAlert == "Per Account")
+	if(settingConfig.emailAlert == $L("Per Account"))
 		settingPreferences.emailAlertCfg = settingConfig.emailAlertCfg;
 	else if(settingConfig.emailAlert != -1)
 		settingPreferences.emailAlert = settingConfig.emailAlert;
 
-	if(settingConfig.emailRingtoneName == "Per Account")
+	if(settingConfig.emailRingtoneName == $L("Per Account"))
 		settingPreferences.emailRingtoneCfg = settingConfig.emailRingtoneCfg;
 	else {
 		if(settingConfig.emailAlert == 3) {
@@ -144,7 +145,7 @@ EmailConfig.prototype.save = function(settingConfig) {
 		}
 	}
 		
-	if(settingConfig.emailSync == "Per Account")
+	if(settingConfig.emailSync == $L("Per Account"))
 		settingPreferences.emailSyncCfg = settingConfig.emailSyncCfg;
 	else if(settingConfig.emailSync != -1)
 		settingPreferences.emailSync = settingConfig.emailSync;
@@ -158,7 +159,7 @@ EmailConfig.prototype.handleListChange = function(changeEvent) {
 	if(changeEvent.property == "emailAlert") {
 		if(changeEvent.value == -2) {
 			if(changeEvent.model.emailAlertCfg.length > 0)
-				changeEvent.model.emailAlert = "Per Account";
+				changeEvent.model.emailAlert = $L("Per Account");
 			else {
 				changeEvent.model.emailAlert = -1;
 	
@@ -189,7 +190,7 @@ EmailConfig.prototype.handleListChange = function(changeEvent) {
 	else if(changeEvent.property == "emailRingtoneName") {
 		if(changeEvent.value == -2) {
 			if(changeEvent.model.emailRingtoneCfg.length > 0)
-				changeEvent.model.emailRingtoneName = "Per Account";		
+				changeEvent.model.emailRingtoneName = $L("Per Account");		
 			else {
 				changeEvent.model.emailRingtoneName = "";		
 				changeEvent.model.emailRingtonePath = "";		
@@ -217,7 +218,7 @@ EmailConfig.prototype.handleListChange = function(changeEvent) {
 	else if(changeEvent.property == "emailSync") {
 		if(changeEvent.value == -2) {
 			if(changeEvent.model.emailSyncCfg.length > 0)
-				changeEvent.model.emailSync = "Per Account";		
+				changeEvent.model.emailSync = $L("Per Account");		
 			else
 				changeEvent.model.emailSync = -1;
 			
@@ -237,7 +238,7 @@ EmailConfig.prototype.handleListChange = function(changeEvent) {
 
 EmailConfig.prototype.executeRingtoneSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
-		'actionType': "attach", 'actionName': "Done", 'onSelect': 
+		'actionType': "attach", 'actionName': $L("Done"), 'onSelect': 
 			function(eventModel, serviceResponse) {
 				eventModel.emailRingtoneName = serviceResponse.name;
 				eventModel.emailRingtonePath = serviceResponse.fullPath;
@@ -251,7 +252,7 @@ EmailConfig.prototype.executeRingtoneSelect = function(eventModel) {
 
 EmailConfig.prototype.handlePerAccountAlert = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		eventModel.emailAlert = "Per Account";		
+		eventModel.emailAlert = $L("Per Account");		
 
 		eventModel.emailAlertCfg.clear();
 		
@@ -275,7 +276,7 @@ EmailConfig.prototype.handlePerAccountAlert = function(eventModel, configList, r
 
 EmailConfig.prototype.handlePerAccountRingtone = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		eventModel.emailRingtoneName = "Per Account";		
+		eventModel.emailRingtoneName = $L("Per Account");		
 
 		eventModel.emailRingtoneCfg.clear();
 		
@@ -293,7 +294,7 @@ EmailConfig.prototype.handlePerAccountRingtone = function(eventModel, configList
 
 EmailConfig.prototype.handlePerAccountSync = function(eventModel, configList, returnValue) {
 	if(returnValue) {
-		eventModel.emailSync = "Per Account";		
+		eventModel.emailSync = $L("Per Account");		
 
 		eventModel.emailSyncCfg.clear();
 		

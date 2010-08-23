@@ -6,7 +6,7 @@ TimeofdayConfig.prototype.version = function() {
 }
 
 TimeofdayConfig.prototype.label = function() {
-	return "Time of Day Trigger";
+	return $L("Time of Day Trigger");
 }
 
 //
@@ -23,12 +23,12 @@ TimeofdayConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesTimeSelector = [
-		{'label': "Every Day", 'value': 0},
-		{'label': "Weekdays", 'value': 1},
-		{'label': "Weekends", 'value': 2},
-		{'label': "Custom", 'value': 3} ];  
+		{'label': $L("Every Day"), 'value': 0},
+		{'label': $L("Weekdays"), 'value': 1},
+		{'label': $L("Weekends"), 'value': 2},
+		{'label': $L("Custom"), 'value': 3} ];  
 
-	sceneController.setupWidget("TimeofdayTimeSelector", { 'label': "Days", 
+	sceneController.setupWidget("TimeofdayTimeSelector", { 'label': $L("Days"), 
 		'labelPlacement': "left", 'modelProperty': "timeofdayDays",
 		'choices': this.choicesTimeSelector});
 
@@ -40,10 +40,10 @@ TimeofdayConfig.prototype.setup = function(sceneController) {
 	sceneController.setupWidget("DayCheckBoxSat", {'modelProperty': "timeofdayDay6"});
 	sceneController.setupWidget("DayCheckBoxSun", {'modelProperty': "timeofdayDay0"});		
 
-	sceneController.setupWidget("TimeofdayStartTime", {'label': "Start", 
+	sceneController.setupWidget("TimeofdayStartTime", {'label': $L("Start"), 
 		'modelProperty': "timeofdayStart"});
 
-	sceneController.setupWidget("TimeofdayCloseTime", {'label': "Close", 
+	sceneController.setupWidget("TimeofdayCloseTime", {'label': $L("Close"), 
 		'modelProperty': "timeofdayClose"});
 	
 	// Listen for change event for day selector
@@ -69,6 +69,14 @@ TimeofdayConfig.prototype.config = function() {
 	closeTime.setMilliseconds(0);
 
 	var triggerConfig = {
+		'timeofdayMon': $L("Mon"),
+		'timeofdayTue': $L("Tue"),
+		'timeofdayWed': $L("Wed"),
+		'timeofdayThu': $L("Thu"),
+		'timeofdayFri': $L("Fri"),
+		'timeofdaySat': $L("Sat"),
+		'timeofdaySun': $L("Sun"),
+		'timeofdayTitle': $L("Time of Day"),
 		'timeofdayDays': 0,
 		'timeofdayCustom': "none",
 		'timeofdayDay0': false,
@@ -96,6 +104,14 @@ TimeofdayConfig.prototype.load = function(triggerPreferences) {
 		var display = "none";
 
 	var triggerConfig = {
+		'timeofdayMon': $L("Mon"),
+		'timeofdayTue': $L("Tue"),
+		'timeofdayWed': $L("Wed"),
+		'timeofdayThu': $L("Thu"),
+		'timeofdayFri': $L("Fri"),
+		'timeofdaySat': $L("Sat"),
+		'timeofdaySun': $L("Sun"),
+		'timeofdayTitle': $L("Time of Day"),
 		'timeofdayCustom': display,
 		'timeofdayDays': triggerPreferences.timeofdayDays,
 		'timeofdayDay0': triggerPreferences.timeofdayCustom[0],

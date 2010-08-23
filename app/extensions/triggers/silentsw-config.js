@@ -6,7 +6,7 @@ SilentswConfig.prototype.version = function() {
 }
 
 SilentswConfig.prototype.label = function() {
-	return "Silent Switch Trigger";
+	return $L("Silent Switch Trigger");
 }
 
 //
@@ -21,10 +21,10 @@ SilentswConfig.prototype.deactivate = function() {
 
 SilentswConfig.prototype.setup = function(sceneController) {
 	this.choicesSwitchStateSelector = [
-		{'label': "Switch On", 'value': 0},
-		{'label': "Switch Off", 'value': 1} ];  
+		{'label': $L("Switch On"), 'value': 0},
+		{'label': $L("Switch Off"), 'value': 1} ];  
 
-	sceneController.setupWidget("SilentswStateSelector", {'label': "State", 
+	sceneController.setupWidget("SilentswStateSelector", {'label': $L("State"), 
 		'labelPlacement': "left", 'modelProperty': "silentswState",
 		'choices': this.choicesSwitchStateSelector});
 }
@@ -33,6 +33,7 @@ SilentswConfig.prototype.setup = function(sceneController) {
 
 SilentswConfig.prototype.config = function() {
 	var triggerConfig = {
+		'silentswTitle': $L("Silent Switch"),
 		'silentswState': 0 };
 	
 	return triggerConfig;
@@ -42,6 +43,7 @@ SilentswConfig.prototype.config = function() {
 
 SilentswConfig.prototype.load = function(triggerPreferences) {
 	var triggerConfig = {
+		'silentswTitle': $L("Silent Switch"),
 		'silentswState': triggerPreferences.silentswState };
 	
 	return triggerConfig;

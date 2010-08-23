@@ -34,8 +34,8 @@ GovnahConfig.prototype.data = function(profileData) {
 	}
 		
 	if((this.normal) && (profileData.profiles.length > 0)) {
-		this.choicesGovnahStartSelector.push({'label': "Do Nothing", 'value': 0});  
-		this.choicesGovnahCloseSelector.push({'label': "Do Nothing", 'value': 0});  
+		this.choicesGovnahStartSelector.push({'label': $L("Do Nothing"), 'value': 0});  
+		this.choicesGovnahCloseSelector.push({'label': $L("Do Nothing"), 'value': 0});  
 	}
 
 	for(var i = 0; i < profileData.profiles.length; i++) {
@@ -60,22 +60,22 @@ GovnahConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesGovnahLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"} ];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"} ];  
 
-	sceneController.setupWidget("GovnahLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("GovnahLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesGovnahLaunchSelector} );
 
-	this.choicesGovnahStartSelector = [{'label': "No profiles", 'value': 0}];
+	this.choicesGovnahStartSelector = [{'label': $L("No Profiles"), 'value': 0}];
 
-	sceneController.setupWidget("GovnahStartSelector", {'label': "On Start", 
+	sceneController.setupWidget("GovnahStartSelector", {'label': $L("On Start"), 
 		'labelPlacement': "left", 'modelProperty': "startProfile",
 		'choices': this.choicesGovnahStartSelector});
 
-	this.choicesGovnahCloseSelector = [{'label': "No profiles", 'value': 0}];
+	this.choicesGovnahCloseSelector = [{'label': $L("No Profiles"), 'value': 0}];
 
-	sceneController.setupWidget("GovnahCloseSelector", {'label': "On Close", 
+	sceneController.setupWidget("GovnahCloseSelector", {'label': $L("On Close"), 
 		'labelPlacement': "left", 'modelProperty': "closeProfile",
 		'choices': this.choicesGovnahCloseSelector});
 

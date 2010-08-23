@@ -6,7 +6,7 @@ ChargerConfig.prototype.version = function() {
 }
 
 ChargerConfig.prototype.label = function() {
-	return "Charger Event Trigger";
+	return $L("Charger Event Trigger");
 }
 
 //
@@ -23,33 +23,33 @@ ChargerConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesChargerSelector = [
-		{'label': "No Charger", 'value': 0},
-		{'label': "Touchstone", 'value': 1},
-		{'label': "Wall Charger", 'value': 2},
-		{'label': "USB Charger", 'value': 3} ];  
+		{'label': $L("No Charger"), 'value': 0},
+		{'label': $L("Touchstone"), 'value': 1},
+		{'label': $L("Wall Charger"), 'value': 2},
+		{'label': $L("USB Charger"), 'value': 3} ];  
 
-	sceneController.setupWidget("ChargerSourceSelector",	{'label': "Charger", 
+	sceneController.setupWidget("ChargerSourceSelector",	{'label': $L("Charger"), 
 		'labelPlacement': "left", 'modelProperty': "chargerCharger",
 		'choices': this.choicesChargerSelector});
 
 	this.choicesOrientationSelector = [
-		{'label': "Any", 'value': 0},
-		{'label': "Left", 'value': 1},
-		{'label': "Right", 'value': 2},
-		{'label': "Up", 'value': 3},
-		{'label': "Down", 'value': 4} ];  
+		{'label': $L("Any"), 'value': 0},
+		{'label': $L("Left"), 'value': 1},
+		{'label': $L("Right"), 'value': 2},
+		{'label': $L("Up"), 'value': 3},
+		{'label': $L("Down"), 'value': 4} ];  
 
-	sceneController.setupWidget("ChargerOrientationSelector", {'label': "Orientation", 
+	sceneController.setupWidget("ChargerOrientationSelector", {'label': $L("Orientation"), 
 		'labelPlacement': "left", 'modelProperty': "chargerOrientation",
 		'choices': this.choicesOrientationSelector});
 	
 	this.choicesDelaySelector = [
-		{'label': "No Delay", 'value': 0},
-		{'label': "3 Seconds", 'value': 3},
-		{'label': "30 Seconds", 'value': 30},
-		{'label': "60 Seconds", 'value': 60} ];  
+		{'label': $L("No Delay"), 'value': 0},
+		{'label': "3 " + $L("Seconds"), 'value': 3},
+		{'label': "30 " + $L("Seconds"), 'value': 30},
+		{'label': "60 " + $L("Seconds"), 'value': 60} ];  
 
-	sceneController.setupWidget("ChargerDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("ChargerDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "chargerDelay",
 		'choices': this.choicesDelaySelector});
 
@@ -63,6 +63,7 @@ ChargerConfig.prototype.setup = function(sceneController) {
 
 ChargerConfig.prototype.config = function() {
 	var triggerConfig = {
+		'chargerTitle': $L("Charger Event"),
 		'chargerCharger': 1,
 		'chargerOrientation': 0,
 		'chargerDelay': 3,
@@ -80,6 +81,7 @@ ChargerConfig.prototype.load = function(triggerPreferences) {
 		var display = "none";
 
 	var triggerConfig = {
+		'chargerTitle': $L("Charger Event"),
 		'chargerCharger': triggerPreferences.chargerCharger,
 		'chargerOrientation': triggerPreferences.chargerOrientation,
 		'chargerDelay': triggerPreferences.chargerDelay,

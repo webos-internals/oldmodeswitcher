@@ -8,7 +8,7 @@ NetworkConfig.prototype.version = function() {
 //
 
 NetworkConfig.prototype.label = function() {
-	return "Network Settings";
+	return $L("Network Settings");
 }
 
 //
@@ -24,30 +24,30 @@ NetworkConfig.prototype.deactivate = function() {
 NetworkConfig.prototype.setup = function(sceneController) {
 	this.choicesNetworkTypeSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Automatic", 'value': 1},
-		{'label': "2G Only", 'value': 2},
-		{'label': "3G Only", 'value': 3} ];  
+		{'label': $L("Automatic"), 'value': 1},
+		{'label': $L("2G Only"), 'value': 2},
+		{'label': $L("3G Only"), 'value': 3} ];  
 
-	sceneController.setupWidget("NetworkTypeSelector", {'label': "Network Type", 
+	sceneController.setupWidget("NetworkTypeSelector", {'label': $L("Network Type"), 
 		'labelPlacement': "left", 'modelProperty': "networkType",
 		'choices': this.choicesNetworkTypeSelector});
 
 	this.choicesDataRoamingSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 2} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 2} ];  
 
-	sceneController.setupWidget("NetworkDataSelector", {'label': "Data Roaming", 
+	sceneController.setupWidget("NetworkDataSelector", {'label': $L("Data Roaming"), 
 		'labelPlacement': "left", 'modelProperty': "networkData",
 		'choices': this.choicesDataRoamingSelector});
 
 	this.choicesVoiceRoamingSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Automatic", 'value': 1},
-		{'label': "Home Only", 'value': 2},
-		{'label': "Roam Only", 'value': 3} ];  
+		{'label': $L("Automatic"), 'value': 1},
+		{'label': $L("Home Only"), 'value': 2},
+		{'label': $L("Roam Only"), 'value': 3} ];  
 
-	sceneController.setupWidget("NetworkVoiceSelector", {'label': "Voice Roaming", 
+	sceneController.setupWidget("NetworkVoiceSelector", {'label': $L("Voice Roaming"), 
 		'labelPlacement': "left", 'modelProperty': "networkVoice",
 		'choices': this.choicesVoiceRoamingSelector});
 }
@@ -56,6 +56,7 @@ NetworkConfig.prototype.setup = function(sceneController) {
 
 NetworkConfig.prototype.config = function() {
 	var settingConfig = {
+		'networkTitle': $L("Network"),
 		'networkType': -1, 
 		'networkData': -1, 
 		'networkVoice': -1 };

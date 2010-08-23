@@ -22,26 +22,26 @@ AppsrvAssistant.prototype.setup = function() {
 
 AppsrvAssistant.prototype.updateNameState = function(event) {
 	if(event == "enable") {
-		this.controller.get("mode-name").innerHTML = "Mode Switcher is";
+		this.controller.get("mode-name").innerHTML = $L("Mode Switcher is");
 	
-		this.controller.get("mode-state").innerHTML = "Activating...";
+		this.controller.get("mode-state").innerHTML = $L("Activating...");
 
 		this.controller.get('lock').removeClassName("unlock");
 		this.controller.get('lock').addClassName("lock");
 	}
 	else if(event == "disable") {
-		this.controller.get("mode-name").innerHTML = "Mode Switcher is";
+		this.controller.get("mode-name").innerHTML = $L("Mode Switcher is");
 	
-		this.controller.get("mode-state").innerHTML = "Deactivating...";
+		this.controller.get("mode-state").innerHTML = $L("Deactivating...");
 
 		this.controller.get('lock').removeClassName("unlock");
 		this.controller.get('lock').addClassName("lock");
 	}
 	else {
 		if(this.config.modeSwitcher.activated == 0) {
-			this.controller.get("mode-name").innerHTML = "Mode Switcher is";
+			this.controller.get("mode-name").innerHTML = $L("Mode Switcher is");
 		
-			this.controller.get("mode-state").innerHTML = "Not Activated";
+			this.controller.get("mode-state").innerHTML = $L("Not Activated");
 
 			this.controller.get('lock').removeClassName("unlock");
 			this.controller.get('lock').addClassName("lock");
@@ -51,12 +51,12 @@ AppsrvAssistant.prototype.updateNameState = function(event) {
 
 			if(this.config.modifierModes.length == 0) {
 				if(this.config.currentMode.type == "default")		
-					this.controller.get("mode-state").innerHTML = "Default settings";
+					this.controller.get("mode-state").innerHTML = $L("Default settings");
 				else
-					this.controller.get("mode-state").innerHTML = "Normal settings";
+					this.controller.get("mode-state").innerHTML = $L("Normal settings");
 			}
 			else
-				this.controller.get("mode-state").innerHTML = "Modified settings";
+				this.controller.get("mode-state").innerHTML = $L("Modified settings");
 	
 			if(this.config.modeSwitcher.modeLocked == "yes") {
 				this.controller.get('lock').removeClassName("lock");

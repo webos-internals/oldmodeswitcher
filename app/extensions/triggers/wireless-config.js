@@ -6,7 +6,7 @@ WirelessConfig.prototype.version = function() {
 }
 
 WirelessConfig.prototype.label = function() {
-	return "Wi-Fi Network Trigger";
+	return $L("Wi-Fi Network Trigger");
 }
 
 //
@@ -23,25 +23,25 @@ WirelessConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesWiFiStateSelector = [
-		{'label': "Connected", 'value': 0},
-		{'label': "Disconnected", 'value': 1},
-		{'label': "Connected to", 'value': 2},
-		{'label': "Disconnected from", 'value': 3} ];  
+		{'label': $L("Connected"), 'value': 0},
+		{'label': $L("Disconnected"), 'value': 1},
+		{'label': $L("Connected to"), 'value': 2},
+		{'label': $L("Disconnected from"), 'value': 3} ];  
 
-	sceneController.setupWidget("WirelessStateSelector", {'label': "State", 
+	sceneController.setupWidget("WirelessStateSelector", {'label': $L("State"), 
 		'labelPlacement': "left", 'modelProperty': "wirelessState",
 		'choices': this.choicesWiFiStateSelector});
 
-	sceneController.setupWidget("WirelessSSIDText", {'hintText': "WiFi Network Name (SSID)", 
+	sceneController.setupWidget("WirelessSSIDText", {'hintText': $L("Wi-Fi Network Name (SSID)"), 
 		'multiline': false, 'enterSubmits': false, 'focus': true, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "wirelessSSID"}); 
 
 	this.choicesWiFiDelaySelector = [
-		{'label': "No Delay", 'value': 0},
-		{'label': "30 Seconds", 'value': 30},
-		{'label': "60 Seconds", 'value': 60} ];  
+		{'label': $L("No Delay"), 'value': 0},
+		{'label': "30 " + $L("Seconds"), 'value': 30},
+		{'label': "60 " + $L("Seconds"), 'value': 60} ];  
 
-	sceneController.setupWidget("WirelessDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("WirelessDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "wirelessDelay",
 		'choices': this.choicesWiFiDelaySelector});
 
@@ -55,6 +55,7 @@ WirelessConfig.prototype.setup = function(sceneController) {
 
 WirelessConfig.prototype.config = function() {
 	var triggerConfig = {
+		'wirelessTitle': $L("Wi-Fi Network"),
 		'wirelessState': 0,
 		'wirelessSSID': "",
 		'wirelessDelay': 0,
@@ -72,6 +73,7 @@ WirelessConfig.prototype.load = function(triggerPreferences) {
 		var display = "none";
 
 	var triggerConfig = {
+		'wirelessTitle': $L("Wi-Fi Network"),
 		'wirelessState': triggerPreferences.wirelessState,
 		'wirelessSSID': triggerPreferences.wirelessSSID,
 		'wirelessDelay': triggerPreferences.wirelessDelay,

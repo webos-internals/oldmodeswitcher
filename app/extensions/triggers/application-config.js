@@ -6,7 +6,7 @@ ApplicationConfig.prototype.version = function() {
 }
 
 ApplicationConfig.prototype.label = function() {
-	return "Application Trigger";
+	return $L("Application Trigger");
 }
 
 //
@@ -23,25 +23,25 @@ ApplicationConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesStateSelector = [
-		{'label': "On Foreground", 'value': 0},
-		{'label': "On Background", 'value': 1} ];  
+		{'label': $L("On Foreground"), 'value': 0},
+		{'label': $L("On Background"), 'value': 1} ];  
 
-	this.controller.setupWidget("ApplicationStateSelector", {'label': "State", 
+	this.controller.setupWidget("ApplicationStateSelector", {'label': $L("State"), 
 		'labelPlacement': "left", 'modelProperty': "applicationState",
 		'choices': this.choicesStateSelector});
 	
 	this.choicesApplicationSelector = [];  
 
-	this.controller.setupWidget("ApplicationIdSelector", {'label': "Application", 
+	this.controller.setupWidget("ApplicationIdSelector", {'label': $L("Application"), 
 		'labelPlacement': "left", 'modelProperty': "applicationId",
 		'choices': this.choicesApplicationSelector});
 
 	this.choicesDelaySelector = [
-		{'label': "15 Seconds", 'value': 15},
-		{'label': "30 Seconds", 'value': 30},
-		{'label': "60 Seconds", 'value': 60} ];  
+		{'label': "15 " + $L("Seconds"), 'value': 15},
+		{'label': "30 " + $L("Seconds"), 'value': 30},
+		{'label': "60 " + $L("Seconds"), 'value': 60} ];  
 
-	this.controller.setupWidget("ApplicationDelaySelector", {'label': "Delay", 
+	this.controller.setupWidget("ApplicationDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "applicationDelay",
 		'choices': this.choicesDelaySelector});
 		
@@ -52,6 +52,7 @@ ApplicationConfig.prototype.setup = function(sceneController) {
 
 ApplicationConfig.prototype.config = function() {
 	var triggerConfig = {
+		'applicationTitle': $L("Application"),
 		'applicationState': 0,
 		'applicationId': this.choicesApplicationSelector[0].value,
 		'applicationDelay': 15 };
@@ -63,6 +64,7 @@ ApplicationConfig.prototype.config = function() {
 
 ApplicationConfig.prototype.load = function(triggerPreferences) {
 	var triggerConfig = {
+		'applicationTitle': $L("Application"),
 		'applicationState': triggerPreferences.applicationState,
 		'applicationId': triggerPreferences.applicationId,
 		'applicationDelay': triggerPreferences.applicationDelay };

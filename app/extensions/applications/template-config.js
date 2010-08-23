@@ -29,10 +29,10 @@ TemplateConfig.prototype.setup = function(sceneController) {
 	// This function should setup all the widgets in the extension-listitem file.
 	
 	this.choicesTemplateLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"} ];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"} ];  
 
-	sceneController.setupWidget("TemplateLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("TemplateLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesTemplateLaunchSelector} );
 }

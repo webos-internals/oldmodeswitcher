@@ -23,27 +23,27 @@ BrowserConfig.prototype.setup = function(sceneController) {
 	// Mode selector
 
 	this.choicesBrowserLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"}];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"}];  
 
-	sceneController.setupWidget("BrowserLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("BrowserLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesBrowserLaunchSelector});
 
 	// URL text field
 			
-	sceneController.setupWidget("BrowserURLText", { 'hintText': "Enter URL to load...", 
+	sceneController.setupWidget("BrowserURLText", { 'hintText': $L("Enter URL to load..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "launchURL"});
 
 	// Delay selector
 	
 	this.choicesBrowserDelaySelector = [
-		{'label': "No Delay", value: 0},
-		{'label': "15 Seconds", value: 15},
-		{'label': "30 Seconds", value: 30} ];  
+		{'label': $L("No Delay"), value: 0},
+		{'label': "15 " + $L("Seconds"), value: 15},
+		{'label': "30 " + $L("Seconds"), value: 30} ];  
 
-	sceneController.setupWidget("BrowserDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("BrowserDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "launchDelay",
 		'choices': this.choicesBrowserDelaySelector} );
 }

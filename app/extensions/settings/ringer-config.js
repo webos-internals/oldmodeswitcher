@@ -8,7 +8,7 @@ RingerConfig.prototype.version = function() {
 //
 
 RingerConfig.prototype.label = function() {
-	return "Ringer Settings";
+	return $L("Ringer Settings");
 }
 
 //
@@ -26,27 +26,27 @@ RingerConfig.prototype.setup = function(sceneController) {
 
 	this.choicesRingerOnSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},		
-		{'label': "Sound & Vibrate", 'value': 1},
-		{'label': "Sound Only", 'value': 0} ];  
+		{'label': $L("Sound & Vibrate"), 'value': 1},
+		{'label': $L("Sound Only"), 'value': 0} ];  
 
-	sceneController.setupWidget("RingerOnSelector", {'label': "Ringer On", 
+	sceneController.setupWidget("RingerOnSelector", {'label': $L("Ringer On"), 
 		'labelPlacement': "left", 'modelProperty': "ringerRingerOn",
 		'choices': this.choicesRingerOnSelector});
 
 	this.choicesRingerOffSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Vibrate", 'value': 1},
-		{'label': "Mute", 'value': 0}];  
+		{'label': $L("Vibrate"), 'value': 1},
+		{'label': $L("Mute"), 'value': 0}];  
 
-	sceneController.setupWidget("RingerOffSelector", {'label': "Ringer Off", 
+	sceneController.setupWidget("RingerOffSelector", {'label': $L("Ringer Off"), 
 		'labelPlacement': "left", 'modelProperty': "ringerRingerOff",
 		'choices': this.choicesRingerOffSelector});
 
 	this.choicesRingerRingtone = [
 		{'label': sceneController.defaultChoiseLabel, 'value': ""},
-		{'label': "Select", 'value': "select"} ];  
+		{'label': $L("Select"), 'value': "select"} ];  
 
-	sceneController.setupWidget("RingerRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("RingerRingtoneSelector", {'label': $L("Ringtone"), 
 		'labelPlacement': "left", 'modelProperty': "ringerRingtoneName",
 		'choices': this.choicesRingerRingtone});
 		
@@ -60,6 +60,7 @@ RingerConfig.prototype.setup = function(sceneController) {
 
 RingerConfig.prototype.config = function() {
 	var settingConfig = {
+		'ringerTitle': $L("Ringer"),
 		'ringerRingerOn': -1, 
 		'ringerRingerOff': -1, 
 		'ringerRingtoneName': "", 
@@ -124,7 +125,7 @@ RingerConfig.prototype.handleListChange = function(changeEvent) {
 
 RingerConfig.prototype.executeRingerSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
-		'actionType': "attach", 'actionName': "Done", 'onSelect': 
+		'actionType': "attach", 'actionName': $L("Done"), 'onSelect': 
 			function(eventModel, serviceResponse) {
 				eventModel.ringerRingtoneName = serviceResponse.name;
 				eventModel.ringerRingtonePath = serviceResponse.fullPath;

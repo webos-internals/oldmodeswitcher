@@ -6,7 +6,7 @@ HeadsetConfig.prototype.version = function() {
 }
 
 HeadsetConfig.prototype.label = function() {
-	return "Headset State Trigger";
+	return $L("Headset State Trigger");
 }
 
 //
@@ -21,19 +21,19 @@ HeadsetConfig.prototype.deactivate = function() {
 
 HeadsetConfig.prototype.setup = function(sceneController) {
 	this.choicesStateSelector = [
-		{'label': "Connected", 'value': 0}, 
-		{'label': "Not Connected", 'value': 1} ];  
+		{'label': $L("Connected"), 'value': 0}, 
+		{'label': $L("Not Connected"), 'value': 1} ];  
 
-	sceneController.setupWidget("HeadsetStateSelector", {'label': "State", 
+	sceneController.setupWidget("HeadsetStateSelector", {'label': $L("State"), 
 		'labelPlacement': "left", 'modelProperty': "headsetState",
 		'choices': this.choicesStateSelector});
 
 	this.choicesScenarioSelector = [
-		{'label': "Any Scenario", 'value': 0}, 
-		{'label': "Headset", 'value': 1},
-		{'label': "Headset / Mic", 'value': 2} ];  
+		{'label': $L("Any Scenario"), 'value': 0}, 
+		{'label': $L("Headset"), 'value': 1},
+		{'label': $L("Headset / Mic"), 'value': 2} ];  
 
-	sceneController.setupWidget("HeadsetScenarioSelector", {'label': "Scenario", 
+	sceneController.setupWidget("HeadsetScenarioSelector", {'label': $L("Scenario"), 
 		'labelPlacement': "left", 'modelProperty': "headsetScenario",
 		'choices': this.choicesScenarioSelector});
 }
@@ -42,6 +42,7 @@ HeadsetConfig.prototype.setup = function(sceneController) {
 
 HeadsetConfig.prototype.config = function() {
 	var triggerConfig = {
+		'headsetTitle': $L("Headset State"),
 		'headsetState': 0,
 		'headsetScenario': 0 };
 	
@@ -52,6 +53,7 @@ HeadsetConfig.prototype.config = function() {
 
 HeadsetConfig.prototype.load = function(triggerPreferences) {
 	var triggerConfig = {
+		'headsetTitle': $L("Headset State"),
 		'headsetState': triggerPreferences.headsetState,
 		'headsetScenario': triggerPreferences.headsetScenario };
 	

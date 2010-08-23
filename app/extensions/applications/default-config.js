@@ -21,21 +21,21 @@ DefaultConfig.prototype.deactivate = function() {
 
 DefaultConfig.prototype.setup = function(sceneController) {
 	this.choicesDefaultLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"} ];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"} ];  
 
-	sceneController.setupWidget("DefaultLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("DefaultLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesDefaultLaunchSelector} );
 		
 	// Delay selector
 	
 	this.choicesDefaultDelaySelector = [
-		{'label': "No Delay", value: 0},
-		{'label': "15 Seconds", value: 15},
-		{'label': "30 Seconds", value: 30} ];  
+		{'label': $L("No Delay"), value: 0},
+		{'label': "15" + $L(" Seconds"), value: 15},
+		{'label': "30 " + $L("Seconds"), value: 30} ];  
 
-	sceneController.setupWidget("DefaultDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("DefaultDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "launchDelay",
 		'choices': this.choicesDefaultDelaySelector} );
 }

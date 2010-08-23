@@ -6,7 +6,7 @@ BluetoothConfig.prototype.version = function() {
 }
 
 BluetoothConfig.prototype.label = function() {
-	return "BT Connection Trigger";
+	return $L("BT Connection Trigger");
 }
 
 //
@@ -23,29 +23,29 @@ BluetoothConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesProfileStateSelector = [
-		{'label': "Connected", 'value': 0},
-		{'label': "Disconnected", 'value': 1},
-		{'label': "Connected to", 'value': 2},
-		{'label': "Disconnected from", 'value': 3} ];
+		{'label': $L("Connected"), 'value': 0},
+		{'label': $L("Disconnected"), 'value': 1},
+		{'label': $L("Connected to"), 'value': 2},
+		{'label': $L("Disconnected from"), 'value': 3} ];
 		
-	sceneController.setupWidget("BluetoothStateSelector", {'label': "State",
+	sceneController.setupWidget("BluetoothStateSelector", {'label': $L("State"),
 		'labelPlacement': "left", 'modelProperty': "bluetoothState",
 		'choices': this.choicesProfileStateSelector});        
 
 	this.choicesProfileSelector = [
-		{'label': "Any Profile", 'value': "any"},
-		{'label': "Stereo Music", 'value': "a2dp"},
-		{'label': "AV Remote Control", 'value': "avrcp"},
-		{'label': "Hands-Free", 'value': "hfg"},
-		{'label': "Headset", 'value': "hsp"},
-		{'label': "Personal Area Network", 'value': "pan"},
-		{'label': "Phone Book Access", 'value': "pba"} ];
+		{'label': $L("Any Profile"), 'value': "any"},
+		{'label': $L("Stereo Music"), 'value': "a2dp"},
+		{'label': $L("AV Remote Control"), 'value': "avrcp"},
+		{'label': $L("Hands-Free"), 'value': "hfg"},
+		{'label': $L("Headset"), 'value': "hsp"},
+		{'label': $L("Personal Area Network"), 'value': "pan"},
+		{'label': $L("Phone Book Access"), 'value': "pba"} ];
 
-	sceneController.setupWidget("BluetoothProfileSelector", {'label': "Profile",
+	sceneController.setupWidget("BluetoothProfileSelector", {'label': $L("Profile"),
 		'labelPlacement': "left", 'modelProperty': "bluetoothProfile",
 		'choices': this.choicesProfileSelector});        
 
-	sceneController.setupWidget("BluetoothDeviceText", {'hintText': "Bluetooth Device Name", 
+	sceneController.setupWidget("BluetoothDeviceText", {'hintText': $L("Bluetooth Device Name"), 
 		'multiline': false, 'enterSubmits': false, 'focus': true, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "bluetoothDevice"}); 
 
@@ -59,6 +59,7 @@ BluetoothConfig.prototype.setup = function(sceneController) {
 
 BluetoothConfig.prototype.config = function() {
 	var triggerConfig = {
+		'bluetoothTitle': $L("BT Connection"),
 		'bluetoothState': 0,
 		'bluetoothProfile': "any",
 		'bluetoothDevice': "",
@@ -80,6 +81,7 @@ BluetoothConfig.prototype.load = function(triggerPreferences) {
 	}
 
 	var triggerConfig = {
+		'bluetoothTitle': $L("BT Connection"),
 		'bluetoothState': triggerPreferences.bluetoothState,
 		'bluetoothProfile': triggerPreferences.bluetoothProfile,
 		'bluetoothDevice': triggerPreferences.bluetoothDevice,

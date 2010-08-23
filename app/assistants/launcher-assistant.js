@@ -37,23 +37,23 @@ LauncherAssistant.prototype.setup = function() {
 	// Buttons
 	
 	if(this.event == "start")
-		this.modelStartButton = {label: "Switch Mode", buttonClass : 'affirmative popupbutton', disabled : false};
+		this.modelStartButton = {label: $L("Switch Mode"), buttonClass : 'affirmative popupbutton', disabled : false};
    else
-   	this.modelStartButton = {label: "Close Mode", buttonClass : 'affirmative popupbutton', disabled : false};
+   	this.modelStartButton = {label: $L("Close Mode"$L(, buttonClass : 'affirmative popupbutton', disabled : false};
    	     
 	this.controller.setupWidget('StartButton', {}, this.modelStartButton);
 
 	Mojo.Event.listen(this.controller.get('StartButton'), Mojo.Event.tap, 
 		this.handleStartButtonPress.bind(this));
 
-	this.modelSelectButton = {label: "Default Mode", buttonClass : 'popupbutton', disabled : false};
+	this.modelSelectButton = {label: $L("Default Mode"), buttonClass : 'popupbutton', disabled : false};
   
    this.controller.setupWidget('SelectButton', {}, this.modelSelectButton);
 
 	Mojo.Event.listen(this.controller.get('SelectButton'), Mojo.Event.tap, 
 		this.handleSelectButtonPress.bind(this));
    
- 	this.modelCancelButton = {label: "Cancel", buttonClass : 'negative popupbutton', disabled : false};
+ 	this.modelCancelButton = {label: $L("Cancel"), buttonClass : 'negative popupbutton', disabled : false};
 
 	this.controller.setupWidget('CancelButton', {}, this.modelCancelButton);
 
@@ -69,7 +69,7 @@ LauncherAssistant.prototype.setup = function() {
 LauncherAssistant.prototype.setupStart = function() {
 	clearTimeout(this.timer);
 
-	this.modelStartButton.label = "Switch Mode";
+	this.modelStartButton.label = $L("Switch Mode");
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
@@ -105,7 +105,7 @@ LauncherAssistant.prototype.setupStart = function() {
 LauncherAssistant.prototype.setupClose = function() {
 	clearTimeout(this.timer);
 
-	this.modelStartButton.label = "Close Mode";
+	this.modelStartButton.label = $L("Close Mode");
 		
 	this.controller.modelChanged(this.modelStartButton, this);
 
@@ -133,7 +133,7 @@ LauncherAssistant.prototype.setupClose = function() {
 
 LauncherAssistant.prototype.updateCancelTimer = function() {
 	if(this.counterCancel >= 0) {
-		this.modelCancelButton.label = "Cancel (" + this.counterCancel-- + ")";
+		this.modelCancelButton.label = $L("Cancel") + " (" + this.counterCancel-- + ")";
 		this.controller.modelChanged(this.modelCancelButton, this);
 		
 		this.timer = setTimeout(this.updateCancelTimer.bind(this), 1000);
@@ -144,7 +144,7 @@ LauncherAssistant.prototype.updateCancelTimer = function() {
 
 LauncherAssistant.prototype.updateStartTimer = function() {
 	if(this.counterStart >= 0) {
-		this.modelStartButton.label = "Switch Mode (" + this.counterStart-- + ")";
+		this.modelStartButton.label = $L("Switch Mode") + " (" + this.counterStart-- + ")";
 			
 		this.controller.modelChanged(this.modelStartButton, this);
 		
@@ -156,7 +156,7 @@ LauncherAssistant.prototype.updateStartTimer = function() {
 
 LauncherAssistant.prototype.updateCloseTimer = function() {
 	if(this.counterClose >= 0) {
-		this.modelStartButton.label = "Close Mode (" + this.counterClose-- + ")";
+		this.modelStartButton.label = $L("Close Mode") + " (" + this.counterClose-- + ")";
 		this.controller.modelChanged(this.modelStartButton, this);
 		
 		this.timer = setTimeout(this.updateCloseTimer.bind(this), 1000);
@@ -175,11 +175,11 @@ LauncherAssistant.prototype.handleSelectButtonPress = function() {
 	clearTimeout(this.timer);
 
 	if(this.event == "start") {
-		this.modelStartButton.label = "Switch Mode";
+		this.modelStartButton.label = $L("Switch Mode");
 		
 		this.controller.modelChanged(this.modelStartButton, this);
 
-		this.modelCancelButton.label = "Cancel";
+		this.modelCancelButton.label = $L("Cancel");
 		this.controller.modelChanged(this.modelCancelButton, this);
 
 		this.modeidx++;

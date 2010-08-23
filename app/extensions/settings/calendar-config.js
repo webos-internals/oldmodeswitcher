@@ -8,7 +8,7 @@ CalendarConfig.prototype.version = function() {
 //
 
 CalendarConfig.prototype.label = function() {
-	return "Calendar Settings";
+	return $L("Calendar Settings");
 }
 
 //
@@ -26,21 +26,20 @@ CalendarConfig.prototype.setup = function(sceneController) {
 
 	this.choicesCalendarAlarmSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Vibrate", 'value': 3},
-		{'label': "System Sound", 'value': 1},
-		{'label': "Ringtone", 'value': 2},
-		{'label': "Mute", 'value': 0} ];  
+		{'label': $L("Vibrate"), 'value': 3},
+		{'label': $L("System Sound"), 'value': 1},
+		{'label': $L("Ringtone"), 'value': 2},
+		{'label': $L("Mute"), 'value': 0} ];  
 
-	sceneController.setupWidget("CalendarAlarmSelector", {
-		'label': "Reminder",	'labelPlacement': "left",
-		'modelProperty': "calendarAlarm", 
+	sceneController.setupWidget("CalendarAlarmSelector", {'label': $L("Reminder"),	
+		'labelPlacement': "left", 'modelProperty': "calendarAlarm", 
 		'choices': this.choicesCalendarAlarmSelector});
 
 	this.choicesCalendarRingtoneSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': ""},
-		{'label': "Select", 'value': "select"} ];  
+		{'label': $L("Select"), 'value': "select"} ];  
 
-	sceneController.setupWidget("CalendarRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("CalendarRingtoneSelector", {'label': $L("Ringtone"), 
 		'labelPlacement': "left", 'modelProperty': "calendarRingtoneName",
 		'choices': this.choicesCalendarRingtoneSelector});
 		
@@ -54,6 +53,7 @@ CalendarConfig.prototype.setup = function(sceneController) {
 
 CalendarConfig.prototype.config = function() {
 	var settingConfig = {
+		'calendarTitle': $L("Calendar"),
 		'calendarAlarm': -1,
 		'calendarRingtoneName': "", 
 		'calendarRingtonePath': "",
@@ -135,7 +135,7 @@ CalendarConfig.prototype.handleListChange = function(changeEvent) {
 
 CalendarConfig.prototype.executeRingtoneSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
-		'actionType': "attach", 'actionName': "Done", 'onSelect': 
+		'actionType': "attach", 'actionName': $L("Done"), 'onSelect': 
 			function(eventModel, serviceResponse) {
 				eventModel.calendarRingtoneName = serviceResponse.name;
 				eventModel.calendarRingtonePath = serviceResponse.fullPath;

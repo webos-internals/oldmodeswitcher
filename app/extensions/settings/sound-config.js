@@ -8,7 +8,7 @@ SoundConfig.prototype.version = function() {
 //
 
 SoundConfig.prototype.label = function() {
-	return "Sound Settings";
+	return $L("Sound Settings");
 }
 
 //
@@ -26,10 +26,10 @@ SoundConfig.prototype.setup = function(sceneController) {
 	
 	this.choicesRingerVolumeSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Minimum", 'value': 0},
-		{'label': "Maximum", 'value': 100} ];  
+		{'label': $L("Minimum"), 'value': 0},
+		{'label': $L("Maximum"), 'value': 100} ];  
 
-	sceneController.setupWidget("SoundRingerSelector", {'label': "Ringer", 
+	sceneController.setupWidget("SoundRingerSelector", {'label': $L("Ringer"), 
 		'labelPlacement': "left", 'modelProperty': "soundRingerVolume",
 		'choices': this.choicesRingerVolumeSelector});
 		
@@ -38,10 +38,10 @@ SoundConfig.prototype.setup = function(sceneController) {
 
 	this.choicesSystemVolumeSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Minimum", 'value': 0},
-		{'label': "Maximum", 'value': 100} ];  
+		{'label': $L("Minimum"), 'value': 0},
+		{'label': $L("Maximum"), 'value': 100} ];  
 
-	sceneController.setupWidget("SoundSystemSelector", {'label': "System", 
+	sceneController.setupWidget("SoundSystemSelector", {'label': $L("System"), 
 		'labelPlacement': "left", 'modelProperty': "soundSystemVolume",
 		'choices': this.choicesSystemVolumeSelector});
 		
@@ -50,10 +50,10 @@ SoundConfig.prototype.setup = function(sceneController) {
 
 	this.choicesMediaVolumeSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Minimum", 'value': 0},
-		{'label': "Maximum", 'value': 100} ];  
+		{'label': $L("Minimum"), 'value': 0},
+		{'label': $L("Maximum"), 'value': 100} ];  
 
-	sceneController.setupWidget("SoundMediaSelector", {'label': "Media", 
+	sceneController.setupWidget("SoundMediaSelector", {'label': $L("Media"), 
 		'labelPlacement': "left", 'modelProperty': "soundMediaVolume",
 		'choices': this.choicesMediaVolumeSelector});
 
@@ -65,6 +65,7 @@ SoundConfig.prototype.setup = function(sceneController) {
 
 SoundConfig.prototype.config = function() {
 	var settingConfig = {
+		'soundTitle': $L("Sounds"),
 		'soundRingerVolume': -1, 
 		'soundSystemVolume': -1, 
 		'soundMediaVolume': -1 };

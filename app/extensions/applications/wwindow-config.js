@@ -21,27 +21,27 @@ WwindowConfig.prototype.deactivate = function() {
 
 WwindowConfig.prototype.setup = function(sceneController) {
 	this.choicesWwindowLaunchSelector = [
-		{'label': "On Mode Start", value: "start"},
-		{'label': "On Mode Close", value: "close"} ];  
+		{'label': $L("On Mode Start"), value: "start"},
+		{'label': $L("On Mode Close"), value: "close"} ];  
 
-	sceneController.setupWidget("WwindowLaunchSelector", {'label': "Launch", 
+	sceneController.setupWidget("WwindowLaunchSelector", {'label': $L("Launch"), 
 		'labelPlacement': "left", 'modelProperty': "launchMode",
 		'choices': this.choicesWwindowLaunchSelector} );
 	
 	this.choicesWwindowActionSelector = [
-		{'label': "Do Nothing", value: 0},
-		{'label': "Get Weather", value: 1} ];  
+		{'label': $L("Do Nothing"), value: 0},
+		{'label': $L("Get Weather"), value: 1} ];  
 
-	sceneController.setupWidget("WwindowActionSelector", {'label': "Action", 
+	sceneController.setupWidget("WwindowActionSelector", {'label': $L("Action"), 
 		'labelPlacement': "left", 'modelProperty': "launchAction",
 		'choices': this.choicesWwindowActionSelector} );
 
 	this.choicesWwindowtDelaySelector = [
-		{'label': "No Delay", value: 0},
-		{'label': "15 Seconds", value: 15},
-		{'label': "30 Seconds", value: 30} ];  
+		{'label': $L("No Delay"), value: 0},
+		{'label': "15 " + $L("Seconds"), value: 15},
+		{'label': "30 " + $L("Seconds"), value: 30} ];  
 
-	sceneController.setupWidget("WwindowDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("WwindowDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "launchDelay",
 		'choices': this.choicesWwindowDelaySelector} );
 }

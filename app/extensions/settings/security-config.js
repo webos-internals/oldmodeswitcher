@@ -8,7 +8,7 @@ SecurityConfig.prototype.version = function() {
 //
 
 SecurityConfig.prototype.label = function() {
-	return "Security Settings";
+	return $L("Security Settings");
 }
 
 //
@@ -26,29 +26,29 @@ SecurityConfig.prototype.setup = function(sceneController) {
 
 	this.choicesSecurityLockSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Unsecure", 'value': 0},
-		{'label': "Simple PIN", 'value': 1},
-		{'label': "Password", 'value': 2} ];  
+		{'label': $L("Unsecure"), 'value': 0},
+		{'label': $L("Simple PIN"), 'value': 1},
+		{'label': $L("Password"), 'value': 2} ];  
 
-	sceneController.setupWidget("SecurityLockSelector", {'label': "Unlock Mode", 
+	sceneController.setupWidget("SecurityLockSelector", {'label': $L("Unlock Mode"), 
 		'labelPlacement': "left", 'modelProperty': "securityLock",
 		'choices': this.choicesSecurityLockSelector});
 
-	sceneController.setupWidget("SecurityPINText", {'hintText': "Enter PIN...", 
+	sceneController.setupWidget("SecurityPINText", {'hintText': $L("Enter PIN..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'modifierState': Mojo.Widget.numLock, 'modelProperty': "securitySecretPIN", 
 		'charsAllow': this.checkPINCharacter.bind(this)});
 
-	sceneController.setupWidget("SecurityPINText2", {'hintText': "Enter PIN Again...", 
+	sceneController.setupWidget("SecurityPINText2", {'hintText': $L("Enter PIN Again..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'modifierState': Mojo.Widget.numLock, 'modelProperty': "securitySecretPIN2", 
 		'charsAllow': this.checkPINCharacter.bind(this)});
 
-	sceneController.setupWidget("SecurityPWText", {'hintText': "Enter Password...", 
+	sceneController.setupWidget("SecurityPWText", {'hintText': $L("Enter Password..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "securitySecretPW"});
 
-	sceneController.setupWidget("SecurityPWText2", {'hintText': "Enter Password Again...", 
+	sceneController.setupWidget("SecurityPWText2", {'hintText': $L("Enter Password Again..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 
 		'textCase': Mojo.Widget.steModeLowerCase, 'modelProperty': "securitySecretPW2"});
 
@@ -62,6 +62,7 @@ SecurityConfig.prototype.setup = function(sceneController) {
 
 SecurityConfig.prototype.config = function() {
 	var settingConfig = {
+		'securityTitle': $L("Security"),
 		'securityLock': -1, 
 		'securitySecretPIN': "",
 		'securitySecretPW': "",

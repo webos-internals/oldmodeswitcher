@@ -8,7 +8,7 @@ ConnectionConfig.prototype.version = function() {
 //
 
 ConnectionConfig.prototype.label = function() {
-	return "Connection Settings";
+	return $L("Connection Settings");
 }
 
 //
@@ -24,46 +24,46 @@ ConnectionConfig.prototype.deactivate = function() {
 ConnectionConfig.prototype.setup = function(sceneController) {
 	this.choicesPhoneSelector = [
 		{'label': sceneController.defaultChoiseLabel, value: -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ConnectionPhoneSelector", {'label': "Phone", 
+	sceneController.setupWidget("ConnectionPhoneSelector", {'label': $L("Phone"), 
 		'labelPlacement': "left", 'modelProperty': "connectionPhone",
 		'choices': this.choicesPhoneSelector});
 
 	this.choicesDataSelector = [
 		{'label': sceneController.defaultChoiseLabel, value: -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ConnectionDataSelector",	{'label': "Data", 
+	sceneController.setupWidget("ConnectionDataSelector",	{'label': $L("Data"), 
 		'labelPlacement': "left", 'modelProperty': "connectionData",
 		'choices': this.choicesDataSelector});
 
 	this.choicesWIFISelector = [
 		{'label': sceneController.defaultChoiseLabel, value: -1},
-		{'label': "Enabled", value: 1},
-		{'label': "Disabled", value: 0} ];  
+		{'label': $L("Enabled"), value: 1},
+		{'label': $L("Disabled"), value: 0} ];  
 
-	sceneController.setupWidget("ConnectionWIFISelector",	{'label': "Wi-Fi", 
+	sceneController.setupWidget("ConnectionWIFISelector",	{'label': $L("Wi-Fi"), 
 		'labelPlacement': "left", 'modelProperty': "connectionWiFi",
 		'choices': this.choicesWIFISelector});
 
 	this.choicesBTSelector = [
 		{'label': sceneController.defaultChoiseLabel, value: -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ConnectionBTSelector", {'label': "Bluetooth", 
+	sceneController.setupWidget("ConnectionBTSelector", {'label': $L("Bluetooth"), 
 		'labelPlacement': "left", 'modelProperty': "connectionBT",
 		'choices': this.choicesBTSelector});
 
 	this.choicesGPSSelector = [
 		{'label': sceneController.defaultChoiseLabel, value: -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ConnectionGPSSelector",	{'label': "GPS", 
+	sceneController.setupWidget("ConnectionGPSSelector",	{'label': $L("GPS"), 
 		'labelPlacement': "left", 'modelProperty': "connectionGPS",
 		'choices': this.choicesGPSSelector});
 }
@@ -72,6 +72,7 @@ ConnectionConfig.prototype.setup = function(sceneController) {
 
 ConnectionConfig.prototype.config = function() {
 	var settingConfig = {
+		'connectionTitle': $L("Connections"),
 		'connectionWiFi': -1, 
 		'connectionBT': -1, 
 		'connectionGPS': -1, 

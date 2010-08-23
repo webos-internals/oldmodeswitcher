@@ -1,0 +1,946 @@
+{
+	"Mode Switcher is":
+		"",
+	"Activating...":
+		"",
+	"Deactivating...":
+		"",
+	"Not Activated":
+		"",
+	"Default settings":
+		"",
+	"Normal settings":
+		"",
+	"Modified settings":
+		"",
+
+	"Initial setup of Mode Switcher!":
+		"",
+	"<i>Mode Switcher</i> needs to retrieve your current system settings for <i>Default Mode</i>. This operation should only take few seconds to finish. You can modify the <i>Default Mode</i> afterwards by clicking the <i>Edit Default Mode</i> button.": 
+		"",
+	"Report Problem": 
+		"",
+	"Import Mode": 
+		"",
+	"Donate": 
+		"",
+	"Help": 
+		"",
+	"Seconds": 
+		"",
+	"On":
+		"",
+	"Off":
+		"",
+	"Start Timer": 
+		"",
+	"Close Timer": 
+		"",
+	"Add Custom Mode": 
+		"",
+	"Edit Default Mode": 
+		"",
+	"Continue": 
+		"",
+	"Retrieving current system settings": 
+		"",
+	"Retrieving": 
+		"",	
+	"settings": 
+		"",
+	"Retrieving system settings finished": 
+		"",
+	"normal": 
+		"",
+	"modifier": 
+		"",
+
+	"Get System Settings": 
+		"",
+	"Add to Launcher": 
+		"",
+	"Export Mode": 
+		"",
+	"Default Mode Settings": 
+		"",
+	"Mode Configuration": 
+		"",
+	"Settings": 
+		"",
+	"Apps": 
+		"",
+	"Triggers": 
+		"",
+	"Default Mode": 
+		"",
+	"Unique Mode Name": 
+		"",
+	"Default": 
+		"",
+	"Normal": 
+		"",
+	"Modifier": 
+		"",
+	"Mode Type": 
+		"",
+	"Only Manually": 
+		"",
+	"By Selection": 
+		"",
+	"After Timer": 
+		"",
+	"Immediate": 
+		"",
+	"Auto Start": 
+		"",
+	"Auto Close": 
+		"",
+	"Active Mode": 
+		"",
+	"Default Mode": 
+		"",
+	"On Startup": 
+		"",
+	"Everytime": 
+		"",
+	"Applications": 
+		"",
+	"Disabled": 
+		"",
+	"Use Banner": 
+		"",
+	"Do Not Set": 
+		"",
+	"Notify": 
+		"",
+	"Lock Screen": 
+		"",
+	"Always On": 
+		"",
+	"Turn Off": 
+		"",
+	"On Charger": 
+		"",
+	"Do Nothing": 
+		"",
+	"Close All Apps": 
+		"",
+	"On Start": 
+		"",
+	"On Close": 
+		"",
+	"Close Started": 
+		"",
+	"Required": 
+		"",
+	"Block Mode": 
+		"",
+	"All Unique": 
+		"",
+	"One Trigger": 
+		"",
+	"Any Grouped": 
+		"",
+	"No Blocking": 
+		"",
+	"Other Modes": 
+		"",
+	"Normal Modes": 
+		"",
+	"Modifier Modes": 
+		"",
+	"Activation Triggers": 
+		"",
+	"Retrieving process still in progress": 
+		"",
+	"All": 
+		"",
+	"Add Setting": 
+		"",
+	"Add App": 
+		"",
+	"Add MS": 
+		"",
+	"Add Srv": 
+		"",
+	"Group": 
+		"",
+	"Add Trigger": 
+		"",
+	"New Mode":
+		"",
+	"Reserved Mode Name": 
+		"",			
+
+	"Switch Mode":
+		"",
+	"Close Mode":
+		"",
+	"Cancel":
+		"",
+		
+	"Match words...":
+		"",
+	"Yes":
+		"",
+	"No":
+		"",
+	"Title":
+		"",
+	"Last Modified":
+		"",
+	"Order By":
+		"",
+	"Google Docs email...":
+		"",
+	"Google Docs password...":
+		"",
+	"List Modes":
+		"",
+	"by <Your nick>":
+		"",
+	"Descriptive mode name...":
+		"",
+	"Short mode description...":
+		"",
+	"Enter street address...":
+		"",
+	"Zoom":
+		"",
+	"Alert":
+		"",
+	"Vibrate":
+		"",
+	"System Sound":
+		"",
+	"Ringtone":
+		"",
+	"Mute":
+		"",
+	"Email Alert Configuration":
+		"",
+	"Select":
+		"",
+	"Email Ringtone Configuration":
+		"",
+	"Get Email":
+		"",
+	"As Items Arrive":
+		"",
+	"Minutes":
+		"",
+	"Hour":
+		"",
+	"Hours":
+		"",
+	"Manual":
+		"",
+	"Email Sync Configuration":
+		"",
+	"Status":
+		"",
+	"Available":
+		"",
+	"Busy":
+		"",
+	"Sign Off":
+		"",
+	"IM Status Configuration":
+		"",
+	"Done Configuring":
+		"",
+	"Unable to retrieve per account configuration. Maybe you don't have messaging plugins installed?":
+		"",
+	"Done":
+		"",
+	"OK":
+		"",
+	"Unable to list documents!":
+		"",
+	"Received invalid JSON response from Google Docs.":
+		"",
+	"Failed to receive documents list from Google Docs.":
+		"",
+	"Unable to login!": 
+		"",
+	"Login to Google Docs failed, please check your username and password.": 
+		"",
+	"Invalid JSON data received!": 
+		"",
+	"The received document data was not in proper JSON format.": 
+		"",
+	"Unable to download!": 
+		"",
+	"Downloading from Google Docs failed, please try again later.": 
+		"",	
+	"Unable to share!": 
+		"",
+	"Sharing of Google Docs document failed, please try again later.": 
+		"",
+	"Unable to upload!": 
+		"",
+	"Uploading to Google Docs failed, please try again later.": 
+		"",
+
+	"Unknown mode": 
+		"",
+	"Starting mode": 
+		"",
+	"Done starting": 
+		"",
+	"Closing mode": 
+		"",
+	"Done closing": 
+		"",
+	"Updating mode": 
+		"",
+	"Done updating": 
+		"",
+	"Switching mode to": 
+		"",
+	"Done switching to": 
+		"",
+		
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+	"Enter URL to load...":
+		"",
+	"No Delay":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+	
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+	"No Delay":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+
+	"Do Nothing":
+		"",
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+	"No Profiles":
+		"",
+	"On Start":
+		"",
+	"On Close":
+		"",
+	
+	"Previous Mode":
+		"",
+	"Before Mode Start":
+		"",
+	"Before Mode Close":
+		"",
+	"Before Mode Switch":
+		"",
+	"After Mode Start":
+		"",
+	"After Mode Close":
+		"",
+	"After Mode Switch":
+		"",
+	"Process":
+		"",
+	"Start Mode":
+		"",
+	"Close Mode":
+		"",
+	"Trigger Mode":
+		"",
+	"Require Mode":
+		"",
+	"Disable Triggers":
+		"",
+	"Action":
+		"",
+	"Mode":
+		"",
+	"All Normal Modes":
+		"",
+	"All Modifier Modes":
+		"",
+	"Current Mode":
+		"",
+	
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+	"Enter phone number...":
+		"",
+	
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+
+	"On Mode Start":
+		"",
+	"On Mode Close":
+		"",
+	"Launch":
+		"",
+	"Do Nothing":
+		"",
+	"Get Weather":
+		"",
+	"Action":
+		"",
+	"No Delay":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+
+	"Airplane":
+		"",
+	"Airplane Settings":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Flight Mode":
+		"",
+	
+	"Calendar":
+		"",
+	"Calendar Settings":
+		"",
+	"Vibrate":
+		"",
+	"System Sound":
+		"",
+	"Ringtone":
+		"",
+	"Mute":
+		"",
+	"Reminder":
+		"",
+	"Select":
+		"",
+	"Done":
+		"",
+	
+	"Connections":
+		"",
+	"Connection Settings":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Phone":
+		"",
+	"Data":
+		"",
+	"Wi-Fi":
+		"",
+	"Bluetooth":
+		"",
+	"GPS":
+		"",
+	
+	"Email":
+		"",
+	"Email Settings":
+		"",
+	"Set Per Account":
+		"",
+	"Per Account":
+		"",
+	"Vibrate":
+		"",
+	"System Sound":
+		"",
+	"Ringtone":
+		"",
+	"Mute":
+		"",
+	"Alert":
+		"",
+	"Select":
+		"",
+	"As Items Arrive":
+		"",
+	"Minutes":
+		"",
+	"Hour":
+		"",
+	"Hours":
+		"",
+	"Manual":
+		"",
+	"Get Email":
+		"",
+	"Done":
+		"",
+	
+	"Messaging":
+		"",
+	"Messaging Settings":
+		"",
+	"Vibrate":
+		"",
+	"System Sound":
+		"",
+	"Ringtone":
+		"",
+	"Mute":
+		"",
+	"Msg Alert":
+		"",
+	"Select":
+		"",
+	"Set Per Account":
+		"",
+	"Per Account":
+		"",
+	"Available":
+		"",
+	"Busy":
+		"",
+	"Sign Off":
+		"",
+	"IM Status":
+		"",
+	"Done":
+		"",
+
+	"Network":
+		"",
+	"Network Settings":
+		"",
+	"Automatic":
+		"",
+	"2G Only":
+		"",
+	"3G Only":
+		"",
+	"Network Type":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Data Roaming":
+		"",
+	"Automatic":
+		"",
+	"Home Only":
+		"",
+	"Roam Only":
+		"",
+	"Voice Roaming":
+		"",
+	
+	"Ringer":
+		"",
+	"Ringer Settings":
+		"",
+	"Sound & Vibrate":
+		"",
+	"Sound Only":
+		"",
+	"Ringer On":
+		"",
+	"Vibrate":
+		"",
+	"Mute":
+		"",
+	"Ringer Off":
+		"",
+	"Select":
+		"",
+	"Ringtone":
+		"",
+	"Done":
+		"",
+	
+	"Screen":
+		"",
+	"Screen Settings":
+		"",
+	"Minimum":
+		"",
+	"Maximum":
+		"",
+	"Brightness":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Blink Notify":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Locked Notify":
+		"",
+	"Seconds":
+		"",
+	"Minute":
+		"",
+	"Minutes":
+		"",
+	"Turn off After":
+		"",
+	"Select":
+		"",
+	"Wallpaper":
+		"",
+	"Select Wallpaper":
+		"",
+	
+	"Security":
+		"",
+	"Security Settings":
+		"",
+	"Unsecure":
+		"",
+	"Simple PIN":
+		"",
+	"Password":
+		"",
+	"Unlock Mode":
+		"",
+	"Enter PIN...":
+		"",
+	"Enter PIN Again...":
+		"",
+	"Enter Password...":
+		"",
+	"Enter Password Again...":
+		"",
+	
+	"Sounds":
+		"",
+	"Sound Settings":
+		"",
+	"Minimum":
+		"",
+	"Maximum":
+		"",
+	"Ringer":
+		"",
+	"System":
+		"",
+	"Media":
+		"",
+	
+	"Template":
+		"",
+	"Template Settings":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Template Option":
+		"",
+	
+	"Application":
+		"",
+	"Application Trigger":
+		"",
+	"On Foreground":
+		"",
+	"On Background":
+		"",
+	"State":
+		"",
+	"Application":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+		
+	"Battery Level":
+		"",
+	"Battery Level Trigger":
+		"",
+	"High Limit":
+		"",
+	"Low Limit":
+		"",
+
+	"BT Connection":
+		"",
+	"BT Connection Trigger":
+		"",
+	"Connected":
+		"",
+	"Disconnected":
+		"",
+	"Connected to":
+		"",
+	"Disconnected from":
+		"",
+	"State":
+		"",
+	"Any Profile":
+		"",
+	"Stereo Music":
+		"",
+	"AV Remote Control":
+		"",
+	"Hands-Free":
+		"",
+	"Headset":
+		"",
+	"Personal Area Network":
+		"",
+	"Phone Book Access":
+		"",
+	"Profile":
+		"",
+	"Bluetooth Device Name":
+		"",
+	
+	"Calendar Event":
+		"",
+	"Calendar Event Trigger":
+		"",
+	"Any Calendar":
+		"",
+	"Calendar":
+		"",
+	"Match":
+		"",
+	"No Match":
+		"",
+	"Active On":
+		"",
+	"Text to Match in Events":
+		"",
+	
+	"Charger Event":
+		"",
+	"Charger Event Trigger":
+		"",
+	"No Charger":
+		"",
+	"Touchstone":
+		"",
+	"Wall Charger":
+		"",
+	"USB Charger":
+		"",
+	"Charger":
+		"",
+	"Any":
+		"",
+	"Left":
+		"",
+	"Right":
+		"",
+	"Up":
+		"",
+	"Down":
+		"",
+	"Orientation":
+		"",
+	"No Delay":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+	
+	"Display State":
+		"",
+	"Display State Trigger":
+		"",
+	"Display On":
+		"",
+	"Display Off":
+		"",
+	"Screen Locked":
+		"",
+	"State":
+		"",
+	"Any":
+		"",
+	"Face Up":
+		"",
+	"Face Down":
+		"",
+	"Orientation":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		"",
+	
+	"Headset State":
+		"",
+	"Headset State Trigger":
+		"",
+	"Connected":
+		"",
+	"Not Connected":
+		"",
+	"State":
+		"",
+	"Any Scenario":
+		"",
+	"Headset":
+		"",
+	"Headset / Mic":
+		"",
+	"Scenario":
+		"",
+	
+	"Time Interval":
+		"",
+	"Minutes":
+		"",
+	"Hour":
+		"",
+	"Hours":
+		"",
+	"Time Interval Trigger":
+		"",
+	"Repeating":
+		"",
+	"No Repeating":
+		"",
+	"Mode":
+		"",
+	"Active":
+		"",
+	"Every":
+		"",
+	
+	"GPS Location":
+		"",
+	"GPS Location Trigger":
+		"",
+	"When In Location":
+		"",
+	"When Not In Location":
+		"",
+	"Active":
+		"",
+	"Select Location":
+		"",
+	"Current Location":
+		"",
+	"Location":
+		"",
+	"Meters":
+		"",
+	"Radius":
+		"",
+	"No Location Set":
+		"",
+	"Failed to Locate":
+		"",
+	"Querying Location":
+		"",
+	
+	"Silent Switch":
+		"",
+	"Silent Switch Trigger":
+		"",
+	"Switch On":
+		"",
+	"Switch Off":
+		"",
+	"State":
+		"",
+	
+	"Template":
+		"",
+	"Template Trigger":
+		"",
+	"Enabled":
+		"",
+	"Disabled":
+		"",
+	"Template Option":
+		"",
+	
+	"Time of Day":
+		"",
+	"Time of Day Trigger":
+		"",
+	"Every Day":
+		"",
+	"Weekdays":
+		"",
+	"Weekends":
+		"",
+	"Custom":
+		"",
+	"Days":
+		"",
+	"Start":
+		"",
+	"Close":
+		"",
+	"Mon":
+		"",
+	"Tue":
+		"",
+	"Wed":
+		"",
+	"Thu":
+		"",
+	"Fri":
+		"",
+	"Sat":
+		"",
+	"Sun":
+		"",
+	
+	"Wi-Fi Network":
+		"",
+	"Wi-Fi Network Trigger":
+		"",
+	"Connected":
+		"",
+	"Disconnected":
+		"",
+	"Connected to":
+		"",
+	"Disconnected from":
+		"",
+	"State":
+		"",
+	"Wi-Fi Network Name (SSID)":
+		"",
+	"No Delay":
+		"",
+	"Seconds":
+		"",
+	"Delay":
+		""
+}

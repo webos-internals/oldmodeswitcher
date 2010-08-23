@@ -30,15 +30,6 @@ ConfigAssistant.prototype.setup = function() {
     * Setup widgets and add event handlers to listen to events from widgets here. 
     */
 
-	if(document.body) {	
-		var script = document.createElement("script");
-
-		script.type = "text/javascript";
-		script.src = "http://maps.google.com/maps/api/js?sensor=true";
-		
-		document.body.appendChild(script);
-	}
-
 	// Application menu
 	
 	this.controller.setupWidget(Mojo.Menu.appMenu, {omitDefaultItems: true},
@@ -53,7 +44,7 @@ ConfigAssistant.prototype.setup = function() {
 	this.modelActivatedButton = { value: this.config.modeSwitcher.activated, disabled: false };
 
 	this.controller.setupWidget('ActivatedButton', 
-		{falseValue: 0, falseLabel: "Off", trueValue: 1, trueLabel: "On"},
+		{falseValue: 0, falseLabel: $L("Off"), trueValue: 1, trueLabel: $L("On")},
       this.modelActivatedButton);
 
 	Mojo.Event.listen(this.controller.get('ActivatedButton'), 
@@ -101,7 +92,7 @@ ConfigAssistant.prototype.setup = function() {
 
 	// Modes List
 	
-	this.modelModesList = {items: this.config.modesConfig};
+	this.modelModesList = {items: []};
 	
 	this.controller.setupWidget("ModesList", {
 		itemTemplate: 'config/listitem-modes',
@@ -221,11 +212,14 @@ ConfigAssistant.prototype.retrieveDefaultSettings = function(index, settings) {
 ConfigAssistant.prototype.getConfigData = function() {
 	this.config = this.appAssistant.config;
 
+	this.modelModesList.items.clear();
+
+	for(var i = 0; i < this.config.modesConfig.length; i++)
+		this.modelModesList.items.push({'type': $L(this.config.modesConfig[i].type), 'name': this.config.modesConfig[i].name});
+		
 	this.modelActivatedButton.value = this.config.modeSwitcher.activated;
 	this.modelStartSelector.value = this.config.modeSwitcher.timerStart;
 	this.modelCloseSelector.value = this.config.modeSwitcher.timerClose;
-
-	this.modelModesList.items = this.config.modesConfig;
 
 	this.controller.modelChanged(this.modelActivatedButton, this);
 	this.controller.modelChanged(this.modelStartSelector, this);
@@ -255,19 +249,24 @@ ConfigAssistant.prototype.handleModesListTap = function(event) {
 }
 
 ConfigAssistant.prototype.handleModesListReorder = function(event) {
-	var tempMode = this.modelModesList.items[event.fromIndex];
+	var tempItem = this.modelModesList.items[event.fromIndex];
 	
 	this.modelModesList.items.splice(event.fromIndex,1);
-	this.modelModesList.items.splice(event.toIndex,0,tempMode);
+	this.modelModesList.items.splice(event.toIndex,0,tempItem);
 
-	this.appAssistant.modes = this.modelModesList.items;
+	var tempMode = this.config.modesConfig[event.fromIndex];
+	
+	this.config.modesConfig.splice(event.fromIndex,1);
+	this.config.modesConfig.splice(event.toIndex,0,tempMode);
+
 	this.appAssistant.saveConfigData("modesConfig");
 }
 
 ConfigAssistant.prototype.handleRemoveModeFromList = function(event) {
 	this.modelModesList.items.splice(event.index,1);
 
-	this.appAssistant.modes = this.modelModesList.items;
+	this.config.modesConfig.splice(event.index,1);
+
 	this.appAssistant.saveConfigData("modesConfig");
 }
 

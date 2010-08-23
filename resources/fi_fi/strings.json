@@ -1,0 +1,946 @@
+{
+	"Mode Switcher is":
+		"Mode Switcher",
+	"Activating...":
+		"Käynnistyy...",
+	"Deactivating...":
+		"Sulkeutuu...",
+	"Not Activated":
+		"Ei aktivoitu",
+	"Default settings":
+		"Oletus asetukset",
+	"Normal settings":
+		"Normaalit asetukset",
+	"Modified settings":
+		"Muokatut asetukset",
+
+	"Initial setup of Mode Switcher!":
+		"Mode Switcher:n alkuasennus!",
+	"<i>Mode Switcher</i> needs to retrieve your current system settings for <i>Default Mode</i>. This operation should only take few seconds to finish. You can modify the <i>Default Mode</i> afterwards by clicking the <i>Edit Default Mode</i> button.": 
+		"<i>Mode Switcher</i> tarvitsee noutaa nykyiset järjestelmän asetukset <i>Oletus Tilalle</i>. Tämän operaation pitäisi kestää vain hetken. Voit muutaa <i>Oletus Tilan</i> asetuksia jälkeenpäin painamalla <i>Muokkaa Oletus Tilaa</i> nappia.",
+	"Report Problem": 
+		"Ilmoita ongelmasta",
+	"Import Mode": 
+		"Tuo tila",
+	"Donate": 
+		"Lahjoita",
+	"Help": 
+		"Ohjeita",
+	"Seconds": 
+		"Sekunttia",
+	"On":
+		"Päällä",
+	"Off":
+		"Pois",
+	"Start Timer": 
+		"Aloitus aika",
+	"Close Timer": 
+		"Sulkemis aika",
+	"Add Custom Mode": 
+		"Lisää mukautettu tila",
+	"Edit Default Mode": 
+		"Muokkaa oletus tilaa",
+	"Continue": 
+		"Jatka",
+	"Retrieving current system settings": 
+		"Noudetaan järjestelmän asetuksia",
+	"Retrieving": 
+		"Noudetaan",	
+	"settings": 
+		"asetuksia",
+	"Retrieving system settings finished": 
+		"Järjestelmä asetusten nouto valmis",
+	"normal": 
+		"normaali",
+	"modifier": 
+		"muokkaaja",
+
+	"Get System Settings": 
+		"Hae järjestelmän asetukset",
+	"Add to Launcher": 
+		"Lisää laukaisijaan",
+	"Export Mode": 
+		"Vie tila",
+	"Default Mode Settings": 
+		"Oletus tilan asetukset",
+	"Mode Configuration": 
+		"Tilan asetukset",
+	"Settings": 
+		"Asetukset",
+	"Apps": 
+		"Ohjelmat",
+	"Triggers": 
+		"Liipaisijat",
+	"Default Mode": 
+		"Oletus tila",
+	"Unique Mode Name": 
+		"Yksilöllinen tilan nimi",
+	"Default": 
+		"Oletus",
+	"Normal": 
+		"Normaali",
+	"Modifier": 
+		"Muokkaaja",
+	"Mode Type": 
+		"Tilan tyyppi",
+	"Only Manually": 
+		"Vain manuaalisesti",
+	"By Selection": 
+		"Valitsemalla itse",
+	"After Timer": 
+		"Ajastimen jälkeen",
+	"Immediate": 
+		"Aloita heti",
+	"Auto Start": 
+		"Aloitus",
+	"Auto Close": 
+		"Sulkeminen",
+	"Active Mode": 
+		"Aktiivinen tila",
+	"Default Mode": 
+		"Oletus tila",
+	"On Startup": 
+		"Käynnistä",
+	"Everytime": 
+		"Joka kerta",
+	"Applications": 
+		"Ohjelmat",
+	"Disabled": 
+		"Pois käytöstä",
+	"Use Banner": 
+		"Visuaalinen",
+	"Do Not Set": 
+		"Älä aseta",
+	"Notify": 
+		"Ilmoitus",
+	"Lock Screen": 
+		"Lukitse näyttö",
+	"Always On": 
+		"Aina päällä",
+	"Turn Off": 
+		"Sulje näyttö",
+	"On Charger": 
+		"Laturissa",
+	"Do Nothing": 
+		"Älä tee mitään",
+	"Close All Apps": 
+		"Sulje kaikki",
+	"On Start": 
+		"Aloituksessa",
+	"On Close": 
+		"Suljettaessa",
+	"Close Started": 
+		"Sulje aloitetut",
+	"Required": 
+		"Vaaditaan",
+	"Block Mode": 
+		"Esto tila",
+	"All Unique": 
+		"Kaikki erilaiset",
+	"One Trigger": 
+		"Yksi liipaisin",
+	"Any Grouped": 
+		"Joku ryhmistä",
+	"No Blocking": 
+		"Ei estoa",
+	"Other Modes": 
+		"Muut tilat",
+	"Normal Modes": 
+		"Normaalit tilat",
+	"Modifier Modes": 
+		"Muokkaus tilat",
+	"Activation Triggers": 
+		"Aktivointi liipaisimet",
+	"Retrieving process still in progress": 
+		"Asetusten noutaminen vielä kesken",
+	"All": 
+		"Kaikki",
+	"Add Setting": 
+		"Lisää asetus",
+	"Add App": 
+		"Lisää ohjelma",
+	"Add MS": 
+		"MS",
+	"Add Srv": 
+		"Lisää palvelu",
+	"Group": 
+		"Ryhmä",
+	"Add Trigger": 
+		"Lisää liipaisin",
+	"New Mode":
+		"Uusi tila",
+	"Reserved Mode Name": 
+		"Varattu tilan nimi",			
+
+	"Switch Mode":
+		"Vaihda tila",
+	"Close Mode":
+		"Sulje tila",
+	"Cancel":
+		"Keskeytä",
+		
+	"Match words...":
+		"Haku sanat...",
+	"Yes":
+		"Kyllä",
+	"No":
+		"Ei",
+	"Title":
+		"Otsikko",
+	"Last Modified":
+		"Viimeksi muokattu",
+	"Order By":
+		"Järjestä",
+	"Google Docs email...":
+		"Google Docs sähköposti...",
+	"Google Docs password...":
+		"Google Docs salasana...",
+	"List Modes":
+		"Listaa tilat",
+	"by <Your nick>":
+		"by <Nimimerkki>",
+	"Descriptive mode name...":
+		"Kuvaava tilan nimi...",
+	"Short mode description...":
+		"Lyhyt tilan kuvaus...",
+	"Enter street address...":
+		"Syötä katuosoite...",
+	"Zoom":
+		"Zoomaa",
+	"Alert":
+		"Hälytys",
+	"Vibrate":
+		"Värinä",
+	"System Sound":
+		"Järjestelmä ääni",
+	"Ringtone":
+		"Soittoääni",
+	"Mute":
+		"Vaimenna",
+	"Email Alert Configuration":
+		"Sähköpostin hälytys asetukset",
+	"Select":
+		"Valitse",
+	"Email Ringtone Configuration":
+		"Sähköpostin soittoääni asetukset",
+	"Get Email":
+		"Hae sähköposti",
+	"As Items Arrive":
+		"Kun saapuvat",
+	"Minutes":
+		"Minuutin välein",
+	"Hour":
+		"Tunnin välein",
+	"Hours":
+		"Tunnin välein",
+	"Manual":
+		"Maanulisesti",
+	"Email Sync Configuration":
+		"Sähköpostin synkronointi asetukset",
+	"Status":
+		"Tila",
+	"Available":
+		"Läsnä",
+	"Busy":
+		"Kiireinen",
+	"Sign Off":
+		"Poissa",
+	"IM Status Configuration":
+		"Pikaviestintä tilan asetukset",
+	"Done Configuring":
+		"Tallenna asetukset",
+	"Unable to retrieve per account configuration. Maybe you don't have messaging plugins installed?":
+		"Tili kohtasten asetusten nouto epäonnistui. Ehkä viestintä lisäosat eivät ole asennettuna?",
+	"Done":
+		"Valmis",
+	"OK":
+		"Jatka",
+	"Unable to list documents!":
+		"Dokumenttien listaus epäonnistui!",
+	"Received invalid JSON response from Google Docs.":
+		"Google Docs lähetti viallisen JSON vastauksen.",
+	"Failed to receive documents list from Google Docs.":
+		"Google Docs dokumentti listan nouto epäonnistui.",
+	"Unable to login!": 
+		"Kirjautuminen epäonnistui!",
+	"Login to Google Docs failed, please check your username and password.": 
+		"Google Docs kirjautuminen epäonnistui ole hyvä ja tarkista käyttäjänimi ja salasana.",
+	"Invalid JSON data received!": 
+		"Viallinen JSON rakenne!",
+	"The received document data was not in proper JSON format.": 
+		"Ladattu dokumentti ei ollut oikeassa JSON formaatissa.",
+	"Unable to download!": 
+		"Lataaminen epäonnistui!",
+	"Downloading from Google Docs failed, please try again later.": 
+		"Lataaminen Google Docs:sta epäonnistui, ole hyvä ja yritä uudelleen myöhemmin.",	
+	"Unable to share!": 
+		"Jakaminen epäonnistui!",
+	"Sharing of Google Docs document failed, please try again later.": 
+		"Google Docs dokumentin jakaminen epäonnistui, ole hyvä ja yritä uudelleen myöhemmin.",
+	"Unable to upload!": 
+		"Datan siirto epäonnistui!",
+	"Uploading to Google Docs failed, please try again later.": 
+		"Tiedon siirto Google Docs:iin epäonnistui, ole hyvä ja yritä uudelleen.",
+
+	"Unknown mode": 
+		"Tuntematon tila",
+	"Starting mode": 
+		"Aloitetaan tila",
+	"Done starting": 
+		"Tila aloitettu",
+	"Closing mode": 
+		"Suljetaan tila",
+	"Done closing": 
+		"Tila suljettu",
+	"Updating mode": 
+		"Päivitetään tilaa",
+	"Done updating": 
+		"Tilaa päivitetty",
+	"Switching mode to": 
+		"Vaihdetaan tila",
+	"Done switching to": 
+		"Tila vaihdettiin",
+		
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+	"Enter URL to load...":
+		"Ladattava URL osoite...",
+	"No Delay":
+		"Ei viivettä",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+	
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+	"No Delay":
+		"Ei viivettä",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+
+	"Do Nothing":
+		"Älä tee mitään",
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+	"No Profiles":
+		"Ei profiileita",
+	"On Start":
+		"Aloituksessa",
+	"On Close":
+		"Suljettaessa",
+	
+	"Previous Mode":
+		"Edellinen tila",
+	"Before Mode Start":
+		"Ennen aloitusta",
+	"Before Mode Close":
+		"Ennen sulkemista",
+	"Before Mode Switch":
+		"Ennen vaihtoa",
+	"After Mode Start":
+		"Aloituksen jälkeen",
+	"After Mode Close":
+		"Sulkemisen jälkeen",
+	"After Mode Switch":
+		"Vaihdon jälkeen",
+	"Process":
+		"Suorita",
+	"Start Mode":
+		"Aloita tila",
+	"Close Mode":
+		"Sulje tila",
+	"Trigger Mode":
+		"Liipaise tila",
+	"Require Mode":
+		"Vaadi tila",
+	"Disable Triggers":
+		"Estä liipasimet",
+	"Action":
+		"Toiminto",
+	"Mode":
+		"Tila",
+	"All Normal Modes":
+		"Kaikki normaalit tilat",
+	"All Modifier Modes":
+		"Kaikki muokkaus tilat",
+	"Current Mode":
+		"Nykyinen tila",
+	
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+	"Enter phone number...":
+		"Puhelin numero...",
+	
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+
+	"On Mode Start":
+		"Aloitettaessa",
+	"On Mode Close":
+		"Suljettaessa",
+	"Launch":
+		"Käynnistä",
+	"Do Nothing":
+		"Älä tee mitään",
+	"Get Weather":
+		"Hae sää tiedot",
+	"Action":
+		"Toiminto",
+	"No Delay":
+		"Ei viivettä",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+
+	"Airplane":
+		"Lentokone",
+	"Airplane Settings":
+		"Lentokone asetukset",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Flight Mode":
+		"Lentotila",
+	
+	"Calendar":
+		"Kalenteri",
+	"Calendar Settings":
+		"Kalenteri asetukset",
+	"Vibrate":
+		"Värinä",
+	"System Sound":
+		"Järjestelmä ääni",
+	"Ringtone":
+		"Soittoääni",
+	"Mute":
+		"Vaimenna",
+	"Reminder":
+		"Muistutus",
+	"Select":
+		"Valitse",
+	"Done":
+		"Valmis",
+	
+	"Connections":
+		"Yhteydet",
+	"Connection Settings":
+		"Yhteys asetukset",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Phone":
+		"Puhelin",
+	"Data":
+		"Data",
+	"Wi-Fi":
+		"Wi-Fi",
+	"Bluetooth":
+		"Bluetooth",
+	"GPS":
+		"GPS",
+	
+	"Email":
+		"Sähköposti",
+	"Email Settings":
+		"Sähköposti asetukset",
+	"Set Per Account":
+		"Aseta tili kohtasesti",
+	"Per Account":
+		"Tili kohtaset",
+	"Vibrate":
+		"Värinä",
+	"System Sound":
+		"Järjestelmä ääni",
+	"Ringtone":
+		"Soittoääni",
+	"Mute":
+		"Vaimenna",
+	"Alert":
+		"Hälytys",
+	"Select":
+		"Valitse",
+	"As Items Arrive":
+		"Kun saapuvat",
+	"Minutes":
+		"Minuutin välein",
+	"Hour":
+		"Tunnin välein",
+	"Hours":
+		"Tunnin välein",
+	"Manual":
+		"Maanulisesti",
+	"Get Email":
+		"Haku väli",
+	"Done":
+		"Valmis",
+	
+	"Messaging":
+		"Viestintä",
+	"Messaging Settings":
+		"Viesti asetukset",
+	"Vibrate":
+		"Värinä",
+	"System Sound":
+		"Järjestelmä ääni",
+	"Ringtone":
+		"Soittoääni",
+	"Mute":
+		"Vaimenna",
+	"Msg Alert":
+		"Viesti hälytys",
+	"Select":
+		"Valitse",
+	"Set Per Account":
+		"Aseta tili kohtasesti",
+	"Per Account":
+		"Tili kohtaset",
+	"Available":
+		"Läsnä",
+	"Busy":
+		"Kiireinen",
+	"Sign Off":
+		"Poissa",
+	"IM Status":
+		"PV tila",
+	"Done":
+		"Valmis",
+
+	"Network":
+		"Verkko",
+	"Network Settings":
+		"Verkko asetukset",
+	"Automatic":
+		"Automaattinen",
+	"2G Only":
+		"Vain 2G",
+	"3G Only":
+		"Vain 3G",
+	"Network Type":
+		"Verkko tyyppi",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Data Roaming":
+		"Data Roaming",
+	"Automatic":
+		"Automaattinen",
+	"Home Only":
+		"Vain kotiverkko",
+	"Roam Only":
+		"Vain vierasverkko",
+	"Voice Roaming":
+		"Voice Roaming",
+	
+	"Ringer":
+		"Hälytin",
+	"Ringer Settings":
+		"Hälytin asetukset",
+	"Sound & Vibrate":
+		"Ääni & värinä",
+	"Sound Only":
+		"Vain ääni",
+	"Ringer On":
+		"Hälytin päällä",
+	"Vibrate":
+		"Värinä",
+	"Mute":
+		"Vaimenna",
+	"Ringer Off":
+		"Hälytin pois päältä",
+	"Select":
+		"Valitse",
+	"Ringtone":
+		"Soittoääni",
+	"Done":
+		"Valmis",
+	
+	"Screen":
+		"Näyttö",
+	"Screen Settings":
+		"Näytön asetukset",
+	"Minimum":
+		"Minimi",
+	"Maximum":
+		"Maksimi",
+	"Brightness":
+		"Kirkkaus",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Blink Notify":
+		"Valo ilmoitus",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Locked Notify":
+		"Näyttö ilmoitus",
+	"Seconds":
+		"Sekunttia",
+	"Minute":
+		"Minuutin",
+	"Minutes":
+		"Minuuttia",
+	"Turn off After":
+		"Pidä päällä",
+	"Select":
+		"Valitse",
+	"Wallpaper":
+		"Taustakuva",
+	"Select Wallpaper":
+		"Valitse taustakuva",
+	
+	"Security":
+		"Turvallisuus",
+	"Security Settings":
+		"Turvallisuus asetukset",
+	"Unsecure":
+		"Suojaamaton",
+	"Simple PIN":
+		"PIN Numero",
+	"Password":
+		"Salasana",
+	"Unlock Mode":
+		"Suojaus tila",
+	"Enter PIN...":
+		"Syötä PIN...",
+	"Enter PIN Again...":
+		"Syötä PIN uudestaan...",
+	"Enter Password...":
+		"Syötä salasana...",
+	"Enter Password Again...":
+		"Syötä salasana uudestaan...",
+	
+	"Sounds":
+		"Äänet",
+	"Sound Settings":
+		"Ääni asetukset",
+	"Minimum":
+		"Minimi",
+	"Maximum":
+		"Maksimi",
+	"Ringer":
+		"Hälytin",
+	"System":
+		"Järjestelmä",
+	"Media":
+		"Media",
+	
+	"Template":
+		"Esimerkki",
+	"Template Settings":
+		"Esimerkki asetukset",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Template Option":
+		"Esimerkki valinta",
+	
+	"Application":
+		"Ohjelma",
+	"Application Trigger":
+		"Ohjelma liipaisin",
+	"On Foreground":
+		"Etualalla",
+	"On Background":
+		"Taka-alalla",
+	"State":
+		"Tila",
+	"Application":
+		"Ohjelma",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+		
+	"Battery Level":
+		"Akun lataus",
+	"Battery Level Trigger":
+		"Akun lataus liipaisin",
+	"High Limit":
+		"Yläraja",
+	"Low Limit":
+		"Alaraja",
+
+	"BT Connection":
+		"BT yhteys",
+	"BT Connection Trigger":
+		"BT yhteys liipaisin",
+	"Connected":
+		"Yhdistetty",
+	"Disconnected":
+		"Ei yhdistetty",
+	"Connected to":
+		"Yhdistetty laitteeseen",
+	"Disconnected from":
+		"Ei yhdistetty laitteeseen",
+	"State":
+		"Tila",
+	"Any Profile":
+		"Mikä tahansa",
+	"Stereo Music":
+		"Stereo musiikki",
+	"AV Remote Control":
+		"AV kaukosäädin",
+	"Hands-Free":
+		"Handsfree",
+	"Headset":
+		"Kuulokkeet",
+	"Personal Area Network":
+		"PAN verkko",
+	"Phone Book Access":
+		"Puhelin luettelo liitos",
+	"Profile":
+		"Profiili",
+	"Bluetooth Device Name":
+		"Bluetoot laitteen nimi",
+	
+	"Calendar Event":
+		"Kalenteri merkintä",
+	"Calendar Event Trigger":
+		"Kalenteri merkintä liipaisin",
+	"Any Calendar":
+		"Mikä tahansa",
+	"Calendar":
+		"Kalenteri",
+	"Match":
+		"Löydettäessä",
+	"No Match":
+		"Ei löydettäessä",
+	"Active On":
+		"Aktiivinen",
+	"Text to Match in Events":
+		"Merkinnän etsintä teksti",
+	
+	"Charger Event":
+		"Laturi tapahtuma",
+	"Charger Event Trigger":
+		"Laturi tapahtuma liipaisin",
+	"No Charger":
+		"Ei laturia",
+	"Touchstone":
+		"Touchstone",
+	"Wall Charger":
+		"Seinälaturi",
+	"USB Charger":
+		"USB laturi",
+	"Charger":
+		"Laturi",
+	"Any":
+		"Mikä tahansa",
+	"Left":
+		"Vasen",
+	"Right":
+		"Oikea",
+	"Up":
+		"Ylös",
+	"Down":
+		"Alas",
+	"Orientation":
+		"Orientaation",
+	"No Delay":
+		"Ei viivettä",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+	
+	"Display State":
+		"Näytön tila",
+	"Display State Trigger":
+		"Näytön tila liipaisin",
+	"Display On":
+		"Näyttö päällä",
+	"Display Off":
+		"Näyttö pois päältä",
+	"Screen Locked":
+		"Näyttö lukittu",
+	"State":
+		"Tila",
+	"Any":
+		"Mikä tahansa",
+	"Face Up":
+		"Näyttö ylöspäin",
+	"Face Down":
+		"Näyttö alaspäin",
+	"Orientation":
+		"Orientaatio",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive",
+	
+	"Headset State":
+		"Kuulokkeiden tila",
+	"Headset State Trigger":
+		"Kuulokkeiden tila liipaisin",
+	"Connected":
+		"Yhdistetty",
+	"Not Connected":
+		"Ei yhdistetty",
+	"State":
+		"Tila",
+	"Any Scenario":
+		"Mikä tahansa",
+	"Headset":
+		"Kuulokkeet",
+	"Headset / Mic":
+		"Kuulokkeet / Mikki",
+	"Scenario":
+		"Skenaario",
+	
+	"Time Interval":
+		"Aikaväli",
+	"Minutes":
+		"Minuuttia",
+	"Hour":
+		"Tunti",
+	"Hours":
+		"Tuntia",
+	"Time Interval Trigger":
+		"Aikaväli liipaisin",
+	"Repeating":
+		"Toistava",
+	"No Repeating":
+		"Ei toistava",
+	"Mode":
+		"Toiminta",
+	"Active":
+		"Aktiivinen",
+	"Every":
+		"Väli",
+	
+	"GPS Location":
+		"GPS sijainti",
+	"GPS Location Trigger":
+		"GPS sijainti liipaisin",
+	"When In Location":
+		"Kun sijainnissa",
+	"When Not In Location":
+		"Kun ei sijainnissa",
+	"Active":
+		"Aktiivinen",
+	"Select Location":
+		"Valitse sijainti",
+	"Current Location":
+		"Nykyinen sijainti",
+	"Location":
+		"Sijainti",
+	"Meters":
+		"Metriä",
+	"Radius":
+		"Säde",
+	"No Location Set":
+		"Sijaintia ei asetettu",
+	"Failed to Locate":
+		"Paikannus epäonnistui",
+	"Querying Location":
+		"Sijaintia haetaan",
+	
+	"Silent Switch":
+		"Vaimennus kytkin",
+	"Silent Switch Trigger":
+		"Vaimennus kytkin liipaisin",
+	"Switch On":
+		"Kytkin päällä",
+	"Switch Off":
+		"Kytkin pois päältä",
+	"State":
+		"Tila",
+	
+	"Template":
+		"Esimerkki",
+	"Template Trigger":
+		"Esimerkki liipaisin",
+	"Enabled":
+		"Päällä",
+	"Disabled":
+		"Pois päältä",
+	"Template Option":
+		"Esimerkki valinta",
+	
+	"Time of Day":
+		"Ajankohta",
+	"Time of Day Trigger":
+		"Ajankohta liipaisin",
+	"Every Day":
+		"Joka päivä",
+	"Weekdays":
+		"Viikonpäivinä",
+	"Weekends":
+		"Viikonloppuna",
+	"Custom":
+		"Mukautettu",
+	"Days":
+		"Päivät",
+	"Start":
+		"Aloita",
+	"Close":
+		"Sulje",
+	"Mon":
+		"&nbsp;Ma&nbsp;",
+	"Tue":
+		"&nbsp;&nbsp;Ti",
+	"Wed":
+		"&nbsp;&nbsp;&nbsp;&nbsp;Ke",
+	"Thu":
+		"&nbsp;&nbsp;&nbsp;To",
+	"Fri":
+		"&nbsp;Pe",
+	"Sat":
+		"&nbsp;La",
+	"Sun":
+		"&nbsp;Su",		
+	
+	"Wi-Fi Network":
+		"Wi-Fi verkko",
+	"Wi-Fi Network Trigger":
+		"Wi-Fi verkko liipaisin",
+	"Connected":
+		"Yhdistetty",
+	"Disconnected":
+		"Ei yhdistetty",
+	"Connected to":
+		"Yhdistetty verkkoon",
+	"Disconnected from":
+		"Ei yhdistetty verkkoon",
+	"State":
+		"Tila",
+	"Wi-Fi Network Name (SSID)":
+		"Wi-Fi verkon nimi (SSID)",
+	"No Delay":
+		"Ei viivettä",
+	"Seconds":
+		"Sekunttia",
+	"Delay":
+		"Viive"
+}

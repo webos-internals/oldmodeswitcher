@@ -116,7 +116,7 @@ AppAssistant.prototype.executeLaunch = function(params) {
 		var index = -1;
 		
 		if((params.action == "config") && (params.event == "edit"))
-			index = this.find("name", params.name, this.config.modesConfig);
+			index = this.config.modesConfig.find("name", params.name);
 
 		if(stageController) {
 			Mojo.Log.error("Config stage card already exists");
@@ -638,7 +638,7 @@ AppAssistant.prototype.reloadModeSwitcher = function() {
 			// Check that original mode still exists and triggers are valid.
 
 			if(this.config.currentMode.type == "normal") {
-				var index = this.find("name", this.config.currentMode.name, this.config.modesConfig);
+				var index = this.config.modesConfig.find("name", this.config.currentMode.name);
 	
 				if(index != -1) {
 					if(this.config.modesConfig[index].type == "normal") {
@@ -651,7 +651,7 @@ AppAssistant.prototype.reloadModeSwitcher = function() {
 			// Check that modifier modes still exists and triggers are valid.
 
 			for(var i = 0; i < this.config.modifierModes.length; i++) {
-				var index = this.find("name", this.config.modifierModes[i], this.config.modesConfig);
+				var index = this.config.modesConfig.find("name", this.config.modifierModes[i]);
 
 				if(index != -1) {
 					if(this.config.modesConfig[index].type == "modifier") {
@@ -768,7 +768,7 @@ AppAssistant.prototype.executeStartMode = function(modeName) {
 			}
 		}
 
-		var index = this.find("name", modeName, this.config.modesConfig);
+		var index = this.config.modesConfig.find("name", modeName);
 		
 		if(index != -1)
 			requestedMode = this.config.modesConfig[index];
@@ -787,7 +787,7 @@ AppAssistant.prototype.executeStartMode = function(modeName) {
 	if(requestedMode.type != "modifier")
 		newActiveModes[0] = requestedMode;
 	
-	var index = this.find("name", this.config.currentMode.name, this.config.modesConfig);
+	var index = this.config.modesConfig.find("name", this.config.currentMode.name);
 
 	if(index != -1) {
 		oldActiveModes[0] = this.config.modesConfig[index];
@@ -799,7 +799,7 @@ AppAssistant.prototype.executeStartMode = function(modeName) {
 	// Generate list of modifier modes for update.
 
 	for(var i = 0; i < this.config.modifierModes.length; i++) {
-		var index = this.find("name", this.config.modifierModes[i], this.config.modesConfig);
+		var index = this.config.modesConfig.find("name", this.config.modifierModes[i]);
 		
 		if(index != -1) {
 			oldActiveModes.push(this.config.modesConfig[index]);
@@ -839,7 +839,7 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 			}
 		}
 
-		var index = this.find("name", modeName, this.config.modesConfig);
+		var index = this.config.modesConfig.find("name", modeName);
 		
 		if(index != -1)
 			requestedMode = this.config.modesConfig[index];
@@ -855,7 +855,7 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 	var oldActiveModes = [this.config.defaultMode];
 	var newActiveModes = [this.config.defaultMode];
 
-	var index = this.find("name", this.config.currentMode.name, this.config.modesConfig);
+	var index = this.config.modesConfig.find("name", this.config.currentMode.name);
 
 	if(index != -1) {
 		oldActiveModes[0] = this.config.modesConfig[index];
@@ -867,7 +867,7 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 	// Generate list of modifier modes for update.
 
 	for(var i = 0; i < this.config.modifierModes.length; i++) {
-		var index = this.find("name", this.config.modifierModes[i], this.config.modesConfig);
+		var index = this.config.modesConfig.find("name", this.config.modifierModes[i]);
 		
 		if(index != -1) {
 			oldActiveModes.push(this.config.modesConfig[index]);
@@ -903,16 +903,16 @@ AppAssistant.prototype.executeToggleMode = function(modeName) {
 	
 		this.executeCloseMode(modeName);
 	}
-	else if(this.find("name", modeName, this.config.modesConfig) != -1)
+	else if(this.config.modesConfig.find("name", modeName) != -1)
 	{
 		NotifyControlWrapper.mode("start");
 
 		this.executeStartMode(modeName);
 	}
 	else {
-		var appCtl = Mojo.Controller.getAppController();
+		NotifyControlWrapper.mode("unknown");
 	
-		appCtl.showBanner($L("Unknown mode") + ": " + modeName, {action: 'none'});
+		NotifyControlWrapper.notify("done");
 	}
 }
 
@@ -961,7 +961,7 @@ AppAssistant.prototype.triggerManualMode = function(modeName) {
 				}
 			}
 
-			var index = this.find("name", modeName, this.config.modesConfig);
+			var index = this.config.modesConfig.find("name", modeName);
 		
 			if(index != -1) {
 				if((this.config.currentMode.name != modeName) &&
@@ -1004,7 +1004,7 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 		check.clear();
 	
 		for(var i = 0; i < modesA[loop].length; i++) {
-			if(this.find("name", modesA[loop][i].name, modesB[loop]) == -1) {
+			if(modesB[loop].find("name", modesA[loop][i].name) == -1) {
 				for(var j = 0; j < modesA[loop][i].appsList.length; j++) {
 					if(modesA[loop][i].appsList[j].type == "ms") {
 						if((modesA[loop][i].appsList[j].event == events[loop]) &&
@@ -1053,7 +1053,7 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 				else if((config[i].action == "start") || (config[i].action == "trigger")) {
 					for(var i = 0; i < this.config.modesConfig.length; i ++) {
 						if((this.config.modesConfig[i].type == "modifier") &&
-							(this.find("name", this.config.modesConfig[i].name, newActiveModes) == -1))
+							(newActiveModes.find("name", this.config.modesConfig[i].name) == -1))
 						{
 							if((config[i].action == "start") ||
 								((this.config.modesConfig[index].autoStartMode != 0) &&
@@ -1071,11 +1071,11 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 				else if(modeName == "Previous Mode")
 					modeName = this.historyList[this.historyList.length - 1];
 
-				var index = this.find("name", modeName, this.config.modesConfig);
+				var index = this.config.modesConfig.find("name", modeName);
 
 				if(index != -1) {
 					if(config[i].action == "close") {
-						var index = this.find("name", modeName, newActiveModes);
+						var index = newActiveModes.find("name", modeName);
 
 						if(index != -1) {
 							if(newActiveModes[index].type == "normal")
@@ -1091,7 +1091,7 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 						if(this.config.modesConfig[index].type == "normal")
 							newActiveModes.splice(0, 1, this.config.modesConfig[index]);
 						else if(this.config.modesConfig[index].type == "modifier") {
-							if(this.find("name", modeName, newActiveModes) == -1)
+							if(newActiveModes.find("name", modeName) == -1)
 								newActiveModes.push(this.config.modesConfig[index]);
 						}			
 					}			
@@ -1101,8 +1101,8 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 		
 		for(var i = 0; i < check.length; i++) {
 			if((events[loop] == "start") || (events[loop] == "started")) {
-				if(this.find("name", check[i].require, newActiveModes) == -1) {
-					var index = this.find("name", check[i].mode, newActiveModes);
+				if(newActiveModes.find("name", check[i].require) == -1) {
+					var index = newActiveModes.find("name", check[i].mode);
 
 					if(index != -1) {
 						if(newActiveModes[index].type == "normal")
@@ -1113,9 +1113,9 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 				}
 			}
 			else if((events[loop] == "close") || (events[loop] == "closed")) {
-				if(this.find("name", check[i].require, newActiveModes) != -1) {
-					if(this.find("name", check[i].mode, newActiveModes) == -1) {
-						var index = this.find("name", check[i].mode, oldActiveModes);
+				if(newActiveModes.find("name", check[i].require) != -1) {
+					if(newActiveModes.find("name", check[i].mode) == -1) {
+						var index = oldActiveModes.find("name", check[i].mode);
 
 						if(oldActiveModes[index].type == "normal")
 							newActiveModes.splice(0, 1, oldActiveModes[0]);
@@ -1198,7 +1198,7 @@ AppAssistant.prototype.updateCurrentMode = function(oldActiveModes, newActiveMod
 			currentMode.settings.charging = modes[i].settings.charging;
 
 		for(var j = 0; j < modes[i].settingsList.length; j++) {
-			var index = this.find("extension", modes[i].settingsList[j].extension, currentMode.settingsList);
+			var index = currentMode.settingsList.find("extension", modes[i].settingsList[j].extension);
 			
 			if(index == -1) {
 				var settings = {};
@@ -1290,7 +1290,7 @@ AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiv
 
 	for(var i = 0; i < newActiveModes.length; i++) {
 		for(var j = 0; j < newActiveModes[i].settingsList.length; j++) {
-			var index = this.find("extension", newActiveModes[i].settingsList[j].extension, newSettings);
+			var index = newSettings.find("extension", newActiveModes[i].settingsList[j].extension);
 			
 			if(index == -1) {
 				var settings = {};
@@ -1307,7 +1307,7 @@ AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiv
 
 	for(var i = 0; i < oldActiveModes.length; i++) {
 		for(var j = 0; j < oldActiveModes[i].settingsList.length; j++) {
-			var index = this.find("extension", oldActiveModes[i].settingsList[j].extension, oldSettings);
+			var index = oldSettings.find("extension", oldActiveModes[i].settingsList[j].extension);
 			
 			if(index == -1) {
 				var settings = {};
@@ -1328,7 +1328,7 @@ AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiv
 		modeSettings = newSettings;
 	else {
 		for(var i = 0; i < newSettings.length; i++) {
-			var index = this.find("extension", newSettings[i].extension, oldSettings);
+			var index = oldSettings.find("extension", newSettings[i].extension);
 
 			if((index == -1) || (Object.toJSON(oldSettings[index]) != Object.toJSON(newSettings[i])))
 				modeSettings.push(newSettings[i]);
@@ -1388,7 +1388,7 @@ AppAssistant.prototype.prepareApplicationsUpdate = function(oldActiveModes, newA
 		if((!this.running) || 
 			(newActiveModes[i].type != "default") || (newActiveModes[i].miscAppsMode == 0))
 		{
-			var index = this.find("name", newActiveModes[i].name, oldActiveModes);
+			var index = oldActiveModes.find("name", newActiveModes[i].name);
 
 			if((!this.running) || (index == -1)) {
 				if(newActiveModes[i].apps.start == 2)
@@ -1409,7 +1409,7 @@ AppAssistant.prototype.prepareApplicationsUpdate = function(oldActiveModes, newA
 	}
 
 	for(var i = 0; i < oldActiveModes.length; i++) {
-		if(this.find("name", oldActiveModes[i].name, newActiveModes) == -1)
+		if(newActiveModes.find("name", oldActiveModes[i].name) == -1)
 		{
 			if(oldActiveModes[i].apps.close == 2)
 				oldCloseAll = true;
@@ -1556,18 +1556,5 @@ AppAssistant.prototype.saveConfigData = function(target) {
 	// Helper for other assistants for requesting config saving.
 
 	ConfigManagerWrapper.save(this.config, target);
-}
-
-//
-
-AppAssistant.prototype.find = function(key, value, list) {
-	// Finds object from an array based on given key and value.
-
-	for(var i = 0; i < list.length; i++) {
-		if(list[i][key] == value)
-			return i;
-	}
-	
-	return -1;		
 }
 

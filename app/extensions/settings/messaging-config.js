@@ -8,7 +8,7 @@ MessagingConfig.prototype.version = function() {
 //
 
 MessagingConfig.prototype.label = function() {
-	return "Messaging Settings";
+	return $L("Messaging Settings");
 }
 
 //
@@ -26,32 +26,32 @@ MessagingConfig.prototype.setup = function(sceneController) {
 	
 	this.choicesMsgAlertSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Vibrate", 'value': 3},
-		{'label': "System Sound", 'value': 1},
-		{'label': "Ringtone", 'value': 2},
-		{'label': "Mute", 'value': 0} ];  
+		{'label': $L("Vibrate"), 'value': 3},
+		{'label': $L("System Sound"), 'value': 1},
+		{'label': $L("Ringtone"), 'value': 2},
+		{'label': $L("Mute"), 'value': 0} ];  
 
-	sceneController.setupWidget("MessagingAlertSelector", {'label': "Msg Alert", 
+	sceneController.setupWidget("MessagingAlertSelector", {'label': $L("Msg Alert"), 
 		'labelPlacement': "left", 'modelProperty': "messagingAlert",
 		'choices': this.choicesMsgAlertSelector});
 
 	this.choicesMsgRingtoneSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': ""},
-		{'label': "Select", 'value': "select"} ];  
+		{'label': $L("Select"), 'value': "select"} ];  
 
-	sceneController.setupWidget("MessagingRingtoneSelector", {'label': "Ringtone", 
+	sceneController.setupWidget("MessagingRingtoneSelector", {'label': $L("Ringtone"), 
 		'labelPlacement': "left", 'modelProperty': "messagingRingtoneName",
 		'choices': this.choicesMsgRingtoneSelector});
 
-/*		{'label': "Set Per Account", 'value': -2},*/
+/*		{'label': $L("Set Per Account"), 'value': -2},*/
 
 	this.choicesIMStatusSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Available", 'value': 0},
-		{'label': "Busy", 'value': 2},
-		{'label': "Sign Off", 'value': 4} ];
+		{'label': $L("Available"), 'value': 0},
+		{'label': $L("Busy"), 'value': 2},
+		{'label': $L("Sign Off"), 'value': 4} ];
 
-	sceneController.setupWidget("MessagingIMStatusSelector", {'label': "IM Status", 
+	sceneController.setupWidget("MessagingIMStatusSelector", {'label': $L("IM Status"), 
 		'labelPlacement': "left", 'modelProperty': "messagingIMStatus",
 		'choices': this.choicesIMStatusSelector});
 
@@ -65,6 +65,7 @@ MessagingConfig.prototype.setup = function(sceneController) {
 
 MessagingConfig.prototype.config = function() {
 	var settingConfig = {
+		'messagingTitle': $L("Messaging"),
 		'messagingAlert': -1, 
 		'messagingRingtoneName': "", 
 		'messagingRingtonePath': "",
@@ -92,7 +93,7 @@ MessagingConfig.prototype.load = function(settingPreferences) {
 	}
 	
 	if(settingPreferences.messagingIMStatusCfg != undefined) {
-		settingConfig.messagingIMStatus = "Per Account";
+		settingConfig.messagingIMStatus = $L("Per Account");
 
 		settingConfig.messagingIMStatusCfg = settingPreferences.messagingIMStatusCfg;	
 	}
@@ -116,7 +117,7 @@ MessagingConfig.prototype.save = function(settingConfig) {
 		}
 	}
 
-	if(settingConfig.messagingIMStatus == "Per Account")
+	if(settingConfig.messagingIMStatus == $L("Per Account"))
 		settingPreferences.messagingIMStatusCfg = settingConfig.messagingIMStatusCfg;
 	else if(settingConfig.messagingIMStatus != -1)
 		settingPreferences.messagingIMStatus = settingConfig.messagingIMStatus;
@@ -154,7 +155,7 @@ MessagingConfig.prototype.handleListChange = function(changeEvent) {
 			var callback = this.handlePerAccount.bind(this, changeEvent.model);
 
 			if(changeEvent.model.messagingIMStatusCfg.length > 0)
-				changeEvent.model.messagingIMStatus = "Per Account";		
+				changeEvent.model.messagingIMStatus = $L("Per Account");		
 			else
 				changeEvent.model.messagingIMStatus = -1;
 
@@ -186,7 +187,7 @@ MessagingConfig.prototype.executeRingtoneSelect = function(eventModel) {
 
 MessagingConfig.prototype.handlePerAccount = function(eventModel, configList, returnValue) {
 	if((returnValue) && (configList.length > 0)) {
-		eventModel.messagingIMStatus = "Per Account";
+		eventModel.messagingIMStatus = $L("Per Account");
 		
 		eventModel.messagingIMStatusCfg.clear();
 		

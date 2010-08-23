@@ -25,8 +25,11 @@ NotifyControl.prototype.mode = function(mode) {
 
 NotifyControl.prototype.notify = function(phase, oldMode, newMode) {	
 	var appCtl = Mojo.Controller.getAppController();
-	
-	if(this.notifyMode == "startup") {
+
+	if(this.notifyMode == "unknown") {
+		appCtl.showBanner($L("Unknown mode") + ": " + modeName, {action: 'none'});
+	}
+	else if(this.notifyMode == "startup") {
 		if(phase == "init")
 			appCtl.showBanner($L("Starting mode") + ": " + newMode, {action: 'none'});
 		else if(phase == "done")

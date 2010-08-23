@@ -6,7 +6,7 @@ DisplayConfig.prototype.version = function() {
 }
 
 DisplayConfig.prototype.label = function() {
-	return "Display State Trigger";
+	return $L("Display State Trigger");
 }
 
 //
@@ -23,29 +23,29 @@ DisplayConfig.prototype.setup = function(sceneController) {
 	this.controller = sceneController;
 
 	this.choicesStateSelector = [
-		{'label': "Display On", 'value': 0},
-		{'label': "Display Off", 'value': 1},
-		{'label': "Screen Locked", 'value': 2} ];  
+		{'label': $L("Display On"), 'value': 0},
+		{'label': $L("Display Off"), 'value': 1},
+		{'label': $L("Screen Locked"), 'value': 2} ];  
 
-	sceneController.setupWidget("DisplayStateSelector", {'label': "State", 
+	sceneController.setupWidget("DisplayStateSelector", {'label': $L("State"), 
 		'labelPlacement': "left", 'modelProperty': "displayState",
 		'choices': this.choicesStateSelector});
 /*
 	this.choicesOrientationSelector = [
-		{'label': "Any", 'value': 0},
-		{'label': "Face Up", 'value': 1},
-		{'label': "Face Down", 'value': 2} ];  
+		{'label': $L("Any"), 'value': 0},
+		{'label': $L("Face Up"), 'value': 1},
+		{'label': $L("Face Down"), 'value': 2} ];  
 
-	sceneController.setupWidget("DisplayOrientationSelector", {'label': "Orientation", 
+	sceneController.setupWidget("DisplayOrientationSelector", {'label': $L("Orientation"), 
 		'labelPlacement': "left", 'modelProperty': "displayOrientation",
 		'choices': this.choicesOrientationSelector});
 */	
 	this.choicesDelaySelector = [
-		{'label': "15 Seconds", 'value': 15},
-		{'label': "30 Seconds", 'value': 30},
-		{'label': "60 Seconds", 'value': 60} ];  
+		{'label': "15 " + $L("Seconds"), 'value': 15},
+		{'label': "30 " + $L("Seconds"), 'value': 30},
+		{'label': "60 " + $L("Seconds"), 'value': 60} ];  
 
-	sceneController.setupWidget("DisplayDelaySelector", {'label': "Delay", 
+	sceneController.setupWidget("DisplayDelaySelector", {'label': $L("Delay"), 
 		'labelPlacement': "left", 'modelProperty': "displayDelay",
 		'choices': this.choicesDelaySelector});
 }
@@ -54,6 +54,7 @@ DisplayConfig.prototype.setup = function(sceneController) {
 
 DisplayConfig.prototype.config = function() {
 	var triggerConfig = {
+		'displayTitle': $L("Display State"),
 		'displayState': 1,
 /*		'displayOrientation': 0, */
 		'displayDelay': 15 };
@@ -65,6 +66,7 @@ DisplayConfig.prototype.config = function() {
 
 DisplayConfig.prototype.load = function(triggerPreferences) {
 	var triggerConfig = {
+		'displayTitle': $L("Display State"),
 		'displayState': triggerPreferences.displayState,
 /*		'displayOrientation': triggerPreferences.displayOrientation, */
 		'displayDelay': triggerPreferences.displayDelay };

@@ -13,6 +13,8 @@ function LocationTrigger(Config, Control) {
 	this.gpsLongitude = null;
 	
 	this.gpsAccuracy = -1;
+
+	this.prevAccuracy = 0;
 }
 
 //
@@ -99,6 +101,8 @@ LocationTrigger.prototype.execute = function(triggerData, manualLaunch) {
 		if(gpsAccuracy != 0) {
 			// This will call handleLocationTrigger on successful retrieval.
 
+			this.prevAccuracy = 9999;
+
 			this.fetchCurrentLocation(0, gpsAccuracy, triggerData);
 		}
 	}
@@ -110,7 +114,7 @@ LocationTrigger.prototype.fetchCurrentLocation = function(retryCount, gpsAccurac
 	this.service.request("palm://com.palm.power/com/palm/power", {'method': "activityStart", 
 		'parameters': {'id': Mojo.Controller.appInfo.id, 'duration_ms': 60000}});
 
-	if(retryCount < 25) {
+	if(retryCount < 20) {
 		if(this.requestLocation)
 			this.requestLocation.cancel();
 
@@ -130,7 +134,14 @@ LocationTrigger.prototype.handleCurrentLocation = function(retryCount, gpsAccura
 		if((serviceResponse.horizAccuracy == -1) || (serviceResponse.horizAccuracy > 50 * gpsAccuracy)) {	
 			Mojo.Log.error("Insufficient GPS accuracy: " + serviceResponse.horizAccuracy);
 		
-			this.fetchCurrentLocation(++retryCount, gpsAccuracy, trackingData);
+			var prevAccuracy = this.prevAccuracy;
+			
+			this.prevAccuracy = serviceResponse.horizAccuracy
+		
+			if(prevAccuracy > serviceResponse.horizAccuracy)
+				this.fetchCurrentLocation(retryCount, gpsAccuracy, trackingData);
+			else
+				this.fetchCurrentLocation(++retryCount, gpsAccuracy, trackingData);
 		}
 		else {
 			this.gpsLatitude = serviceResponse.latitude;

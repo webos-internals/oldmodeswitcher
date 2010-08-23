@@ -51,34 +51,34 @@ SceneAssistant.prototype.setup = function() {
 	
 	this.modelImportGDMatch = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ImportGDMatch", {'hintText': "Match words...", 
+	this.controller.setupWidget("ImportGDMatch", {'hintText': $L("Match words..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': true},
 		this.modelImportGDMatch); 
 
 	this.modelImportGDShare = {value: false, disabled: false};
 
-	this.controller.setupWidget("ImportGDShared", {'trueLabel': "Yes", 'falseLabel': "No"},
+	this.controller.setupWidget("ImportGDShared", {'trueLabel': $L("Yes"), 'falseLabel': $L("No")},
 		this.modelImportGDShare); 
 
 	this.modelImportGDOrdering = {'value': "title", 'disabled': false};
 	
 	this.defaultChoicesImportGDOrdering = [
-		{'label': "Title", 'value': "title"},
-		{'label': "Last Modified", 'value': "last-modified"}];  
+		{'label': $L("Title"), 'value': "title"},
+		{'label': $L("Last Modified"), 'value': "last-modified"}];  
 		
-	this.controller.setupWidget("ImportGDOrdering", {'label': "Order By", 
+	this.controller.setupWidget("ImportGDOrdering", {'label': $L("Order By"), 
 		'labelPlacement': "left", 'choices': this.defaultChoicesImportGDOrdering}, 
 		this.modelImportGDOrdering);
 				
 	this.modelImportGDUsername = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ImportGDUsername", {'hintText': "Google Docs email...", 
+	this.controller.setupWidget("ImportGDUsername", {'hintText': $L("Google Docs email..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 'textCase': Mojo.Widget.steModeLowerCase},
 		this.modelImportGDUsername); 
 
 	this.modelImportGDPassword = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ImportGDPassword", {'hintText': "Google Docs password...", 
+	this.controller.setupWidget("ImportGDPassword", {'hintText': $L("Google Docs password..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 'textCase': Mojo.Widget.steModeLowerCase},
 		this.modelImportGDPassword); 
 
@@ -97,7 +97,7 @@ SceneAssistant.prototype.setup = function() {
 
 	this.modelImportGDButton = {buttonClass: '', disabled: false};
 
-	this.controller.setupWidget('ImportGDButton', {label: "List Modes"}, this.modelImportGDButton);
+	this.controller.setupWidget('ImportGDButton', {label: $L("List Modes")}, this.modelImportGDButton);
 	
 	this.controller.listen(this.controller.get('ImportGDButton'), Mojo.Event.tap, 
 		this.listGoogleDocuments.bind(this));
@@ -109,38 +109,38 @@ SceneAssistant.prototype.setup = function() {
 	if(this.action == "exportGDoc")
 		docName = this.data.name;
 	
-	this.modelExportGDTitle = {value: docName + " by <Your nick>", disabled: false};
+	this.modelExportGDTitle = {value: docName + " " + $L("by <Your nick>"), disabled: false};
 		
-	this.controller.setupWidget("ExportGDTitle", {'hintText': "Descriptive mode name...", 
+	this.controller.setupWidget("ExportGDTitle", {'hintText': $L("Descriptive mode name..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': true},
 		this.modelExportGDTitle); 
 
 	this.modelExportGDDesc = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ExportGDDesc", {'hintText': "Short mode description...", 
+	this.controller.setupWidget("ExportGDDesc", {'hintText': $L("Short mode description..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false},
 		this.modelExportGDDesc); 
 
 	this.modelExportGDUsername = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ExportGDUsername", {'hintText': "Google Docs email...", 
+	this.controller.setupWidget("ExportGDUsername", {'hintText': $L("Google Docs email..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 'textCase': Mojo.Widget.steModeLowerCase},
 		this.modelExportGDUsername); 
 
 	this.modelExportGDPassword = {value: "", disabled: false};
 	
-	this.controller.setupWidget("ExportGDPassword", {'hintText': "Google Docs password...", 
+	this.controller.setupWidget("ExportGDPassword", {'hintText': $L("Google Docs password..."), 
 		'multiline': false, 'enterSubmits': false, 'focus': false, 'textCase': Mojo.Widget.steModeLowerCase},
 		this.modelExportGDPassword); 
 
 	this.modelExportGDShare = {value: false, disabled: false};
 
-	this.controller.setupWidget("ExportGDShare", {'trueLabel': "Yes", 'falseLabel': "No"},
+	this.controller.setupWidget("ExportGDShare", {'trueLabel': $L("Yes"), 'falseLabel': $L("No")},
 		this.modelExportGDShare); 
 						
 	this.modelExportGDButton = {buttonClass: '', disabled: false};
 
-	this.controller.setupWidget('ExportGDButton', {label: "Export Mode"}, this.modelExportGDButton);
+	this.controller.setupWidget('ExportGDButton', {label: $L("Export Mode")}, this.modelExportGDButton);
 	
 	this.controller.listen(this.controller.get('ExportGDButton'), Mojo.Event.tap, 
 		this.exportModeData.bind(this));
@@ -149,7 +149,7 @@ SceneAssistant.prototype.setup = function() {
 	
 	this.modelMapViewAddress = {value: "", disabled: false};
 		
-	this.controller.setupWidget("MapViewAddress", {'hintText': "Enter street address...", 
+	this.controller.setupWidget("MapViewAddress", {'hintText': $L("Enter street address..."), 
 		'multiline': false, 'enterSubmits': false, 'requiresEnterKey': true, 'focus': true},
 		this.modelMapViewAddress); 
 
@@ -157,29 +157,14 @@ SceneAssistant.prototype.setup = function() {
 		this.updateMapLocation.bind(this));
 
 	if(this.action == "pickLocation") {
-/*
-		if(document.body) {	
-			var script = document.createElement("script");
-
-			script.type = "text/javascript";
-			script.src = "http://maps.google.com/maps/api/js?sensor=true";
-
-//			script.onload = function(){ this.initializeGoogleMaps(); }.bind(this);
-		
-			document.body.appendChild(script);
-
-			Mojo.Event.listen(document,"onload",this.initializeGoogleMaps.bind(this));
-
-		}
-*/
-		this.initializeGoogleMaps();
+		Mojo.loadScriptWithCallback("http://maps.google.com/maps/api/js?sensor=false&callback=googleMapsLoaded", null);
 
 		this.itemsCommandMenu = [
-			{'label': $L("- Zoom"), 'command': "zoom_out"},
+			{'label': "- " + $L("Zoom"), 'command': "zoom_out"},
 			{'width': 5},
 			{'label': $L("Done"), 'command': "done", 'width': 100},
 			{'width': 5},
-			{'label': $L("Zoom +"), 'command': "zoom_in"} ];
+			{'label': $L("Zoom") + " +", 'command': "zoom_in"} ];
 	
 		this.modelCommandMenu = {'visible': true, 'items': this.itemsCommandMenu};
 		
@@ -193,18 +178,18 @@ SceneAssistant.prototype.setup = function() {
 			'method': "accountList", 'parameters': {'subscribe': false}, 
 			'onComplete': this.handleEmailAccounts.bind(this)} );
 
-		var label = "Alert";
+		var label = $L("Alert");
 		
 		var modelProperty = "emailAlert";
 		
 		this.defaultChoicesConfigSelector = [
 			{'label': this.defaultChoice, 'value': -1},
-			{'label': "Vibrate", 'value': 2},
-			{'label': "System Sound", 'value': 1},
-			{'label': "Ringtone", 'value': 3},
-			{'label': "Mute", 'value': 0} ];
+			{'label': $L("Vibrate"), 'value': 2},
+			{'label': $L("System Sound"), 'value': 1},
+			{'label': $L("Ringtone"), 'value': 3},
+			{'label': $L("Mute"), 'value': 0} ];
 
-		this.itemsViewMenu = [{'label': "Email Alert Configuration", 'command': "", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("Email Alert Configuration"), 'command': "", 'width': 320}];
 
 		this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 	
@@ -215,15 +200,15 @@ SceneAssistant.prototype.setup = function() {
 			'method': "accountList", 'parameters': {'subscribe': false}, 
 			'onComplete': this.handleEmailAccounts.bind(this)} );
 
-		var label = "Ringtone";
+		var label = $L("Ringtone");
 		
 		var modelProperty = "emailRingtoneName";
 
 		this.defaultChoicesConfigSelector = [
 			{'label': this.defaultChoice, 'value': ""},
-			{'label': "Select", 'value': "select"} ];  
+			{'label': $L("Select"), 'value': "select"} ];  
 
-		this.itemsViewMenu = [{'label': "Email Ringtone Configuration", 'command': "", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("Email Ringtone Configuration"), 'command': "", 'width': 320}];
 
 		this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 	
@@ -234,24 +219,24 @@ SceneAssistant.prototype.setup = function() {
 			'method': "accountList", 'parameters': {'subscribe': false}, 
 			'onComplete': this.handleEmailAccounts.bind(this)} );
 
-		var label = "Get Email";
+		var label = $L("Get Email");
 		
 		var modelProperty = "emailSync";
 		
 		this.defaultChoicesConfigSelector = [
 			{'label': this.defaultChoice, 'value': -1},
-			{'label': "As Items Arrive", 'value': 0}, 
-			{'label': "5 Minutes", 'value': 5},
-			{'label': "10 Minutes", 'value': 10},
-			{'label': "15 Minutes", 'value': 15},
-			{'label': "30 Minutes", 'value': 30},
-			{'label': "1 Hour", 'value': 60},
-			{'label': "6 Hours", 'value': 360},		
-			{'label': "12 Hours", 'value': 720},
-			{'label': "24 Hours", 'value': 1440},		
-			{'label': "Manual", 'value': 1000000} ];
+			{'label': $L("As Items Arrive"), 'value': 0}, 
+			{'label': "5 " + $L("Minutes"), 'value': 5},
+			{'label': "10 " + $L("Minutes"), 'value': 10},
+			{'label': "15 " + $L("Minutes"), 'value': 15},
+			{'label': "30 " + $L("Minutes"), 'value': 30},
+			{'label': "1 " + $L("Hour"), 'value': 60},
+			{'label': "6 " + $L("Hours"), 'value': 360},		
+			{'label': "12 " + $L("Hours"), 'value': 720},
+			{'label': "24 " + $L("Hours"), 'value': 1440},		
+			{'label': $L("Manual"), 'value': 1000000} ];
 
-		this.itemsViewMenu = [{'label': "Email Sync Configuration", 'command': "", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("Email Sync Configuration"), 'command': "", 'width': 320}];
 
 		this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 	
@@ -263,17 +248,17 @@ SceneAssistant.prototype.setup = function() {
 			'onSuccess': this.handleIMStatusTest.bind(this),
 			'onFailure': this.handleIMStatusTest.bind(this)});
 
-		var label = "Status";
+		var label = $L("Status");
 		
 		var modelProperty = "messagingIMStatus";
 
 		this.defaultChoicesConfigSelector = [
 			{'label': this.defaultChoice, 'value': -1},
-			{'label': "Available", 'value': 0},
-			{'label': "Busy", 'value': 2},
-			{'label': "Sign Off", 'value': 4} ];
+			{'label': $L("Available"), 'value': 0},
+			{'label': $L("Busy"), 'value': 2},
+			{'label': $L("Sign Off"), 'value': 4} ];
 
-		this.itemsViewMenu = [{'label': "IM Status Configuration", 'command': "", 'width': 320}];
+		this.itemsViewMenu = [{'label': $L("IM Status Configuration"), 'command': "", 'width': 320}];
 
 		this.modelViewMenu = {'visible': true, 'items': this.itemsViewMenu};
 
@@ -306,7 +291,7 @@ SceneAssistant.prototype.setup = function() {
 	this.modelDoneButton = {buttonClass: '', disabled: false};
 	
 	this.controller.setupWidget('DoneButton', 
-		{label: "Done Configuring"}, this.modelDoneButton);
+		{label: $L("Done Configuring")}, this.modelDoneButton);
 			
 	this.controller.listen(this.controller.get('DoneButton'), Mojo.Event.tap, 
 		this.close.bind(this));
@@ -385,8 +370,7 @@ SceneAssistant.prototype.handleIMStatusTest = function(response) {
 
 SceneAssistant.prototype.showIMStatusError = function(response) {
 	this.controller.get('ErrorText').update(
-		"Unable to retrieve per account configuration. " +
-		"Maybe you don't have messaging plugins installed?");
+		$L("Unable to retrieve per account configuration. Maybe you don't have messaging plugins installed?"));
 }
 
 SceneAssistant.prototype.handleIMAccounts = function(index, response) {
@@ -433,7 +417,7 @@ SceneAssistant.prototype.handleRingtoneSelect = function(event) {
 
 SceneAssistant.prototype.executeRingtoneSelect = function(config) {
 	Mojo.FilePicker.pickFile({'defaultKind': "ringtone", 'kinds': ["ringtone"], 
-		'actionType': "attach", 'actionName': "Done", 'onSelect': 
+		'actionType': "attach", 'actionName': $L("Done"), 'onSelect': 
 			function(config, payload) {
 				config.emailRingtoneName = payload.name;
 				config.emailRingtonePath = payload.fullPath;
@@ -526,8 +510,8 @@ SceneAssistant.prototype.listGoogleDocuments = function(event) {
 					}
 					else {
 						this.controller.showAlertDialog({
-							title: "Unable to list documents!",
-							message: "<div align='justify'>" + "Received invalid JSON response from Google Docs." + "</div>",
+							title: $L("Unable to list documents!"),
+							message: "<div align='justify'>" + $L("Received invalid JSON response from Google Docs.") + "</div>",
 							choices:[{label:$L("OK"), value:"ok", type:'default'}],
 							preventCancel: true,
 							allowHTMLMessage: true}); 
@@ -539,8 +523,8 @@ SceneAssistant.prototype.listGoogleDocuments = function(event) {
 				}.bind(this),
 				onFailure: function(response) { 
 					this.controller.showAlertDialog({
-							title: "Unable to list documents!",
-							message: "<div align='justify'>" + "Failed to receive documents list from Google Docs." + "</div>",
+							title: $L("Unable to list documents!"),
+							message: "<div align='justify'>" + $L("Failed to receive documents list from Google Docs.") + "</div>",
 							choices:[{label:$L("OK"), value:"ok", type:'default'}],
 							preventCancel: true,
 							allowHTMLMessage: true});  
@@ -734,13 +718,17 @@ SceneAssistant.prototype.exportModeData = function(event) {
 //
 
 SceneAssistant.prototype.initializeGoogleMaps = function() {
-	if(this.data)
+	if(this.data) {
 		var latlng = new google.maps.LatLng(this.data.lat, this.data.lng);
-	else
+		var zoom = 12;
+	}
+	else {
 		var latlng = new google.maps.LatLng(64.000, 26.000);
-		
+		var zoom = 5;
+	}
+
 	var mapOptions = {
-		'zoom': 5,
+		'zoom': zoom,
 		'center': latlng,
 		'mapTypeId': google.maps.MapTypeId.ROADMAP,
 		'draggable': true,
@@ -754,6 +742,18 @@ SceneAssistant.prototype.initializeGoogleMaps = function() {
 		'position': latlng, 
 		'map': this.map, 
 		'title': "Location" });
+  
+	var rad = 200;
+	
+	if((this.data) && (this.data.rad))
+		rad = parseInt(this.data.rad);
+  
+	var circle = new google.maps.Circle({
+		map: this.map,
+		radius: rad
+		});
+  
+	circle.bindTo('center', this.marker, 'position');
   
 	google.maps.event.addListener(this.map, 'click', function(event) {
 		this.marker.setPosition(event.latLng);

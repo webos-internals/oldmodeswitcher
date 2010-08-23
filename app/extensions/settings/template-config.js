@@ -12,7 +12,7 @@ TemplateConfig.prototype.version = function() {
 TemplateConfig.prototype.label = function() {
 	// This function should return the configuration UI label for this settings group.
 
-	return "Template Settings";
+	return $L("Template Settings");
 }
 
 //
@@ -32,13 +32,12 @@ TemplateConfig.prototype.setup = function(sceneController) {
 
 	this.choicesTemplateModeSelector = [
 		{'label': controller.defaultChoiseLabel, 'value': -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0}
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0}
 	];  
 
-	sceneController.setupWidget("TemplateModeSelector", {
-		'label': "Template Mode",	'labelPlacement': "left",
-		'modelProperty': "templateMode", 
+	sceneController.setupWidget("TemplateModeSelector", {'label': $L("Template Option"),
+		'labelPlacement': "left", 'modelProperty': "templateMode", 
 		'choices': this.choicesTemplateModeSelector} );
 }
 
@@ -50,6 +49,7 @@ TemplateConfig.prototype.config = function() {
 	// Configuration returned here is the configuration for the UI part.
 	
 	var settingConfig = {
+		'templateTitle': $L("Template"),
 		'templateMode': -1 };
 	
 	return settingConfig;

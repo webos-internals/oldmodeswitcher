@@ -437,7 +437,7 @@ EditmodeAssistant.prototype.setup = function() {
 
 		this.modelBlockSelector = {'disabled': true};
 
-		this.controller.setupWidget("BlockSelector",	{'label': $L("Block"), 
+		this.controller.setupWidget("BlockSelector",	{'label': $L("Block Mode"), 
 			'labelPlacement': "left", 'choices': []}, this.modelBlockSelector);	
 
 		this.modelTriggersList = {'items': []};
@@ -585,7 +585,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 	mode.settings.charging = config.settings.charging;
 
 	for(var i = 0; i < config.settingsList.length; i++) {
-		var cfgIndex = this.appAssistant.find("id", config.settingsList[i].extension, this.settings);
+		var cfgIndex = this.settings.find("id", config.settingsList[i].extension);
 
 		if(cfgIndex != -1) {
 			var data = this.settings[cfgIndex].config.load(config.settingsList[i]);
@@ -602,7 +602,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 	mode.apps.close = config.apps.close;
 
 	for(var i = 0; i < config.appsList.length; i++) {
-		var cfgIndex = this.appAssistant.find("id", config.appsList[i].extension, this.applications);
+		var cfgIndex = this.applications.find("id", config.appsList[i].extension);
 		
 		if(cfgIndex != -1) {
 			var data = this.applications[cfgIndex].config.load(config.appsList[i]);
@@ -620,7 +620,7 @@ EditmodeAssistant.prototype.getModeData = function() {
 		mode.triggers.required = config.triggers.required;
 	
 		for(var i = 0; i < config.triggersList.length; i++) {
-			var cfgIndex = this.appAssistant.find("id", config.triggersList[i].extension, this.triggers);
+			var cfgIndex = this.triggers.find("id", config.triggersList[i].extension);
 		
 			if(cfgIndex != -1) {
 				var data = this.triggers[cfgIndex].config.load(config.triggersList[i]);
@@ -709,7 +709,7 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 	mode.settings.charging = this.modelChargingSelector.value;
 		
 	for(var i = 0; i < this.loaded.settings.length; i++) {
-		var cfgIndex = this.appAssistant.find("id", this.loaded.settings[i].extension, this.settings);
+		var cfgIndex = this.settings.find("id", this.loaded.settings[i].extension);
 	
 		if(cfgIndex != -1) {
 			var data = this.settings[cfgIndex].config.save(this.loaded.settings[i]);
@@ -727,7 +727,7 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 	mode.apps.close = this.modelAppsCloseSelector.value;								
 
 	for(var i = 0; i < this.loaded.apps.length; i++) {
-		var cfgIndex = this.appAssistant.find("id", this.loaded.apps[i].extension, this.applications);
+		var cfgIndex = this.applications.find("id", this.loaded.apps[i].extension);
 	
 		if(cfgIndex != -1) {
 			var data = this.applications[cfgIndex].config.save(this.loaded.apps[i]);
@@ -749,7 +749,7 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 			if((this.loaded.triggers[i].group == undefined) || (this.loaded.triggers[i].group == 0) ||
 				(this.modelRequiredSelector.value == 2))
 			{
-				var cfgIndex = this.appAssistant.find("id", this.loaded.triggers[i].extension, this.triggers);
+				var cfgIndex = this.triggers.find("id", this.loaded.triggers[i].extension);
 		
 				if(cfgIndex != -1) {
 					var data = this.triggers[cfgIndex].config.save(this.loaded.triggers[i]);
@@ -885,7 +885,7 @@ EditmodeAssistant.prototype.setTriggersView = function(event) {
 		this.controller.modelChanged(this.modelTriggersList, this);
 	}
 	else {
-		this.controller.get("TriggersTitle").innerHTML = $L("Activation Triggers (0)");
+		this.controller.get("TriggersTitle").innerHTML = $L("Activation Triggers") +" (0)";
 	
 		this.modelCommandMenu.items[2].disabled = false;
 
@@ -1108,7 +1108,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 			var settingItems = [];
 			
 			for(var i = 0; i < this.settings.length; i++) {
-				if(this.appAssistant.find("extension", this.settings[i].id, this.loaded.settings) == -1)
+				if(this.loaded.settings.find("extension", this.settings[i].id) == -1)
 					settingItems.push({'label': this.settings[i].config.label(), 'command': i});
 			}
 
@@ -1164,7 +1164,7 @@ EditmodeAssistant.prototype.handleCommand = function(event) {
 				}.bind(this)});
 		}
 		else if(event.command == "applications-ms") {
-			var cfgIndex = this.appAssistant.find("id", "modesw", this.applications);
+			var cfgIndex = this.applications.find("id", "modesw");
 
 			if(cfgIndex != -1) {
 				var id = this.applications[cfgIndex].id;
@@ -1502,7 +1502,7 @@ EditmodeAssistant.prototype.handleListDelete = function(list, event) {
 
 EditmodeAssistant.prototype.checkModeName = function() {
 	if(this.modelNameText.value.length == 0)
-		this.modelNameText.value = 'New Mode';
+		this.modelNameText.value = $L("New Mode");
 
 	if((this.modelNameText.value == "Current Mode") || 
 		(this.modelNameText.value == "Default Mode") || 

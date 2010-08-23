@@ -8,7 +8,7 @@ ScreenConfig.prototype.version = function() {
 //
 
 ScreenConfig.prototype.label = function() {
-	return "Screen Settings";
+	return $L("Screen Settings");
 }
 
 //
@@ -28,10 +28,10 @@ ScreenConfig.prototype.setup = function(sceneController) {
 
 	this.choicesScreenSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Minimum", 'value': 0},
-		{'label': "Maximum", 'value': 100} ];  
+		{'label': $L("Minimum"), 'value': 0},
+		{'label': $L("Maximum"), 'value': 100} ];  
 
-	sceneController.setupWidget("ScreenBrightnessSelector", {'label': "Brightness", 
+	sceneController.setupWidget("ScreenBrightnessSelector", {'label': $L("Brightness"), 
 		'labelPlacement': "left", 'modelProperty': "screenBrightnessLevel",
 		'choices': this.choicesScreenSelector});
 		
@@ -40,40 +40,40 @@ ScreenConfig.prototype.setup = function(sceneController) {
 
 	this.choicesBlinkSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},		
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ScreenBlinkSelector", {'label': "Blink Notify", 
+	sceneController.setupWidget("ScreenBlinkSelector", {'label': $L("Blink Notify"), 
 		'labelPlacement': "left", 'modelProperty': "screenBlinkNotify",
 		'choices': this.choicesBlinkSelector});
 
 	this.choicesLockedSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},		
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("ScreenLockedSelector", {'label': "Locked Notify", 
+	sceneController.setupWidget("ScreenLockedSelector", {'label': $L("Locked Notify"), 
 		'labelPlacement': "left", 'modelProperty': "screenLockedNotify",
 		'choices': this.choicesBlinkSelector});
 		
 	this.choicesTimeoutSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "15 Seconds", 'value': 15},
-		{'label': "30 Seconds", 'value': 30},
-		{'label': "1 Minute", 'value': 60},
-		{'label': "2 Minutes", 'value': 120},
-		{'label': "3 Minutes", 'value': 180},
-		{'label': "5 Minutes", 'value': 300} ];  
+		{'label': "15 " + $L("Seconds"), 'value': 15},
+		{'label': "30 " + $L("Seconds"), 'value': 30},
+		{'label': "1 " + $L("Minute"), 'value': 60},
+		{'label': "2 " + $L("Minutes"), 'value': 120},
+		{'label': "3 " + $L("Minutes"), 'value': 180},
+		{'label': "5 " + $L("Minutes"), 'value': 300} ];  
 
-	sceneController.setupWidget("ScreenTimeoutSelector",	{'label': "Turn off After", 
+	sceneController.setupWidget("ScreenTimeoutSelector",	{'label': $L("Turn off After"), 
 		'labelPlacement': "left", 'modelProperty': "screenTurnOffTimeout",
 		'choices': this.choicesTimeoutSelector});
 
 	this.choicesWallpaperSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': ""},
-		{'label': "Select", 'value': "select"} ];  
+		{'label': $L("Select"), 'value': "select"} ];  
 
-	sceneController.setupWidget("ScreenWallpaperSelector", {'label': "Wallpaper", 
+	sceneController.setupWidget("ScreenWallpaperSelector", {'label': $L("Wallpaper"), 
 		'labelPlacement': "left", 'modelProperty': "screenWallpaperName",
 		'choices': this.choicesWallpaperSelector});
 			
@@ -87,6 +87,7 @@ ScreenConfig.prototype.setup = function(sceneController) {
 
 ScreenConfig.prototype.config = function() {
 	var settingConfig = {
+		'screenTitle': $L("Screen"),
 		'screenBrightnessLevel': -1, 
 		'screenTurnOffTimeout': -1, 
 		'screenBlinkNotify': -1, 
@@ -165,7 +166,7 @@ ScreenConfig.prototype.handleListChange = function(changeEvent) {
 
 ScreenConfig.prototype.executeWallpaperSelect = function(eventModel) {
 	Mojo.FilePicker.pickFile({'defaultKind': "image", 'kinds': ["image"], 'actionType': "open", 
-		'actionName': "Select wallpaper", 'crop': {'width': 318, 'height': 479}, 'onSelect': 
+		'actionName': $L("Select Wallpaper"), 'crop': {'width': 318, 'height': 479}, 'onSelect': 
 			function(eventModel, serviceResponse) {
 				if((!serviceResponse) || (!serviceResponse.fullPath)) {
 					eventModel.screenWallpaperName = "";

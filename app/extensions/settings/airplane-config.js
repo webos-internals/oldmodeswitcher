@@ -8,7 +8,7 @@ AirplaneConfig.prototype.version = function() {
 //
 
 AirplaneConfig.prototype.label = function() {
-	return "Airplane Settings";
+	return $L("Airplane Settings");
 }
 
 //
@@ -24,12 +24,11 @@ AirplaneConfig.prototype.deactivate = function() {
 AirplaneConfig.prototype.setup = function(sceneController) {
 	this.choicesAirplaneModeSelector = [
 		{'label': sceneController.defaultChoiseLabel, 'value': -1},
-		{'label': "Enabled", 'value': 1},
-		{'label': "Disabled", 'value': 0} ];  
+		{'label': $L("Enabled"), 'value': 1},
+		{'label': $L("Disabled"), 'value': 0} ];  
 
-	sceneController.setupWidget("AirplaneModeSelector", {
-		'label': "Flight Mode",	'labelPlacement': "left",
-		'modelProperty': "airplaneMode", 
+	sceneController.setupWidget("AirplaneModeSelector", {'label': $L("Flight Mode"),	
+		'labelPlacement': "left", 'modelProperty': "airplaneMode", 
 		'choices': this.choicesAirplaneModeSelector});
 }
 
@@ -37,6 +36,7 @@ AirplaneConfig.prototype.setup = function(sceneController) {
 
 AirplaneConfig.prototype.config = function() {
 	var settingConfig = {
+		'airplaneTitle': $L("Airplane"),
 		'airplaneMode': -1 };
 	
 	return settingConfig;
