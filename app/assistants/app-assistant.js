@@ -1004,14 +1004,21 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 		check.clear();
 	
 		for(var i = 0; i < modesA[loop].length; i++) {
-			if(modesB[loop].find("name", modesA[loop][i].name) == -1) {
+			if((modesB[loop].find("name", modesA[loop][i].name) == -1) || (!this.running)) {
 				for(var j = 0; j < modesA[loop][i].appsList.length; j++) {
 					if(modesA[loop][i].appsList[j].type == "ms") {
-						if((modesA[loop][i].appsList[j].event == events[loop]) &&
-							((events[loop] == "start") || (events[loop] == "started") ||
+						// Should check for: reloading, starting, switching and closing.
+					
+						if(((modesA[loop][i].appsList[j].event == events[loop]) ||
+							((modesA[loop][i].appsList[j].event == "switch") && (roundPhase == "init")) ||
+							((modesA[loop][i].appsList[j].event == "switched") && (roundPhase == "done"))) &&
+							((((newActiveModes[0].type != "default") ||
+							(oldActiveModes[0].type == "default")) && 
+							((events[loop] == "start") || (events[loop] == "started"))) ||
 							(modesA[loop][i].appsList[j].force == "yes") || 
-							((newActiveModes[0].type == "default") || 
-							(modesA[loop][i].type == "modifier")))) 
+							(((newActiveModes[0].type == "default") || 
+							(modesA[loop][i].type == "modifier")) &&
+							((events[loop] == "close") || (events[loop] == "closed"))))) 
 						{					
 							if(modesA[loop][i].appsList[j].action == "lock")
 								lock = true;

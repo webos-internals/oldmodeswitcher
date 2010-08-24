@@ -691,9 +691,12 @@ EditmodeAssistant.prototype.setModeData = function(refresh) {
 
 	if(this.type != "default") {
 		this.checkModeName();
+	
+		mode.name = this.modelNameText.value;
 	}
-
-	mode.name = this.modelNameText.value;
+	else
+		mode.name = this.mode.name;
+	
 	mode.type = this.modelTypeSelector.value;
 	
 	if(this.type == "default") {
