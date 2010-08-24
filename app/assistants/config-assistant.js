@@ -171,6 +171,15 @@ ConfigAssistant.prototype.setup = function() {
 	
 		this.controller.stageController.pushScene("editmode", type, this.modeidx);
 	}
+	
+	if(this.action == "notify") {
+		this.controller.showAlertDialog({
+			title: $L("Mode Switcher notification!"),
+			message: "<div align='justify'>" + $L("<i>Mode Switcher</i> started in dashboard mode. For Pixi the dashboard neads to be always on for <i>Mode Switcher</i> to function. For Pre you can install '<i>Launch Mode Switcher on Luna Boot</i>' patch to get rid of the dashboard mode.") + "</div>",
+			choices:[{label:$L("Continue"), value:"ok", type:'default'}],
+			preventCancel: true,
+			allowHTMLMessage: true});
+	} 
 }
 
 //

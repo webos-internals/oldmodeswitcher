@@ -70,8 +70,6 @@ CaleventTrigger.prototype.disable = function() {
 
 CaleventTrigger.prototype.check = function(triggerConfig, modeName) {
 	var date = new Date();	
-	
-	date.setMilliseconds(0);
 
 	if(triggerConfig.caleventMatch.length > 0)
 		var regexp = new RegExp("/*" + triggerConfig.caleventMatch + "*", "i");
@@ -80,9 +78,11 @@ CaleventTrigger.prototype.check = function(triggerConfig, modeName) {
 		if((triggerConfig.caleventCalendar == 0) || 
 			("id" + triggerConfig.caleventCalendar == this.calEvents[i].calendarId))
 		{
+				Mojo.Log.error("DEBUG 8 " + date.getTime() + " " + this.calEvents[i].start + " " + this.calEvents[i].end);
 			if((this.calEvents[i].start <= date.getTime()) && 
 				(this.calEvents[i].end > date.getTime()))
 			{
+					Mojo.Log.error("DEBUG 9");
 				if(((triggerConfig.caleventMode == 0) && ((triggerConfig.caleventMatch.length == 0) || 
 					((this.calEvents[i].subject) && (this.calEvents[i].subject.match(regexp) != null)) || 
 					((this.calEvents[i].location) && (this.calEvents[i].location.match(regexp) != null)) || 
@@ -92,6 +92,7 @@ CaleventTrigger.prototype.check = function(triggerConfig, modeName) {
 					((this.calEvents[i].location) && (this.calEvents[i].location.match(regexp) == null)) && 
 					((this.calEvents[i].note) && (this.calEvents[i].note.match(regexp) == null))))))
 				{
+						Mojo.Log.error("DEBUG 10");
 					return true;
 				}
 			}
@@ -124,6 +125,8 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 		this.subscribeCalendarEvents(true);
 	}
 	else if(triggerData.timestamp) {
+		Mojo.Log.error("DEBUG 1");
+	
 		var index = this.sysTimeouts.indexOf(triggerData.timestamp);
 		
 		if(index != -1)
@@ -144,6 +147,7 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 						if((this.config.modesConfig[i].triggersList[j].caleventCalendar == 0) ||
 							("id" + this.config.modesConfig[i].triggersList[j].caleventCalendar == this.calEvents[k].calendarId))
 						{
+								Mojo.Log.error("DEBUG 2");
 							if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
 								((text.length == 0) || 
 								((this.calEvents[k].subject) && (this.calEvents[k].subject.match(regexp) != null)) || 
@@ -155,6 +159,7 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 								((this.calEvents[k].location) && (this.calEvents[k].location.match(regexp) == null)) &&
 								((this.calEvents[k].note) && (this.calEvents[k].note.match(regexp) == null))))))
 							{
+									Mojo.Log.error("DEBUG 3");
 								var sdate = new Date(this.calEvents[k].start);
 								var edate = new Date(this.calEvents[k].end);
 
@@ -164,8 +169,11 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 								if((this.config.modesConfig[i].name != this.config.currentMode.name) &&
 									(this.config.modifierModes.indexOf(this.config.modesConfig[i].name) == -1))
 								{
+										Mojo.Log.error("DEBUG 4");
 									if((sdate.getTime() / 1000) == triggerData.timestamp) {
+											Mojo.Log.error("DEBUG 5");
 										if(this.check(this.config.modesConfig[i].triggersList[j])) {
+												Mojo.Log.error("DEBUG 6");
 											startModes.push(this.config.modesConfig[i]);
 											break;
 										}
@@ -185,7 +193,7 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 				}
 			}
 		}
-
+		Mojo.Log.error("DEBUG 7");
 		if((this.executeCallback) && ((startModes.length > 0) || (closeModes.length > 0)))
 			this.executeCallback(startModes, closeModes);
 	}

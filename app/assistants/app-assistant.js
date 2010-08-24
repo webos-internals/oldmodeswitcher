@@ -229,7 +229,7 @@ AppAssistant.prototype.processLaunch = function() {
 		
 	if((!this.background) && (!this.running)) {
 		var mainScene = function(stageController) {
-			stageController.pushScene("config");
+			stageController.pushScene("config", "notify");
 		};
 			
 		var stageArgs = {name: "config", lightweight: true};
@@ -1040,13 +1040,13 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 
 			if(modeName == "All Normal Modes") {
 				if(config[i].action == "trigger") {
-					for(var i = 0; i < this.config.modesConfig.length; i ++) {
-						if((this.config.modesConfig[i].type == "normal") &&
-							(this.config.modesConfig[i].autoStartMode != 0) &&
-							(this.config.modesConfig[i].name != newActiveModes[0].name) &&
-							(this.checkModeTriggers(this.config.modesConfig[i])))
+					for(var j = 0; j < this.config.modesConfig.length; j++) {
+						if((this.config.modesConfig[j].type == "normal") &&
+							(this.config.modesConfig[j].autoStartMode != 0) &&
+							(this.config.modesConfig[j].name != newActiveModes[0].name) &&
+							(this.checkModeTriggers(this.config.modesConfig[j])))
 						{
-							newActiveModes.splice(0, 1, this.config.modesConfig[i]);
+							newActiveModes.splice(0, 1, this.config.modesConfig[j]);
 					
 							break;
 						}
@@ -1058,15 +1058,15 @@ AppAssistant.prototype.executeModeUpdate = function(oldActiveModes, newActiveMod
 					newActiveModes.splice(1, newActiveModes.length - 1);
 				}
 				else if((config[i].action == "start") || (config[i].action == "trigger")) {
-					for(var i = 0; i < this.config.modesConfig.length; i ++) {
-						if((this.config.modesConfig[i].type == "modifier") &&
-							(newActiveModes.find("name", this.config.modesConfig[i].name) == -1))
+					for(var j = 0; j < this.config.modesConfig.length; j ++) {
+						if((this.config.modesConfig[j].type == "modifier") &&
+							(newActiveModes.find("name", this.config.modesConfig[j].name) == -1))
 						{
 							if((config[i].action == "start") ||
-								((this.config.modesConfig[index].autoStartMode != 0) &&
-								(this.checkModeTriggers(this.config.modesConfig[i]))))
+								((this.config.modesConfig[j].autoStartMode != 0) &&
+								(this.checkModeTriggers(this.config.modesConfig[j]))))
 							{
-								newActiveModes.push(this.config.modesConfig[i]);
+								newActiveModes.push(this.config.modesConfig[j]);
 							}
 						}
 					}			

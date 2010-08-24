@@ -14,6 +14,10 @@
 	"Modified settings":
 		"",
 
+	"Mode Switcher notification":
+		"",
+	"<i>Mode Switcher</i> started in dashboard mode. For Pixi the dashboard neads to be always on for <i>Mode Switcher</i> to function. For Pre you can install '<i>Launch Mode Switcher on Luna Boot</i>' patch to get rid of the dashboard mode.":
+		"",	
 	"Initial setup of Mode Switcher!":
 		"",
 	"<i>Mode Switcher</i> needs to retrieve your current system settings for <i>Default Mode</i>. This operation should only take few seconds to finish. You can modify the <i>Default Mode</i> afterwards by clicking the <i>Edit Default Mode</i> button.": 
