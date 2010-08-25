@@ -1295,36 +1295,40 @@ AppAssistant.prototype.prepareSettingsUpdate = function(oldActiveModes, newActiv
 	var oldSettings = new Array();
 	var newSettings = new Array();
 
-	for(var i = 0; i < newActiveModes.length; i++) {
-		for(var j = 0; j < newActiveModes[i].settingsList.length; j++) {
-			var index = newSettings.find("extension", newActiveModes[i].settingsList[j].extension);
+	var modes = [this.config.defaultMode].concat(newActiveModes);
+
+	for(var i = 0; i < modes.length; i++) {
+		for(var j = 0; j < modes[i].settingsList.length; j++) {
+			var index = newSettings.find("extension", modes[i].settingsList[j].extension);
 			
 			if(index == -1) {
 				var settings = {};
 				
-				Object.extend(settings, newActiveModes[i].settingsList[j]);
+				Object.extend(settings, modes[i].settingsList[j]);
 				
 				newSettings.push(settings);
 			}
 			else {
-				Object.extend(newSettings[index], newActiveModes[i].settingsList[j]);
+				Object.extend(newSettings[index], modes[i].settingsList[j]);
 			}     	
 		}
 	}
 
-	for(var i = 0; i < oldActiveModes.length; i++) {
-		for(var j = 0; j < oldActiveModes[i].settingsList.length; j++) {
-			var index = oldSettings.find("extension", oldActiveModes[i].settingsList[j].extension);
+	var modes = [this.config.defaultMode].concat(oldActiveModes);
+
+	for(var i = 0; i < modes.length; i++) {
+		for(var j = 0; j < modes[i].settingsList.length; j++) {
+			var index = oldSettings.find("extension", modes[i].settingsList[j].extension);
 			
 			if(index == -1) {
 				var settings = {};
 				
-				Object.extend(settings, oldActiveModes[i].settingsList[j]);
+				Object.extend(settings, modes[i].settingsList[j]);
 				
 				oldSettings.push(settings);
 			}
 			else {
-				Object.extend(oldSettings[index], oldActiveModes[i].settingsList[j]);
+				Object.extend(oldSettings[index], modes[i].settingsList[j]);
 			}     	
 		}
 	}

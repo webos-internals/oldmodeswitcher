@@ -26,16 +26,16 @@ AppsrvAssistant.prototype.updateNameState = function(event) {
 	
 		this.controller.get("mode-state").innerHTML = $L("Activating...");
 
-		this.controller.get('lock').removeClassName("unlock");
-		this.controller.get('lock').addClassName("lock");
+		this.controller.get('lock').removeClassName("lock");
+		this.controller.get('lock').addClassName("unlock");
 	}
 	else if(event == "disable") {
 		this.controller.get("mode-name").innerHTML = $L("Mode Switcher is");
 	
 		this.controller.get("mode-state").innerHTML = $L("Deactivating...");
 
-		this.controller.get('lock').removeClassName("unlock");
-		this.controller.get('lock').addClassName("lock");
+		this.controller.get('lock').removeClassName("lock");
+		this.controller.get('lock').addClassName("unlock");
 	}
 	else {
 		if(this.config.modeSwitcher.activated == 0) {
@@ -43,8 +43,8 @@ AppsrvAssistant.prototype.updateNameState = function(event) {
 		
 			this.controller.get("mode-state").innerHTML = $L("Not Activated");
 
-			this.controller.get('lock').removeClassName("unlock");
-			this.controller.get('lock').addClassName("lock");
+			this.controller.get('lock').removeClassName("lock");
+			this.controller.get('lock').addClassName("unlock");
 		}
 		else {
 			this.controller.get("mode-name").innerHTML = this.config.currentMode.name;
@@ -59,8 +59,8 @@ AppsrvAssistant.prototype.updateNameState = function(event) {
 				this.controller.get("mode-state").innerHTML = $L("Modified settings");
 	
 			if(this.config.modeSwitcher.modeLocked == "yes") {
-				this.controller.get('lock').removeClassName("lock");
-				this.controller.get('lock').addClassName("unlock");
+				this.controller.get('lock').removeClassName("unlock");
+				this.controller.get('lock').addClassName("lock");
 			}
 		}
 	}
@@ -77,13 +77,13 @@ AppsrvAssistant.prototype.toggleModeLock = function(event) {
 	
 	if(this.config.modeSwitcher.modeLocked == "no") {
 		this.appAssistant.lockModeSwitcher();
-		this.controller.get('lock').removeClassName("lock");
-		this.controller.get('lock').addClassName("unlock");
+		this.controller.get('lock').removeClassName("unlock");
+		this.controller.get('lock').addClassName("lock");
 	}
 	else {
 		this.appAssistant.unlockModeSwitcher();
-		this.controller.get('lock').removeClassName("unlock");
-		this.controller.get('lock').addClassName("lock");
+		this.controller.get('lock').removeClassName("lock");
+		this.controller.get('lock').addClassName("unlock");
 	}
 }
 	
