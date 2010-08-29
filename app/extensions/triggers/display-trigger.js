@@ -75,7 +75,7 @@ DisplayTrigger.prototype.check = function(triggerConfig, modeName) {
 //
 
 DisplayTrigger.prototype.execute = function(triggerData, manualLaunch) {
-	Mojo.Log.error("Display trigger received: " + Object.toJSON(triggerData));
+	Mojo.Log.info("Display trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();

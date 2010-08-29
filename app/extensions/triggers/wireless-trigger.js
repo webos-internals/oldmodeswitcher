@@ -172,6 +172,10 @@ WirelessTrigger.prototype.handleWirelessEvent = function(connectedSSID) {
 		}
 	}
 
+	this.service.request("palm://com.palm.power/com/palm/power", { 
+		'method': "activityStart", 'parameters': {'id': Mojo.Controller.appInfo.id + "-wireless", 
+		'duration_ms': timeout + 15000} });
+
 	this.currentSSID = connectedSSID;
 	
 	this.timeoutTrigger = setTimeout(this.execute.bind(this, {'ssid': connectedSSID}, false), timeout);

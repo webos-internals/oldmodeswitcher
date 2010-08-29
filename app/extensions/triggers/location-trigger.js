@@ -213,7 +213,7 @@ LocationTrigger.prototype.handleLocationTrigger = function(trackingData) {
 			// If yes then add to list, if no then calculate new check time.
 	
 			if(hasValidTriggers) {
-				Mojo.Log.error("Location trigger valid: " + this.config.modesConfig[i].name);
+				Mojo.Log.info("Location trigger valid: " + this.config.modesConfig[i].name);
 			
 				// When we are on location the check time is set to 5 minutes.
 					
@@ -228,7 +228,7 @@ LocationTrigger.prototype.handleLocationTrigger = function(trackingData) {
 				}
 			}
 			else {
-				Mojo.Log.error("Location trigger invalid: " + this.config.modesConfig[i].name);
+				Mojo.Log.info("Location trigger invalid: " + this.config.modesConfig[i].name);
 
 				// Remove mode from the tracking list since it is not valid.
 			
@@ -266,7 +266,7 @@ LocationTrigger.prototype.handleLocationTrigger = function(trackingData) {
 			// Check if all triggers of the current mode are still valid.
 		
 			if(!hasValidTriggers) {
-				Mojo.Log.error("Location trigger changed: " + this.config.modesConfig[i].name);
+				Mojo.Log.info("Location trigger changed: " + this.config.modesConfig[i].name);
 
 				// Check if user has been already notified of closing.
 		

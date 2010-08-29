@@ -115,7 +115,8 @@ AppsManager.prototype.launch = function(appid, params) {
 }
 
 AppsManager.prototype.close = function(appid, processid) {
-	if((processid > 1010) && (appid != "com.palm.systemui") && (appid != Mojo.Controller.appInfo.id))
+	if((processid > 1010) && (appid != "com.palm.systemui") && (appid != "com.palm.app.phone") && 
+		(appid != Mojo.Controller.appInfo.id))
 	{
 		Mojo.Log.error("Closing app: " + appid);
 	

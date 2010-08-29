@@ -75,7 +75,7 @@ CalendarConfig.prototype.load = function(settingPreferences) {
 		settingConfig.calendarAlarmRow = "first";		
 		settingConfig.calendarRingtoneDisplay = "block";
 	}
-			
+
 	if(settingPreferences.calendarRingtone != undefined) {
 		settingConfig.calendarRingtoneName = settingPreferences.calendarRingtone.name;
 		settingConfig.calendarRingtonePath = settingPreferences.calendarRingtone.path;
@@ -90,14 +90,14 @@ CalendarConfig.prototype.save = function(settingConfig) {
 	if(settingConfig.calendarAlarm != -1)
 		settingPreferences.calendarAlarm = settingConfig.calendarAlarm;
 	
-	if(settingConfig.calendarAlarm == 3) {	
+	if(settingConfig.calendarAlarm == 2) {	
 		if(settingConfig.calendarRingtoneName.length != 0) {
 			settingPreferences.calendarRingtone = {
 				'name': settingConfig.calendarRingtoneName,
 				'path': settingConfig.calendarRingtonePath };
 		}
 	}
-		
+	
 	return settingPreferences;
 }
 

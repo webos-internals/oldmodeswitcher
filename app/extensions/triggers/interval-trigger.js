@@ -31,8 +31,6 @@ IntervalTrigger.prototype.shutdown = function() {
 IntervalTrigger.prototype.enable = function(executeCallback) {
 	this.executeCallback = executeCallback;
 
-
-
 	for(var i = 0; i < this.config.modesConfig.length; i++) {
 		for(var j = 0; j < this.config.modesConfig[i].triggersList.length; j++) {
  			if(this.config.modesConfig[i].triggersList[j].extension == "interval") {

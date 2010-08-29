@@ -2,7 +2,7 @@ function ServiceRequest() {
 	this.requestId = 0;
 	this.requests = {};
 	
-	this.retries = 3;
+	this.retries = 5;
 }
 
 //

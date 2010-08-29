@@ -218,6 +218,10 @@ ChargerTrigger.prototype.handleChargerEvent = function(connectedCharger) {
 			}
 		}
 	}
+	
+	this.service.request("palm://com.palm.power/com/palm/power", { 
+		'method': "activityStart", 'parameters': {'id': Mojo.Controller.appInfo.id + "-charger", 
+		'duration_ms': timeout + 15000} });
 		
 	this.timeoutTrigger = setTimeout(this.execute.bind(this, {'charger': connectedCharger}, false), timeout);
 }

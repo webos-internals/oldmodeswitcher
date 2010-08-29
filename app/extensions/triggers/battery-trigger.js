@@ -58,7 +58,7 @@ BatteryTrigger.prototype.check = function(triggerConfig, modeName) {
 //
 
 BatteryTrigger.prototype.execute = function(triggerData, manualLaunch) {
-	Mojo.Log.error("Battery trigger received: " + Object.toJSON(triggerData));
+	Mojo.Log.info("Battery trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();
@@ -113,12 +113,10 @@ BatteryTrigger.prototype.handleBatteryStatus = function(serviceResponse) {
 		this.startupCallback(true);
 		this.startupCallback = null;
 	}
-	else if(serviceResponse.percent_ui != undefined) {
-		if((serviceResponse.percent_ui != this.batteryLevel) && (((serviceResponse.percent_ui % 5) == 0) || 
-			((serviceResponse.percent_ui % 5) == 1) || ((serviceResponse.percent_ui % 5) == 4)))
-		{
-			this.execute({'level': serviceResponse.percent_ui}, false);
-		}
+	else if((serviceResponse.percent_ui != undefined) &&
+		(serviceResponse.percent_ui != this.batteryLevel))
+	{
+		this.execute({'level': serviceResponse.percent_ui}, false);
 	}
 }
 

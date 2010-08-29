@@ -64,7 +64,7 @@ ApplicationTrigger.prototype.check = function(triggerConfig, modeName) {
 //
 
 ApplicationTrigger.prototype.execute = function(triggerData, manualLaunch) {
-	Mojo.Log.error("Application trigger received: " + Object.toJSON(triggerData));
+	Mojo.Log.info("Application trigger received: " + Object.toJSON(triggerData));
 
 	var delay = null;
 

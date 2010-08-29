@@ -8,7 +8,7 @@ function SilentswTrigger(Config, Control) {
 	this.startupCallback = null;
 	this.executeCallback = null;
 
-	this.switchState = "off";
+	this.switchState = "unknown";
 }
 
 //
@@ -43,6 +43,9 @@ SilentswTrigger.prototype.disable = function() {
 //
 
 SilentswTrigger.prototype.check = function(triggerConfig, modeName) {
+	if(this.switchState == "unknown")
+		return true;
+
 	if(((triggerConfig.silentswState == 0) && (this.switchState == "on")) ||
 		((triggerConfig.silentswState == 1) && (this.switchState == "off")))
 	{
@@ -55,7 +58,7 @@ SilentswTrigger.prototype.check = function(triggerConfig, modeName) {
 //
 
 SilentswTrigger.prototype.execute = function(triggerData, manualLaunch) {
-	Mojo.Log.error("Silentsw trigger received: " + Object.toJSON(triggerData));
+	Mojo.Log.info("Silentsw trigger received: " + Object.toJSON(triggerData));
 
 	var startModes = new Array();
 	var closeModes = new Array();

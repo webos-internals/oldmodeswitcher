@@ -65,13 +65,13 @@ AppAssistant.prototype.cleanup = function() {
 //
 
 AppAssistant.prototype.handleLaunch = function(params) {
+	if((params) && (params.launchedAtBoot))
+		this.background = true;
+
 	if((!this.running) && (!this.initialized)) {
 		// Load config and init Mode Switcher.
 
 		this.initialized = true;
-
-		if((params) && (params.launchedAtBoot))
-			this.background = true;
 
 		Mojo.Log.error("Mode Switcher is loading config: " + 
 			this.background);
@@ -119,7 +119,7 @@ AppAssistant.prototype.executeLaunch = function(params) {
 			index = this.config.modesConfig.find("name", params.name);
 
 		if(stageController) {
-			Mojo.Log.error("Config stage card already exists");
+			Mojo.Log.info("Config stage card already exists");
 
 			if(index == -1)
 				stageController.popScenesTo("config");
@@ -130,7 +130,7 @@ AppAssistant.prototype.executeLaunch = function(params) {
 			stageController.activate();
 		}
 		else {
-			Mojo.Log.error("Creating new config stage card");
+			Mojo.Log.info("Creating new config stage card");
 			
 			var mainScene = function(stageController) {
 				if(index == -1)
@@ -372,13 +372,22 @@ AppAssistant.prototype.executeLaunching = function(startModes, closeMode, modifi
 	var stageController = this.controller.getStageController("launcher");
 	var appController = Mojo.Controller.getAppController();
 
+	if(this.config.modeSwitcher.timerStart >= this.config.modeSwitcher.timerStart)
+		var timeout = this.config.modeSwitcher.timerStart * 1000;
+	else 
+		var timeout = this.config.modeSwitcher.timerClose * 1000;
+
+	ServiceRequestWrapper.request("palm://com.palm.power/com/palm/power", { 
+		'method': "activityStart", 'parameters': {'id': Mojo.Controller.appInfo.id + "-launcher", 
+		'duration_ms': timeout + 15000} });
+
 	if(stageController) {
-		Mojo.Log.error("Launcher stage card already exists");
+		Mojo.Log.info("Launcher stage card already exists");
 
 		// FIXME: Should update the launcher!!!
 	}
 	else {
-		Mojo.Log.error("Creating new launcher stage card");
+		Mojo.Log.info("Creating new launcher stage card");
 
 		var launcherScene = function(stageController) {
 			stageController.pushScene("launcher", startModes, closeMode, modifiers);};
@@ -617,6 +626,12 @@ AppAssistant.prototype.reloadModeSwitcher = function() {
 	if((this.config.currentMode == null) || 
 		(this.config.modifierModes == null))
 	{
+		if(this.config.currentMode == null)
+			this.config.currentMode = this.config.defaultMode;
+
+		if(this.config.modifierModes == null)
+			this.config.modifierModes = [];
+	
 		clearTimeout(this.initTriggersTimer);
 	
 		this.initTriggersTimer = setTimeout(this.reloadModeTriggers.bind(this), 30000);
@@ -731,7 +746,7 @@ AppAssistant.prototype.disableModeTriggers = function() {
 //
 
 AppAssistant.prototype.lockModeSwitcher = function() {
-	Mojo.Log.error("Locking mode and preventing triggers");
+	Mojo.Log.info("Locking mode and preventing triggers");
 
 	this.config.modeSwitcher.modeLocked = "yes";
 	
@@ -739,7 +754,7 @@ AppAssistant.prototype.lockModeSwitcher = function() {
 }
 
 AppAssistant.prototype.unlockModeSwitcher = function() {
-	Mojo.Log.error("Unlocking mode and allowing triggers");
+	Mojo.Log.info("Unlocking mode and allowing triggers");
 	
 	this.config.modeSwitcher.modeLocked = "no";
 	
@@ -885,7 +900,7 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 }
 
 AppAssistant.prototype.executeToggleMode = function(modeName) {
-	Mojo.Log.error("Executing toggling of: " + modeName);
+	Mojo.Log.info("Executing toggling of: " + modeName);
 
 	if(modeName == "Current Mode") {
 		modeName = this.config.currentMode.name;
@@ -1265,7 +1280,7 @@ AppAssistant.prototype.updateCurrentMode = function(oldActiveModes, newActiveMod
 AppAssistant.prototype.updateHistoryList = function(oldActiveModes, newActiveModes) {
 	// Add to list if this is a new mode if already last in the list then remove.
 
-	Mojo.Log.error("Updating normal mode history list");
+	Mojo.Log.info("Updating normal mode history list");
 
 	if((oldActiveModes[0].name != newActiveModes[0].name) &&
 		(oldActiveModes[0].name != "Default Mode"))
