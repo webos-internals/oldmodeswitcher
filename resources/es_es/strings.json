@@ -1,0 +1,946 @@
+{
+	"Mode Switcher is":
+		"Mode Switcher está",
+	"Activating...":
+		"Activando...",
+	"Deactivating...":
+		"Desactivando...",
+	"Not Activated":
+		"No Activado",
+	"Default settings":
+		"Ajustes por defecto",
+	"Normal settings":
+		"Ajustes normales",
+	"Modified settings":
+		"Ajustes modificados",
+
+	"Initial setup of Mode Switcher!":
+		"Arranque inicial de Mode Switcher",
+	"<i>Mode Switcher</i> needs to retrieve your current system settings for <i>Default Mode</i>. This operation should only take few seconds to finish. You can modify the <i>Default Mode</i> afterwards by clicking the <i>Edit Default Mode</i> button.": 
+		"<i>Mode Switcher</i> necesita recopilar sus ajustes del sistema actuales para el <i>Modo Defecto</i>. Esta operación sólo debería tardar unos segundos en acabar. Puede modificar el <i>Modo Defecto</i> luego pulsando el botón <i>Editar Modo Defecto</i>.",
+	"Report Problem": 
+		"Informe de Problemas",
+	"Import Mode": 
+		"Modo Importar",
+	"Donate": 
+		"Donaciones",
+	"Help": 
+		"Ayuda",
+	"Seconds": 
+		"Segundos",
+	"On":
+		"Sí",
+	"Off":
+		"No",
+	"Start Timer": 
+		"Tiempo de Inicio",
+	"Close Timer": 
+		"Tiempo de Cierre",
+	"Add Custom Mode": 
+		"Añadir Modo Personal",
+	"Edit Default Mode": 
+		"Editar Modo Defecto",
+	"Continue": 
+		"Continuar",
+	"Retrieving current system settings": 
+		"Recuperando ajustes del sistema actuales",
+	"Retrieving": 
+		"Recuperando",	
+	"settings": 
+		"ajustes",
+	"Retrieving system settings finished": 
+		"Recuperación ajustes del sistema acabada",
+	"normal": 
+		"normal",
+	"modifier": 
+		"modificador",
+
+	"Get System Settings": 
+		"Cargar Ajustes del Sistema",
+	"Add to Launcher": 
+		"Añadir al Lanzador",
+	"Export Mode": 
+		"Modo Exportar",
+	"Default Mode Settings": 
+		"Ajustes Modo Defecto",
+	"Mode Configuration": 
+		"Configuración del Modo",
+	"Settings": 
+		"Ajustes",
+	"Apps": 
+		"Aplic",
+	"Triggers": 
+		"Activ",
+	"Default Mode": 
+		"Modo Defecto",
+	"Unique Mode Name": 
+		"Nombre Modo Único",
+	"Default": 
+		"Defecto",
+	"Normal": 
+		"Normal",
+	"Modifier": 
+		"Modificador",
+	"Mode Type": 
+		"Tipo Modo",
+	"Only Manually": 
+		"Sólo Manual",
+	"By Selection": 
+		"Por Selección",
+	"After Timer": 
+		"Después Tiempo",
+	"Immediate": 
+		"Inmediatamente",
+	"Auto Start": 
+		"Auto Inicio",
+	"Auto Close": 
+		"Auto Cierre",
+	"Active Mode": 
+		"Modo Activo",
+	"Default Mode": 
+		"Modo Defecto",
+	"On Startup": 
+		"Al Arrancar",
+	"Everytime": 
+		"Siempre",
+	"Applications": 
+		"Aplicaciones",
+	"Disabled": 
+		"Desactivado",
+	"Use Banner": 
+		"Usar Aviso",
+	"Do Not Set": 
+		"No Asignar",
+	"Notify": 
+		"Notificaciones",
+	"Lock Screen": 
+		"Bloquear",
+	"Always On": 
+		"Encender",
+	"Turn Off": 
+		"Apagar",
+	"On Charger": 
+		"En Cargador",
+	"Do Nothing": 
+		"No hacer Nada",
+	"Close All Apps": 
+		"Cerrar Todas Apls",
+	"On Start": 
+		"Al Inicio",
+	"On Close": 
+		"Al Cierre",
+	"Close Started": 
+		"Cerrar Iniciadas",
+	"Required": 
+		"Requeridos",
+	"Block Mode": 
+		"Bloqueo Modos",
+	"All Unique": 
+		"Todos Únicos",
+	"One Trigger": 
+		"Un Activador",
+	"Any Grouped": 
+		"Algún Agrupado",
+	"No Blocking": 
+		"Sin Bloquear",
+	"Other Modes": 
+		"Otros Modos",
+	"Normal Modes": 
+		"Modos Normales",
+	"Modifier Modes": 
+		"Modos Modificadores",
+	"Activation Triggers": 
+		"Activadores",
+	"Retrieving process still in progress": 
+		"Recuperando todavía en progreso",
+	"All": 
+		"Todo",
+	"Add Setting": 
+		"Añadir Ajuste",
+	"Add App": 
+		"+ Apl",
+	"Add MS": 
+		"+ MS",
+	"Add Srv": 
+		"+ Srv",
+	"Group": 
+		"Grupo",
+	"Add Trigger": 
+		"+ Activador",
+	"New Mode":
+		"Nuevo Modo",
+	"Reserved Mode Name": 
+		"Nombre Modo Reservado",			
+
+	"Switch Mode":
+		"Cambiar Modo",
+	"Close Mode":
+		"Cerrar Modo",
+	"Cancel":
+		"Cancelar",
+		
+	"Match words...":
+		"Encontrar palabras...",
+	"Yes":
+		"Sí",
+	"No":
+		"No",
+	"Title":
+		"Título",
+	"Last Modified":
+		"Última Modificación",
+	"Order By":
+		"Ordenar Por",
+	"Google Docs email...":
+		"Correo Google Docs...",
+	"Google Docs password...":
+		"Contraseña Google Docs...",
+	"List Modes":
+		"Listar Modos",
+	"by <Your nick>":
+		"por <Tu apodo>",
+	"Descriptive mode name...":
+		"Nombre modo descriptivo...",
+	"Short mode description...":
+		"Descripción corta del modo...",
+	"Enter street address...":
+		"Introducir dirección...",
+	"Zoom":
+		"Ampliar",
+	"Alert":
+		"Alerta",
+	"Vibrate":
+		"Vibrar",
+	"System Sound":
+		"Sonido Sistema",
+	"Ringtone":
+		"Tono",
+	"Mute":
+		"Silenciar",
+	"Email Alert Configuration":
+		"Configuración Alerta Correo",
+	"Select":
+		"eleccionar",
+	"Email Ringtone Configuration":
+		"Configuración Tono Correo",
+	"Get Email":
+		"Recibir Correo",
+	"As Items Arrive":
+		"Cuando lleguen",
+	"Minutes":
+		"Minutos",
+	"Hour":
+		"Hora",
+	"Hours":
+		"Horas",
+	"Manual":
+		"Manual",
+	"Email Sync Configuration":
+		"Configuración Sincr. Correo",
+	"Status":
+		"Estado",
+	"Available":
+		"Disponible",
+	"Busy":
+		"Ocupado",
+	"Sign Off":
+		"Acabar sesión",
+	"IM Status Configuration":
+		"Configuración Estado IM",
+	"Done Configuring":
+		"Configuración hecha",
+	"Unable to retrieve per account configuration. Maybe you don't have messaging plugins installed?":
+		"No se puede recuperar la configuración de la cuenta. ¿No tiene instalados los plugins de mensajería?",
+	"Done":
+		"Listo",
+	"OK":
+		"Aceptar",
+	"Unable to list documents!":
+		"¡No se pueden listar los documentos!",
+	"Received invalid JSON response from Google Docs.":
+		"Respuesta JSON invalida recibida desde Google Docs.",
+	"Failed to receive documents list from Google Docs.":
+		"Fallo en la recepción de la lista de documentos desde Google Docs.",
+	"Unable to login!": 
+		"¡No se puede iniciar la sesión!",
+	"Login to Google Docs failed, please check your username and password.": 
+		"No se pudo iniciar la sesión en Google Docs, compruebe su nombre de usuario y contraseña.",
+	"Invalid JSON data received!": 
+		"¡Recibidos datos JSON no válidos!",
+	"The received document data was not in proper JSON format.": 
+		"Los datos del documento recibidos no están en formato JSON correcto.",
+	"Unable to download!": 
+		"¡No se puede descargar!",
+	"Downloading from Google Docs failed, please try again later.": 
+		"La descarga desde Google Docs falló, inténtelo de nuevo más tarde.",	
+	"Unable to share!": 
+		"¡No se puede compartir!",
+	"Sharing of Google Docs document failed, please try again later.": 
+		"No se pudo compartir el documento de Google Docs, inténtelo de nuevo más tarde.",
+	"Unable to upload!": 
+		"¡No se puede subir!",
+	"Uploading to Google Docs failed, please try again later.": 
+		"No se pudo subir el documento de Google Docs, inténtelo de nuevo más tarde.",
+
+	"Unknown mode": 
+		"modo desconocido",
+	"Starting mode": 
+		"Iniciando modo",
+	"Done starting": 
+		"Modo iniciado",
+	"Closing mode": 
+		"Cerrando modo",
+	"Done closing": 
+		"Modo cerrado",
+	"Updating mode": 
+		"Actualizando modo",
+	"Done updating": 
+		"Modo actualizado",
+	"Switching mode to": 
+		"Cambiando modo a",
+	"Done switching to": 
+		"Modo cambiado a",
+		
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+	"Enter URL to load...":
+		"URL para cargar...",
+	"No Delay":
+		"Sin Retraso",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+	
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+	"No Delay":
+		"Sin Retraso",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+
+	"Do Nothing":
+		"No hacer Nada",
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+	"No Profiles":
+		"Sin Perfiles",
+	"On Start":
+		"Al inicio",
+	"On Close":
+		"Al cierre",
+	
+	"Previous Mode":
+		"Modo Previo",
+	"Before Mode Start":
+		"Antes Inicio Modo",
+	"Before Mode Close":
+		"Antes Cierre Modo",
+	"Before Mode Switch":
+		"Antes Cambio Modo",
+	"After Mode Start":
+		"Después Inicio Modo",
+	"After Mode Close":
+		"Después Cierre Modo",
+	"After Mode Switch":
+		"Después Cambio Modo",
+	"Process":
+		"Proceso",
+	"Start Mode":
+		"Iniciar Modo",
+	"Close Mode":
+		"Cerrar Modo",
+	"Trigger Mode":
+		"Activar Modo",
+	"Require Mode":
+		"Pedir Modo",
+	"Disable Triggers":
+		"Desactivar Acivadores",
+	"Action":
+		"Acción",
+	"Mode":
+		"Modo",
+	"All Normal Modes":
+		"Todos los Modos Normales",
+	"All Modifier Modes":
+		"Todos los Modos Modificadores",
+	"Current Mode":
+		"Modo Actual",
+	
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+	"Enter phone number...":
+		"Número de teléfono...",
+	
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+
+	"On Mode Start":
+		"Al Iniciar Modo",
+	"On Mode Close":
+		"Al Cerrar Modo",
+	"Launch":
+		"Lanzar",
+	"Do Nothing":
+		"No hacer Nada",
+	"Get Weather":
+		"Cargar Clima",
+	"Action":
+		"Acción",
+	"No Delay":
+		"Sin Retraso",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+
+	"Airplane":
+		"Vuelo",
+	"Airplane Settings":
+		"Ajustes Vuelo",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivado",
+	"Flight Mode":
+		"Modo Vuelo",
+	
+	"Calendar":
+		"Calendario",
+	"Calendar Settings":
+		"Ajustes Calendario",
+	"Vibrate":
+		"Vibrar",
+	"System Sound":
+		"Sonido Sistema",
+	"Ringtone":
+		"Tono",
+	"Mute":
+		"Silenciar",
+	"Reminder":
+		"Recordatorio",
+	"Select":
+		"Seleccionar",
+	"Done":
+		"Listo",
+	
+	"Connections":
+		"Conexiones",
+	"Connection Settings":
+		"Ajustes Conexión",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivaado",
+	"Phone":
+		"Teléfono",
+	"Data":
+		"Datos",
+	"Wi-Fi":
+		"Wi-Fi",
+	"Bluetooth":
+		"Bluetooth",
+	"GPS":
+		"GPS",
+	
+	"Email":
+		"Correo",
+	"Email Settings":
+		"Ajustes Correo",
+	"Set Per Account":
+		"Asignar Por Cuenta",
+	"Per Account":
+		"Por Cuenta",
+	"Vibrate":
+		"Vibrar",
+	"System Sound":
+		"Sonido Sistema",
+	"Ringtone":
+		"Tono",
+	"Mute":
+		"Silenciar",
+	"Alert":
+		"ALerta",
+	"Select":
+		"Seleccionar",
+	"As Items Arrive":
+		"Cuando lleguen",
+	"Minutes":
+		"Minutos",
+	"Hour":
+		"Hora",
+	"Hours":
+		"Horas",
+	"Manual":
+		"Manual",
+	"Get Email":
+		"Recibir Correo",
+	"Done":
+		"Listo",
+	
+	"Messaging":
+		"Mensajería",
+	"Messaging Settings":
+		"Ajustes de mensajería",
+	"Vibrate":
+		"Vibrar",
+	"System Sound":
+		"Sonido del sistema",
+	"Ringtone":
+		"Timbre",
+	"Mute":
+		"Silenciar",
+	"Msg Alert":
+		"Alerta de mensaje",
+	"Select":
+		"Seleccionar",
+	"Set Per Account":
+		"Ajuste por cuenta",
+	"Per Account":
+		"Por cuenta",
+	"Available":
+		"Disponible",
+	"Busy":
+		"Ocupado",
+	"Sign Off":
+		"Desconectado",
+	"IM Status":
+		"Estado de mensajería",
+	"Done":
+		"Listo",
+
+	"Network":
+		"Ajustes",
+	"Network Settings":
+		"Ajustes de red",
+	"Automatic":
+		"Automático",
+	"2G Only":
+		"Sólo 2G",
+	"3G Only":
+		"Sólo 3G",
+	"Network Type":
+		"Tipo de red",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivado",
+	"Data Roaming":
+		"Itinerancia de datos",
+	"Automatic":
+		"Automático",
+	"Home Only":
+		"Sólo doméstico",
+	"Roam Only":
+		"Sólo itinerancia",
+	"Voice Roaming":
+		"Itinerancia de voz",
+	
+	"Ringer":
+		"Timbre",
+	"Ringer Settings":
+		"Ajustes de timbre",
+	"Sound & Vibrate":
+		"Sonido y vibración",
+	"Sound Only":
+		"Sólo sonido",
+	"Ringer On":
+		"Timbre encendido",
+	"Vibrate":
+		"VIbrar",
+	"Mute":
+		"Sileciar",
+	"Ringer Off":
+		"Timbre apagado",
+	"Select":
+		"Seleccionar",
+	"Ringtone":
+		"Timbre",
+	"Done":
+		"Listo",
+	
+	"Screen":
+		"Pantalla",
+	"Screen Settings":
+		"Ajustes de pantalla",
+	"Minimum":
+		"Mínimo",
+	"Maximum":
+		"Máximo",
+	"Brightness":
+		"Brillo",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivado",
+	"Blink Notify":
+		"Notificación de parpadeo",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivado",
+	"Locked Notify":
+		"Notifcación de bloqueo",
+	"Seconds":
+		"Segundos",
+	"Minute":
+		"Minuto",
+	"Minutes":
+		"Minutos",
+	"Turn off After":
+		"Apagar después de",
+	"Select":
+		"Seleccionar",
+	"Wallpaper":
+		"Fondo",
+	"Select Wallpaper":
+		"Seleccionar fondo",
+	
+	"Security":
+		"Seguridad",
+	"Security Settings":
+		"Ajustes de seguridad",
+	"Unsecure":
+		"Inseguro",
+	"Simple PIN":
+		"PIN simple",
+	"Password":
+		"Contraseña",
+	"Unlock Mode":
+		"Modo de desbloqueo",
+	"Enter PIN...":
+		"Teclear PIN...",
+	"Enter PIN Again...":
+		"Teclear PIN otra vez...",
+	"Enter Password...":
+		"Teclear Contraseña...",
+	"Enter Password Again...":
+		"Teclear Contraseña otra vez...",
+	
+	"Sounds":
+		"Sonidos",
+	"Sound Settings":
+		"Ajustes de sonido",
+	"Minimum":
+		"Mínimo",
+	"Maximum":
+		"Máximo",
+	"Ringer":
+		"Timbre",
+	"System":
+		"Sistema",
+	"Media":
+		"Medios",
+	
+	"Template":
+		"Plantilla",
+	"Template Settings":
+		"Ajustes de plantilla",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desativado",
+	"Template Option":
+		"Opción de plantilla",
+	
+	"Application":
+		"Aplicación",
+	"Application Trigger":
+		"Activador aplicación",
+	"On Foreground":
+		"En primer plano",
+	"On Background":
+		"En segundo plano",
+	"State":
+		"Estado",
+	"Application":
+		"",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+		
+	"Battery Level":
+		"Nivel de batería",
+	"Battery Level Trigger":
+		"Activador nivel de batería",
+	"High Limit":
+		"Límite superior",
+	"Low Limit":
+		"Límite inferior",
+
+	"BT Connection":
+		"Conexión BT",
+	"BT Connection Trigger":
+		"Activador conexión BT",
+	"Connected":
+		"Conectado",
+	"Disconnected":
+		"Desconectado",
+	"Connected to":
+		"Conectado a",
+	"Disconnected from":
+		"Desconectado de",
+	"State":
+		"Estado",
+	"Any Profile":
+		"Cualquier perfil",
+	"Stereo Music":
+		"Música estéreo",
+	"AV Remote Control":
+		"Control Remoto AV",
+	"Hands-Free":
+		"Manos Libres",
+	"Headset":
+		"Auriculares",
+	"Personal Area Network":
+		"Red Área Personal",
+	"Phone Book Access":
+		"Acceso libreta de teléfonos",
+	"Profile":
+		"Perfil",
+	"Bluetooth Device Name":
+		"Nombre dispositivo Bluetooth",
+	
+	"Calendar Event":
+		"Evento de calendario",
+	"Calendar Event Trigger":
+		"Activador evento de calendario",
+	"Any Calendar":
+		"Cualquier calendario",
+	"Calendar":
+		"Calendario",
+	"Match":
+		"Coincide",
+	"No Match":
+		"No coincide",
+	"Active On":
+		"Activo en",
+	"Text to Match in Events":
+		"Texto a coincidir en eventos",
+	
+	"Charger Event":
+		"Evento de cargador",
+	"Charger Event Trigger":
+		"Activador de evento de cargador",
+	"No Charger":
+		"Sin cargador",
+	"Touchstone":
+		"Touchstone",
+	"Wall Charger":
+		"Cargador de pared",
+	"USB Charger":
+		"Cargador USB",
+	"Charger":
+		"Cargador",
+	"Any":
+		"Cualquiera",
+	"Left":
+		"Izquierda",
+	"Right":
+		"Derecha",
+	"Up":
+		"Arriba",
+	"Down":
+		"Abajo",
+	"Orientation":
+		"Orientación",
+	"No Delay":
+		"Sin retraso",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+	
+	"Display State":
+		"Estado de pantalla",
+	"Display State Trigger":
+		"Activador estado de pantalla",
+	"Display On":
+		"Pantalla encendida",
+	"Display Off":
+		"Pantalla apagada",
+	"Screen Locked":
+		"Pantalla bloqueada",
+	"State":
+		"Estado",
+	"Any":
+		"Cualquiera",
+	"Face Up":
+		"Boca arriba",
+	"Face Down":
+		"Boca abajo",
+	"Orientation":
+		"Orientación",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso",
+	
+	"Headset State":
+		"Estado de auriculares",
+	"Headset State Trigger":
+		"Activador de estado de auriculares",
+	"Connected":
+		"Conectado",
+	"Not Connected":
+		"No conectado",
+	"State":
+		"Estado",
+	"Any Scenario":
+		"Cualquier escenario",
+	"Headset":
+		"Auriculares",
+	"Headset / Mic":
+		"Auriculares / Micro",
+	"Scenario":
+		"Escenario",
+	
+	"Time Interval":
+		"Intervalo",
+	"Minutes":
+		"Minutos",
+	"Hour":
+		"Hora",
+	"Hours":
+		"Horas",
+	"Time Interval Trigger":
+		"Activador intervalo",
+	"Repeating":
+		"Repetición",
+	"No Repeating":
+		"Sin repetición",
+	"Mode":
+		"Modo",
+	"Active":
+		"Activo",
+	"Every":
+		"Cada",
+	
+	"GPS Location":
+		"Ubicación GPS",
+	"GPS Location Trigger":
+		"Activador ubicación GPS",
+	"When In Location":
+		"Ubicado en",
+	"When Not In Location":
+		"No ubicado en",
+	"Active":
+		"Activo",
+	"Select Location":
+		"Seleccionar ubicación",
+	"Current Location":
+		"Ubicación actual",
+	"Location":
+		"Ubicación",
+	"Meters":
+		"Metros",
+	"Radius":
+		"Radio",
+	"No Location Set":
+		"No hay ubicación",
+	"Failed to Locate":
+		"Falló la ubicación",
+	"Querying Location":
+		"Obteniendo ubicación",
+	
+	"Silent Switch":
+		"Silenciador",
+	"Silent Switch Trigger":
+		"Activador de silenciador",
+	"Switch On":
+		"Encender",
+	"Switch Off":
+		"Apagar",
+	"State":
+		"Estado",
+	
+	"Template":
+		"Plantilla",
+	"Template Trigger":
+		"Activador de plantilla",
+	"Enabled":
+		"Activado",
+	"Disabled":
+		"Desactivado",
+	"Template Option":
+		"Opción de plantilla",
+	
+	"Time of Day":
+		"Hora del día",
+	"Time of Day Trigger":
+		"Activador de hora del día",
+	"Every Day":
+		"Cada día",
+	"Weekdays":
+		"Entre semana",
+	"Weekends":
+		"Fines de semana",
+	"Custom":
+		"Personal",
+	"Days":
+		"Días",
+	"Start":
+		"Iniciar",
+	"Close":
+		"Cerrar",
+	"Mon":
+		"Lun",
+	"Tue":
+		"Mar",
+	"Wed":
+		"Mié",
+	"Thu":
+		"Jue",
+	"Fri":
+		"Vie",
+	"Sat":
+		"Sáb",
+	"Sun":
+		"Dom",
+	
+	"Red Wi-Fi":
+		"Red Wi-Fi",
+	"Red Wi-Fi Trigger":
+		"Activador de Red Wi-Fi",
+	"Connected":
+		"Conectado",
+	"Disconnected":
+		"Desconectado",
+	"Connected to":
+		"Conectado a",
+	"Disconnected from":
+		"Desconectado de",
+	"State":
+		"Estado",
+	"Red Wi-Fi Name (SSID)":
+		"Nombre de red Wi-Fi",
+	"No Delay":
+		"Sin Retraso",
+	"Seconds":
+		"Segundos",
+	"Delay":
+		"Retraso"
+}

@@ -41,7 +41,7 @@ ConnectionSetting.prototype.apply = function(currentSettings, requestedSettings,
 //	if((requestedSettings.connectionWiFi != undefined) && (currentSettings.connectionWiFi != requestedSettings.connectionWiFi))
 		systemSettings.connectionWiFi = requestedSettings.connectionWiFi;
 		
-	if((requestedSettings.connectionBT != undefined) && (currentSettings.connectionBT != requestedSettings.connectionBT))
+//	if((requestedSettings.connectionBT != undefined) && (currentSettings.connectionBT != requestedSettings.connectionBT))
 		systemSettings.connectionBT = requestedSettings.connectionBT;
 
 	if((requestedSettings.connectionGPS != undefined) && (currentSettings.connectionGPS != requestedSettings.connectionGPS))

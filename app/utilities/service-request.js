@@ -36,7 +36,7 @@ ServiceRequest.prototype.completeHandler = function(url, options, retry, request
 		if(retry < this.retries) {
 			Mojo.Log.error("Retrying service request (count: " + retry + ")");
 			
-			this.executeRequest(url, options, ++retry);
+			setTimeout(this.executeRequest.bind(this, url, options, retry + 1), 500 * (retry + 1));
 		}
 		else {
 			Mojo.Log.error("Dropping service request (count: " + retry + ")");

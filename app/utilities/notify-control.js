@@ -17,6 +17,8 @@ NotifyControl.prototype.cleanup = function() {
 //
 
 NotifyControl.prototype.mode = function(mode) {	
+	Mojo.Log.error("Mode notification set: " + mode + " " + this.notifyMode);
+
 	if((mode == "") || (this.notifyMode == ""))
 		this.notifyMode = mode;
 }
@@ -26,8 +28,13 @@ NotifyControl.prototype.mode = function(mode) {
 NotifyControl.prototype.notify = function(phase, oldMode, newMode) {	
 	var appCtl = Mojo.Controller.getAppController();
 
+	Mojo.Log.error("Mode notification with mode: " + this.notifyMode);
+
 	if(this.notifyMode == "unknown") {
-		appCtl.showBanner($L("Unknown mode") + ": " + modeName, {action: 'none'});
+		if(oldMode == newMode)
+			appCtl.showBanner($L("Unknown modifier mode launched"), {action: 'none'});
+		else
+			appCtl.showBanner($L("Unknown mode") + ": " + newMode, {action: 'none'});
 	}
 	else if(this.notifyMode == "startup") {
 		if(phase == "init")

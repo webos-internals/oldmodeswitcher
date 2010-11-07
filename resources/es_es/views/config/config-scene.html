@@ -1,0 +1,51 @@
+<div id="main">
+	<div class="palm-page-header">
+		<div class="header-icon modeswitcher"></div>
+		<div class="header-text">
+			<span x-mojo-loc=''>Mode Switcher</span>
+		</div>
+	</div>
+
+	<div class="palm-list">
+		<div class='palm-row single'>
+			<div class='palm-row-wrapper'>
+				<div id="ActivatedButton" x-mojo-element="ToggleButton"></div>
+				<div class="title left">Activado</div>     
+			</div>
+		</div>
+	</div>
+	
+	<div class="palm-group">
+		<div class="palm-group-title">Ventana del Lanzador</div>
+	
+		<div class="palm-list">
+			<div class='palm-row first'>
+				<div class='palm-row-wrapper'>
+					<div  id="StartSelector" x-mojo-element="ListSelector"></div>
+				</div>
+			</div>
+			<div class='palm-row last'>
+				<div class='palm-row-wrapper'>
+					<div  id="CloseSelector" x-mojo-element="ListSelector"></div>
+		 		</div>
+		 	</div>
+		</div>
+	</div>
+
+	<div style="min-height:3px;"> </div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Modos Configurados</div>
+		
+		<div class="palm-list">
+			<div  id="ModesList" x-mojo-element="List"></div>
+		</div>
+	</div>
+
+	<div id="AddModeButton" x-mojo-element="Button"></div>
+
+	<div style="min-height:3px;"> </div>
+	
+	<div id="DefModeButton" x-mojo-element="Button"></div>
+</div>
+

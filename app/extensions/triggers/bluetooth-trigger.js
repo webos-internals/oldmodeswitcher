@@ -86,7 +86,7 @@ BluetoothTrigger.prototype.check = function(triggerConfig, modeName) {
 //
 
 BluetoothTrigger.prototype.execute = function(triggerData, manualLaunch) {
-	Mojo.Log.error("Btprofile trigger received: " + Object.toJSON(triggerData));
+	Mojo.Log.error("Bluetooth trigger received: " + Object.toJSON(triggerData));
 
 	var oldConnected = Object.toJSON(this.btConnected);
 

@@ -147,10 +147,13 @@ DisplayTrigger.prototype.handleDisplayStatus = function(response) {
 			}		
 		}
 	}
+
+	if(response.event == "displayOn")
+		timeout = 1000;
 	
 	if(this.triggerTimeout)
 		clearTimeout(this.triggerTimeout);
-		
+	
 	var func = this.execute.bind(this, {'state': this.currentState, 'locked': this.currentLocked}, false);
 		
 	this.triggerTimeout = setTimeout(func, timeout);

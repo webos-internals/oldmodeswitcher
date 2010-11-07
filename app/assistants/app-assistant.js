@@ -357,9 +357,9 @@ AppAssistant.prototype.handleLaunching = function(startModes, closeModes) {
 	
 	if((startModes.length == 1) && (startModes[0].autoStartMode == 3))
 		this.processLaunching(startModes[0].name, modifiers);
-	else if((closeModes.length == 1) && (closeModes[0].autoCloseMode == 3))
+	else if((startModes.length == 0) && (closeModes.length == 1) && (closeModes[0].autoCloseMode == 3))
 		this.processLaunching(this.config.defaultMode.name, modifiers);
-	else if((startModes.length > 0) || (closeModes.length == 1))
+	else if((startModes.length > 0) || ((closeModes.length == 1) && (closeModes[0].autoCloseMode != 3)))
 		this.executeLaunching(startModes, closeModes[0], modifiers);
 	else if(Object.toJSON(modifiers) != Object.toJSON(this.config.modifierModes))
 		this.processLaunching(this.config.currentMode.name, modifiers);
@@ -401,7 +401,7 @@ AppAssistant.prototype.executeLaunching = function(startModes, closeMode, modifi
 
 AppAssistant.prototype.processLaunching = function(originalMode, modifierModes) {
 	Mojo.Log.error("Processing launcher event from trigger: " + 
-		originalMode.name + " " + modifierModes.length);
+		originalMode + " " + modifierModes.length);
 
 	var oldActiveModes = [this.config.defaultMode];
 
@@ -900,7 +900,7 @@ AppAssistant.prototype.executeCloseMode = function(modeName) {
 }
 
 AppAssistant.prototype.executeToggleMode = function(modeName) {
-	Mojo.Log.info("Executing toggling of: " + modeName);
+	Mojo.Log.error("Executing toggling of: " + modeName);
 
 	if(modeName == "Current Mode") {
 		modeName = this.config.currentMode.name;
@@ -938,7 +938,7 @@ AppAssistant.prototype.triggerManualMode = function(modeName) {
 	
 	if((modeName == "All Modes") || 
 		(modeName == "All Normal Modes") || 
-		(modeNAme == "All Modifier Modes"))
+		(modeName == "All Modifier Modes"))
 	{
 		var startModes = new Array();
 		var closeModes = new Array();
