@@ -148,7 +148,7 @@ DisplayTrigger.prototype.handleDisplayStatus = function(response) {
 		}
 	}
 
-	if(response.event == "displayOn")
+	if((this.currentState == "displayOn") && (response.locked == false))
 		timeout = 1000;
 	
 	if(this.triggerTimeout)

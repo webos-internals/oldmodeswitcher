@@ -89,9 +89,9 @@ LocationTrigger.prototype.execute = function(triggerData, manualLaunch) {
 					if((this.config.modesConfig[i].triggersList[j].locationLatitude != "(failed)") &&
 						(this.config.modesConfig[i].triggersList[j].locationLongitude != "(failed)"))
 					{
-						if(this.config.modesConfig[i].triggersList[j].locationRadius > 0)
+/*						if(this.config.modesConfig[i].triggersList[j].locationRadius > 0)
 							gpsAccuracy = 1;
-						if(this.config.modesConfig[i].triggersList[j].locationRadius > 500)
+						if(this.config.modesConfig[i].triggersList[j].locationRadius > 500)*/
 							gpsAccuracy = 2;
 					}
 				}

@@ -71,6 +71,8 @@ CaleventTrigger.prototype.disable = function() {
 CaleventTrigger.prototype.check = function(triggerConfig, modeName) {
 	var date = new Date();	
 
+	date.setMilliseconds(0);
+
 	if(triggerConfig.caleventMatch.length > 0)
 		var regexp = new RegExp("/*" + triggerConfig.caleventMatch + "*", "i");
 
@@ -78,17 +80,23 @@ CaleventTrigger.prototype.check = function(triggerConfig, modeName) {
 		if((triggerConfig.caleventCalendar == 0) || 
 			("id" + triggerConfig.caleventCalendar == this.calEvents[i].calendarId))
 		{
-			if((this.calEvents[i].start <= date.getTime()) && 
-				(this.calEvents[i].end > date.getTime()))
+			var sdate = new Date(this.calEvents[i].start);
+			var edate = new Date(this.calEvents[i].end);
+
+			sdate.setMilliseconds(0);
+			edate.setMilliseconds(0);
+
+			if((sdate.getTime() <= date.getTime()) && 
+				(edate.getTime() > date.getTime()))
 			{
 				if(((triggerConfig.caleventMode == 0) && ((triggerConfig.caleventMatch.length == 0) || 
 					((this.calEvents[i].subject) && (this.calEvents[i].subject.match(regexp) != null)) || 
 					((this.calEvents[i].location) && (this.calEvents[i].location.match(regexp) != null)) || 
 					((this.calEvents[i].note) && (this.calEvents[i].note.match(regexp) != null)))) ||
 					((triggerConfig.caleventMode == 1) && ((triggerConfig.caleventMatch.length == 0) || 
-					(((this.calEvents[i].subject) && (this.calEvents[i].subject.match(regexp) == null)) && 
-					((this.calEvents[i].location) && (this.calEvents[i].location.match(regexp) == null)) && 
-					((this.calEvents[i].note) && (this.calEvents[i].note.match(regexp) == null))))))
+					(((!this.calEvents[i].subject) || (this.calEvents[i].subject.match(regexp) == null)) && 
+					((!this.calEvents[i].location) || (this.calEvents[i].location.match(regexp) == null)) && 
+					((!this.calEvents[i].note) || (this.calEvents[i].note.match(regexp) == null))))))
 				{
 					return true;
 				}
@@ -142,16 +150,14 @@ CaleventTrigger.prototype.execute = function(triggerData, manualLaunch) {
 						if((this.config.modesConfig[i].triggersList[j].caleventCalendar == 0) ||
 							("id" + this.config.modesConfig[i].triggersList[j].caleventCalendar == this.calEvents[k].calendarId))
 						{
-							if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && 
-								((text.length == 0) || 
+							if(((this.config.modesConfig[i].triggersList[j].caleventMode == 0) && ((text.length == 0) || 
 								((this.calEvents[k].subject) && (this.calEvents[k].subject.match(regexp) != null)) || 
 								((this.calEvents[k].location) && (this.calEvents[k].location.match(regexp) != null)) ||
 								((this.calEvents[k].note) && (this.calEvents[k].note.match(regexp) != null)))) ||
-								((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
-								((text.length == 0) || 
-								(((this.calEvents[k].subject) && (this.calEvents[k].subject.match(regexp) == null)) && 
-								((this.calEvents[k].location) && (this.calEvents[k].location.match(regexp) == null)) &&
-								((this.calEvents[k].note) && (this.calEvents[k].note.match(regexp) == null))))))
+								((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && ((text.length == 0) || 
+								(((!this.calEvents[k].subject) || (this.calEvents[k].subject.match(regexp) == null)) && 
+								((!this.calEvents[k].location) || (this.calEvents[k].location.match(regexp) == null)) &&
+								((!this.calEvents[k].note) || (this.calEvents[k].note.match(regexp) == null))))))
 							{
 								var sdate = new Date(this.calEvents[k].start);
 								var edate = new Date(this.calEvents[k].end);
@@ -226,11 +232,13 @@ CaleventTrigger.prototype.handleCalendarEvents = function(serviceResponse) {
 								((this.calEvents[k].note) && (this.calEvents[k].note.match(regexp) != null)))) ||
 								((this.config.modesConfig[i].triggersList[j].caleventMode == 1) && 
 								((text.length == 0) || 
-								(((this.calEvents[k].subject) && (this.calEvents[k].subject.match(regexp) == null)) && 
-								((this.calEvents[k].location) && (this.calEvents[k].location.match(regexp) == null)) &&
-								((this.calEvents[k].note) && (this.calEvents[k].note.match(regexp) == null))))))
+								(((!this.calEvents[k].subject) || (this.calEvents[k].subject.match(regexp) == null)) && 
+								((!this.calEvents[k].location) || (this.calEvents[k].location.match(regexp) == null)) &&
+								((!this.calEvents[k].note) || (this.calEvents[k].note.match(regexp) == null))))))
 							{
 								var date = new Date();
+
+								date.setMilliseconds(0);
 
 								var sdate = new Date(this.calEvents[k].start);
 								var edate = new Date(this.calEvents[k].end);
