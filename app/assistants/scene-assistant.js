@@ -475,7 +475,7 @@ SceneAssistant.prototype.listGoogleDocuments = function(event) {
 		onSuccess: function(response) { 
 			var auth = response.responseText.split("\n")[2].split("=")[1];
 
-			new Ajax.Request("http://docs.google.com/feeds/documents/private/full" + private + "?alt=json&title=" + match + "&" + order, {
+			new Ajax.Request("https://docs.google.com/feeds/documents/private/full" + private + "?alt=json&title=" + match + "&" + order, {
 				method: "get",
 				contentType: "application/atom+xml",
 				evalJSON: true,
@@ -636,7 +636,7 @@ SceneAssistant.prototype.exportModeData = function(event) {
 		onSuccess: function(response) { 
 			var auth = response.responseText.split("\n")[2].split("=")[1];
 
-			new Ajax.Request("http://docs.google.com/feeds/documents/private/full?alt=json", {
+			new Ajax.Request("https://docs.google.com/feeds/documents/private/full?alt=json", {
 				method: "post",
 				contentType: "text/plain",
 				postBody: modeData,
